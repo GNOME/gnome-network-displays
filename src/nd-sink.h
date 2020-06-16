@@ -33,6 +33,7 @@ typedef struct _NdSinkIface NdSinkIface;
 
 typedef enum {
   ND_SINK_STATE_DISCONNECTED       =      0x0,
+  ND_SINK_STATE_ENSURE_FIREWALL    =     0x50,
   ND_SINK_STATE_WAIT_P2P           =    0x100,
   ND_SINK_STATE_WAIT_SOCKET        =    0x110,
   ND_SINK_STATE_WAIT_STREAMING     =    0x120,

@@ -46,6 +46,7 @@ enum {
   PROP_STATE,
   PROP_MISSING_VIDEO_CODEC,
   PROP_MISSING_AUDIO_CODEC,
+  PROP_MISSING_FIREWALL_ZONE,
 
   PROP_LAST = PROP_DISPLAY_NAME,
 };
@@ -101,6 +102,10 @@ nd_dummy_wfd_sink_get_property (GObject    *object,
       g_value_set_boxed (value, sink->missing_audio_codec);
       break;
 
+    case PROP_MISSING_FIREWALL_ZONE:
+      g_value_set_static_string (value, NULL);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -134,6 +139,7 @@ nd_dummy_wfd_sink_class_init (NdDummyWFDSinkClass *klass)
   g_object_class_override_property (object_class, PROP_STATE, "state");
   g_object_class_override_property (object_class, PROP_MISSING_VIDEO_CODEC, "missing-video-codec");
   g_object_class_override_property (object_class, PROP_MISSING_AUDIO_CODEC, "missing-audio-codec");
+  g_object_class_override_property (object_class, PROP_MISSING_FIREWALL_ZONE, "missing-firewall-zone");
 }
 
 static void

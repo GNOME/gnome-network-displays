@@ -37,6 +37,7 @@ struct _NdWFDP2PSink
 
   GStrv               missing_video_codec;
   GStrv               missing_audio_codec;
+  char               *missing_firewall_zone;
 
   WfdServer          *server;
   guint               server_source_id;
@@ -53,6 +54,7 @@ enum {
   PROP_STATE,
   PROP_MISSING_VIDEO_CODEC,
   PROP_MISSING_AUDIO_CODEC,
+  PROP_MISSING_FIREWALL_ZONE,
 
   PROP_LAST = PROP_DISPLAY_NAME,
 };
@@ -152,6 +154,10 @@ nd_wfd_p2p_sink_get_property (GObject    *object,
       g_value_set_boxed (value, sink->missing_audio_codec);
       break;
 
+    case PROP_MISSING_FIREWALL_ZONE:
+      g_value_set_string (value, sink->missing_firewall_zone);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -217,6 +223,7 @@ nd_wfd_p2p_sink_finalize (GObject *object)
 
   g_clear_pointer (&sink->missing_video_codec, g_strfreev);
   g_clear_pointer (&sink->missing_audio_codec, g_strfreev);
+  g_clear_pointer (&sink->missing_firewall_zone, g_free);
 
   G_OBJECT_CLASS (nd_wfd_p2p_sink_parent_class)->finalize (object);
 }
@@ -256,6 +263,7 @@ nd_wfd_p2p_sink_class_init (NdWFDP2PSinkClass *klass)
   g_object_class_override_property (object_class, PROP_STATE, "state");
   g_object_class_override_property (object_class, PROP_MISSING_VIDEO_CODEC, "missing-video-codec");
   g_object_class_override_property (object_class, PROP_MISSING_AUDIO_CODEC, "missing-audio-codec");
+  g_object_class_override_property (object_class, PROP_MISSING_FIREWALL_ZONE, "missing-firewall-zone");
 }
 
 static void

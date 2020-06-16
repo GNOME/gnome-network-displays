@@ -84,6 +84,13 @@ nd_sink_default_init (NdSinkIface *iface)
                                                            "One of the audio codec elements in the list is required.",
                                                            G_TYPE_STRV,
                                                            G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
+                                       g_param_spec_string ("missing-firewall-zone",
+                                                            "Missing Firewall Zone",
+                                                            "Operation requires a specific firewall zone.",
+                                                            NULL,
+                                                            G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 /**

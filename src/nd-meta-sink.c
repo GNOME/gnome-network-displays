@@ -37,6 +37,7 @@ enum {
   PROP_STATE,
   PROP_MISSING_VIDEO_CODEC,
   PROP_MISSING_AUDIO_CODEC,
+  PROP_MISSING_FIREWALL_ZONE,
 
   PROP_LAST = PROP_DISPLAY_NAME,
 };
@@ -109,6 +110,7 @@ nd_meta_sink_update (NdMetaSink *meta_sink)
   g_object_notify (G_OBJECT (meta_sink), "state");
   g_object_notify (G_OBJECT (meta_sink), "missing-video-codec");
   g_object_notify (G_OBJECT (meta_sink), "missing-audio-codec");
+  g_object_notify (G_OBJECT (meta_sink), "missing-firewall-zone");
 }
 
 static void
@@ -180,6 +182,13 @@ nd_meta_sink_get_property (GObject    *object,
         g_value_set_boxed (value, NULL);
       break;
 
+    case PROP_MISSING_FIREWALL_ZONE:
+      if (meta_sink->current_sink)
+        g_object_get_property (G_OBJECT (meta_sink->current_sink), pspec->name, value);
+      else
+        g_value_set_static_string (value, NULL);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -249,6 +258,7 @@ nd_meta_sink_class_init (NdMetaSinkClass *klass)
   g_object_class_override_property (object_class, PROP_STATE, "state");
   g_object_class_override_property (object_class, PROP_MISSING_VIDEO_CODEC, "missing-video-codec");
   g_object_class_override_property (object_class, PROP_MISSING_AUDIO_CODEC, "missing-audio-codec");
+  g_object_class_override_property (object_class, PROP_MISSING_FIREWALL_ZONE, "missing-firewall-zone");
 }
 
 static void

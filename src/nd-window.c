@@ -67,6 +67,7 @@ struct _NdWindow
   GtkListBox *error_sink_list;
   GtkBox     *error_video_install;
   GtkBox     *error_audio_install;
+  GtkBox     *error_firewall_zone;
   GtkButton  *error_return;
 };
 
@@ -152,6 +153,13 @@ sink_notify_state_cb (NdWindow *self, GParamSpec *pspec, NdSink *sink)
 
   switch (state)
     {
+    case ND_SINK_STATE_ENSURE_FIREWALL:
+      gtk_label_set_text (self->connect_state_label,
+                          _("Checking and installing required firewall zones."));
+
+      gtk_stack_set_visible_child_name (self->step_stack, "connect");
+      break;
+
     case ND_SINK_STATE_WAIT_P2P:
       gtk_label_set_text (self->connect_state_label,
                           _("Making P2P connection"));
@@ -207,6 +215,17 @@ sink_notify_state_cb (NdWindow *self, GParamSpec *pspec, NdSink *sink)
       g_clear_object (&self->stream_sink);
       break;
     }
+}
+
+gboolean
+transform_str_is_set_to_bool (GBinding *binding,
+                              const GValue *from_value,
+                              GValue *to_value,
+                              gpointer user_data)
+{
+  g_value_set_boolean (to_value, g_value_get_string(from_value) != NULL);
+
+  return TRUE;
 }
 
 static void
@@ -279,6 +298,17 @@ find_sink_list_row_activated_cb (NdWindow *self, NdSinkRow *row, NdSinkList *sin
                                                          "codecs",
                                                          G_BINDING_SYNC_CREATE)));
 
+  g_ptr_array_add (self->sink_property_bindings,
+                   g_object_ref (g_object_bind_property_full (self->stream_sink,
+                                                              "missing-firewall-zone",
+                                                              self->error_firewall_zone,
+                                                              "reveal-child",
+                                                              G_BINDING_SYNC_CREATE,
+                                                              transform_str_is_set_to_bool,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL)));
+
   g_object_set (self->meta_provider, "discover", FALSE, NULL);
   gtk_container_add (GTK_CONTAINER (self->connect_sink_list),
                      GTK_WIDGET (nd_sink_row_new (self->stream_sink)));
@@ -331,6 +361,7 @@ gnome_nd_window_class_init (NdWindowClass *klass)
   gtk_widget_class_bind_template_child (widget_class, NdWindow, error_sink_list);
   gtk_widget_class_bind_template_child (widget_class, NdWindow, error_video_install);
   gtk_widget_class_bind_template_child (widget_class, NdWindow, error_audio_install);
+  gtk_widget_class_bind_template_child (widget_class, NdWindow, error_firewall_zone);
   gtk_widget_class_bind_template_child (widget_class, NdWindow, error_return);
 }
 
