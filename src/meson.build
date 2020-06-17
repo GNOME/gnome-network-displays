@@ -5,6 +5,7 @@ gnome_nd_sources = [
   'main.c',
   'nd-window.c',
   'nd-codec-install.c',
+  'nd-firewalld.c',
   'nd-sink-list.c',
   'nd-sink-row.c',
   'nd-sink.c',
