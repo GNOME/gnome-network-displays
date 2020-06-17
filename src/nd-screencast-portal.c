@@ -531,6 +531,8 @@ nd_screencast_portal_get_source (NdScreencastPortal *self)
   path = g_strdup_printf ("%u", self->stream_node_id);
 
   src = gst_element_factory_make ("pipewiresrc", "portal-pipewire-source");
+  if (src == NULL)
+    g_error ("GStreamer element \"pipewiresrc\" could not be created!");
 
   g_object_set (src,
                 "fd", fds[0],
