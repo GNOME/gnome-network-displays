@@ -21,6 +21,9 @@ add_project_arguments([
   '-I' + meson.build_root(),
 ], language: 'c')
 
+enable_firewalld_zone = get_option('firewalld_zone')
+
+
 subdir('data')
 subdir('src')
 subdir('po')

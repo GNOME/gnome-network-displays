@@ -1,0 +1,1 @@
+option('firewalld_zone', type: 'boolean', value: true, description: 'Install firewalld zones')

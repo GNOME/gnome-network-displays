@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone target="ACCEPT">
+  <short>GNOME Network Displays WiFi-Display</short>
+  <description>A zone intended to be used by GNOME Network Displays when establishing P2P connections to Wi-Fi Display (Miracast) sinks.</description>
+  <service name="dhcp"/>
+  <service name="dns"/>
+  <port port="7236" protocol="tcp"/>
+  <protocol value="icmp"/>
+  <protocol value="ipv6-icmp"/>
+  <rule priority="32767">
+    <reject/>
+  </rule>
+</zone>
+

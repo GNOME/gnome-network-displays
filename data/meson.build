@@ -41,3 +41,10 @@ if compile_schemas.found()
     args: ['--strict', '--dry-run', meson.current_source_dir()]
   )
 endif
+
+if enable_firewalld_zone
+  install_data(
+    'P2P-WiFi-Display.xml',
+    install_dir: join_paths(get_option('prefix'), 'lib', 'firewalld', 'zones')
+  )
+endif
