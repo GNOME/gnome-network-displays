@@ -366,9 +366,10 @@ nd_screencast_portal_async_initable_iface_init (GAsyncInitableIface *iface)
   iface->init_finish = nd_screencast_portal_async_initable_init_finish;
 }
 
-typedef struct {
+typedef struct
+{
   GCancellable *cancellable;
-  gulong cancel_handler_id;
+  gulong        cancel_handler_id;
 } AsyncInitData;
 
 static void

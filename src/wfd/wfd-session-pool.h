@@ -7,7 +7,7 @@
 
 G_BEGIN_DECLS
 
-#define WFD_TYPE_SESSION_POOL (wfd_session_pool_get_type())
+#define WFD_TYPE_SESSION_POOL (wfd_session_pool_get_type ())
 
 G_DECLARE_FINAL_TYPE (WfdSessionPool, wfd_session_pool, WFD, SESSION_POOL, GstRTSPSessionPool)
 

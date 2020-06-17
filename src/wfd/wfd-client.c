@@ -191,6 +191,7 @@ wfd_client_configure_client_media (GstRTSPClient * client,
                                    GstRTSPContext * ctx)
 {
   WfdClient *self = WFD_CLIENT (client);
+
   g_autoptr(GstElement) element = NULL;
   gboolean res;
 
