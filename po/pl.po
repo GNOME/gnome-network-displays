@@ -1,0 +1,163 @@
+# Polish translation for gnome-network-displays.
+# Copyright © 2020 the gnome-network-displays authors.
+# This file is distributed under the same license as the gnome-network-displays package.
+# Piotr Drąg <piotrdrag@gmail.com>, 2020.
+# Aviary.pl <community-poland@mozilla.org>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-06-18 06:10+0000\n"
+"PO-Revision-Date: 2020-06-21 11:05+0200\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
+"Language-Team: Polish <community-poland@mozilla.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "Ekrany sieciowe GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr ""
+"Wyświetlanie pulpitu na urządzeniach obsługujących protokół Wi-Fi Display"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"Program Ekrany sieciowe GNOME umożliwia wyświetlanie pulpitu na zdalnym "
+"ekranie. Obecnie zaimplementowana jest obsługa wyświetlania na urządzeniach "
+"zgodnych z protokołem Wi-Fi Display (znanym także jako Miracast)."
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "Enkoder wideo OpenH264 biblioteki GStreamer (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "Enkoder wideo x264 biblioteki GStreamer (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "Enkoder wideo H.264 za pomocą VA-API biblioteki GStreamer (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "Enkoder dźwięku AAC FDK biblioteki GStreamer (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "Enkoder dźwięku AAC libav biblioteki GStreamer (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "Wolny enkoder dźwięku AAC biblioteki GStreamer (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "Element biblioteki GStreamer „%s”"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+"Proszę zainstalować jedną z tych wtyczek biblioteki GStreamer klikając "
+"poniżej"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "Sprawdzanie i instalowanie wymaganych stref zapory sieciowej."
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "Tworzenie połączenia P2P"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "Nawiązywanie połączenia z odpływem"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "Rozpoczynanie wysyłania"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "Nie odnaleziono żadnych adapterów Wi‑Fi z obsługą P2P"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Nie odnaleziono żadnych używalnych adapterów bezprzewodowych. Proszę się "
+"upewnić, że Wi‑Fi jest włączone oraz działania P2P przez Wi‑Fi są możliwe "
+"w usługach NetworkManager i wpa_supplicant."
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "Dostępne odpływy wideo"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "Łączenie"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "Wysyłanie"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Wymagana jest jedna z poniższych wtyczek kodeków wideo.\n"
+"Kliknięcie rozpocznie proces instalacji."
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Do obsługi dźwięku wymagana jest jedna z poniższych wtyczek kodeków "
+"dźwięku.\n"
+"Kliknięcie rozpocznie proces instalacji."
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "Błąd"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "Wróć"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"Wymagana strefa zapory sieciowej jest niedostępna i nie może zostać "
+"zainstalowana. Proszę spróbować ponownie i wpisać hasło, kiedy użytkownik "
+"zostanie o to poproszony lub skontaktować się z administratorem komputera."
