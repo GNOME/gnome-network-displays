@@ -43,7 +43,7 @@ get_portal_path (GDBusConnection * connection,
   int i;
   char *path;
 
-  *token = g_strdup_printf ("gtk%d", g_random_int_range (0, G_MAXINT));
+  *token = g_strdup_printf ("gnd%d", g_random_int_range (0, G_MAXINT));
   sender = g_strdup (g_dbus_connection_get_unique_name (connection) + 1);
   for (i = 0; sender[i]; i++)
     if (sender[i] == '.')
