@@ -1,5 +1,6 @@
 #include "nd-screencast-portal.h"
 #include <gio/gunixfdlist.h>
+#include <gst/base/base.h>
 
 #define SCREEN_CAST_IFACE "org.freedesktop.portal.ScreenCast"
 
@@ -535,6 +536,7 @@ nd_screencast_portal_get_source (NdScreencastPortal *self)
   if (src == NULL)
     g_error ("GStreamer element \"pipewiresrc\" could not be created!");
 
+  gst_base_src_set_live (GST_BASE_SRC (src), TRUE);
   g_object_set (src,
                 "fd", fds[0],
                 "path", path,
