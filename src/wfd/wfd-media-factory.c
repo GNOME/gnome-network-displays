@@ -315,6 +315,12 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
                 "max-size-time", 500 * GST_MSECOND,
                 NULL);
 
+  /* TODO: With gstreamer 1.17 we should be able to set things up so
+   *       that audio frames are still send even if there are no new
+   *       video frames. At that point, some semantics should be
+   *       changed like doing proper variable framerate and such.
+   *       This is possible as mpegtsmux was being ported to GstAggregator.
+   */
   mpegmux = gst_element_factory_make ("mpegtsmux", "wfd-mpegtsmux");
   success &= gst_bin_add (bin, mpegmux);
   g_object_set (mpegmux,
