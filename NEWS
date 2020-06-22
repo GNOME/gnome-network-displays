@@ -1,3 +1,19 @@
+GNOME Network Displays 0.90.4
+=============================
+
+Please note that there is a pipewire issue currently that breaks the
+GNOME shell integration currently. This problem has been fixed already in
+pipewire as of commit 95192b21f152ba6fa769049a2298aba1221f794d (mem: reset
+the map in clear).
+
+ * Add firewalld integration (#134)
+
+UI translations:
+ * Lctrs (fr)
+ * Piotr Drąg (pl)
+ * Rafael Fontenelle (pt_BR)
+ * Yuri Chornoivan (uk)
+
 GNOME Network Displays 0.90.3
 =============================
 
