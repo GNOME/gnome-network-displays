@@ -87,7 +87,8 @@ encoding_perf_handoff_cb (GstElement *elem, GstBuffer *buf, gpointer user_data)
            * Just use late / 50ms for the long term proportion. */
           proportion = late / (gdouble) (50 * GST_MSECOND);
 
-          /* g_debug ("Sending QOS event with proportion %.2f", proportion); */
+          g_debug ("Sending QOS event with proportion %.2f (late: %" GST_TIME_FORMAT ")", proportion, GST_TIME_ARGS(late));
+          g_debug ("Segment: %p", qos_data->segment);
           qos_event = gst_event_new_qos (GST_QOS_TYPE_UNDERFLOW,
                                          proportion,
                                          late - 50 * GST_MSECOND,
@@ -141,6 +142,7 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   QOSData *qos_data;
   g_autoptr(GstElement) source = NULL;
   g_autoptr(GstElement) audio_source = NULL;
+  GstElement *videorate;
   GstElement *scale;
   GstElement *sizefilter;
   GstElement *convert;
@@ -162,6 +164,13 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   g_signal_emit (self, signals[SIGNAL_CREATE_SOURCE], 0, &source);
   g_assert (source);
   success &= gst_bin_add (bin, source);
+
+  /* Yes, we use a compositor to create a constant framerate stream. */
+  videorate = gst_element_factory_make ("compositor", "wfd-videorate");
+  g_object_set (videorate,
+                "start-time-selection", 1,
+                NULL);
+  success &= gst_bin_add (bin, videorate);
 
   scale = gst_element_factory_make ("videoscale", "wfd-scale");
   g_object_set (scale,
@@ -347,6 +356,7 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
                 NULL);
 
   success &= gst_element_link_many (source,
+                                    videorate,
                                     scale,
                                     sizefilter,
                                     convert,
@@ -376,6 +386,8 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
       GstElement *audioresample;
       GstElement *audioconvert;
       GstElement *queue_mpegmux_audio;
+
+      //gst_audio_base_src_set_provide_clock (audio_source, FALSE);
 
       audio_pipeline = GST_BIN (gst_bin_new ("wfd-audio"));
       success &= gst_bin_add (bin, GST_ELEMENT (g_object_ref (audio_pipeline)));

@@ -27,6 +27,7 @@
 #include "nd-dummy-provider.h"
 
 #include <gst/gst.h>
+#include <gst/base/base.h>
 
 #include "nd-screencast-portal.h"
 #include "nd-pulseaudio.h"
@@ -76,10 +77,8 @@ G_DEFINE_TYPE (NdWindow, gnome_nd_window, GTK_TYPE_APPLICATION_WINDOW)
 static GstElement *
 sink_create_source_cb (NdWindow * self, NdSink * sink)
 {
-  GstBin *bin;
-  GstElement *src, *dst, *res;
+  GstElement *src;
 
-  bin = GST_BIN (gst_bin_new ("screencast source bin"));
   g_debug ("use x11: %d", self->use_x11);
   if (self->use_x11)
     src = gst_element_factory_make ("ximagesrc", "X11 screencast source");
@@ -89,36 +88,7 @@ sink_create_source_cb (NdWindow * self, NdSink * sink)
   if (!src)
     g_error ("Error creating video source element, likely a missing dependency!");
 
-  gst_bin_add (bin, src);
-
-  dst = gst_element_factory_make ("intervideosink", "inter video sink");
-  if (!dst)
-    g_error ("Error creating intervideosink, missing dependency!");
-  g_object_set (dst,
-                "channel", "nd-inter-video",
-                "max-lateness", (gint64) - 1,
-                "sync", FALSE,
-                NULL);
-  gst_bin_add (bin, dst);
-
-  gst_element_link_many (src, dst, NULL);
-
-  res = gst_element_factory_make ("intervideosrc", "screencastsrc");
-  g_object_set (res,
-                "do-timestamp", FALSE,
-                "timeout", (guint64) G_MAXUINT64,
-                "channel", "nd-inter-video",
-                NULL);
-
-  gst_bin_add (bin, res);
-
-  gst_element_add_pad (GST_ELEMENT (bin),
-                       gst_ghost_pad_new ("src",
-                                          gst_element_get_static_pad (res,
-                                                                      "src")));
-
-  g_object_ref_sink (bin);
-  return GST_ELEMENT (bin);
+  return g_object_ref_sink (src);
 }
 
 static GstElement *
