@@ -5,11 +5,11 @@
 	<project_license>GPL-3.0-or-later</project_license>
 	<name>GNOME Network Displays</name>
 	<summary>Stream the desktop to Wi-Fi Display capable devices</summary>
-	<url type="homepage">https://github.com/benzea/gnome-screencast</url>
+	<url type="homepage">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
 	<translation type="gettext">gnome-network-displays</translation>
 	<screenshots>
 		<screenshot>
-			<image>https://raw.githubusercontent.com/benzea/gnome-screencast/master/data/appdata/device-list.png</image>
+			<image>https://gitlab.gnome.org/GNOME/gnome-network-displays/-/raw/master/data/appdata/device-list.png</image>
 		</screenshot>
 	</screenshots>
 	<description>
