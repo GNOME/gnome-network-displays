@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-17 11:15+0200\n"
+"POT-Creation-Date: 2020-06-23 10:26+0200\n"
 "PO-Revision-Date: 2020-06-06 21:39-0300\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
@@ -25,11 +25,6 @@ msgstr ""
 msgid "GNOME Network Displays"
 msgstr "GNOME Tela via Rede"
 
-#. Translators: Do NOT translate or transliterate this text (this is an icon file name)!
-#: data/org.gnome.NetworkDisplays.desktop.in:6
-msgid "org.gnome.NetworkDisplays"
-msgstr "org.gnome.NetworkDisplays"
-
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7
 msgid "Stream the desktop to Wi-Fi Display capable devices"
 msgstr ""
@@ -45,11 +40,66 @@ msgstr ""
 "Atualmente está implementado o suporte à projeção em dispositivos "
 "compatíveis com o Wi-Fi Display (também conhecido como Miracast)."
 
-#: src/nd-window.ui:74
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr ""
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr ""
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr ""
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr ""
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr ""
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr ""
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr ""
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr ""
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "Fazendo a conexão P2P"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "Estabelecendo conexão com o coletor"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "Iniciando a transmissão"
+
+#: src/nd-window.ui:75
 msgid "No Wi‑Fi P2P adapters found"
 msgstr "Nenhum adaptador Wi-Fi P2P encontrado"
 
-#: src/nd-window.ui:89
+#: src/nd-window.ui:90
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -59,23 +109,23 @@ msgstr ""
 "está ativado e as operações de Wi-Fi P2P estão disponíveis no NetworkManager "
 "e no wpa_supplicant."
 
-#: src/nd-window.ui:174
+#: src/nd-window.ui:176
 msgid "Available Video Sinks"
 msgstr "Coletores de vídeo disponíveis"
 
-#: src/nd-window.ui:334
+#: src/nd-window.ui:337
 msgid "Connecting"
 msgstr "Conectando"
 
-#: src/nd-window.ui:396 src/nd-window.ui:577
+#: src/nd-window.ui:396 src/nd-window.ui:579
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/nd-window.ui:499
+#: src/nd-window.ui:501
 msgid "Streaming"
 msgstr "Transmitindo"
 
-#: src/nd-window.ui:556 src/nd-window.ui:782
+#: src/nd-window.ui:558 src/nd-window.ui:786
 msgid ""
 "One of the following video codec plugins is required.\n"
 "Clicking will start the installation process."
@@ -83,7 +133,7 @@ msgstr ""
 "Um dos seguintes plugins de codec de vídeo é necessário.\n"
 "Clicar vai iniciar o processo de instalação."
 
-#: src/nd-window.ui:601 src/nd-window.ui:798
+#: src/nd-window.ui:603 src/nd-window.ui:802
 msgid ""
 "One of the following audio codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
@@ -92,22 +142,20 @@ msgstr ""
 "áudio.\n"
 "Clicar vai iniciar o processo de instalação."
 
-#: src/nd-window.ui:696
+#: src/nd-window.ui:700
 msgid "Error"
 msgstr "Erro"
 
-#: src/nd-window.ui:758
+#: src/nd-window.ui:762
 msgid "Return"
 msgstr "Retornar"
 
-#: src/nd-window.c:149
-msgid "Making P2P connection"
-msgstr "Fazendo a conexão P2P"
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
 
-#: src/nd-window.c:156
-msgid "Establishing connection to sink"
-msgstr "Estabelecendo conexão com o coletor"
-
-#: src/nd-window.c:163
-msgid "Starting to stream"
-msgstr "Iniciando a transmissão"
+#~ msgid "org.gnome.NetworkDisplays"
+#~ msgstr "org.gnome.NetworkDisplays"
