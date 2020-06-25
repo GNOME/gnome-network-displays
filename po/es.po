@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-06-23 10:26+0200\n"
-"PO-Revision-Date: 2020-06-22 20:15-0600\n"
+"PO-Revision-Date: 2020-06-23 11:51-0600\n"
 "Last-Translator: \n"
 "Language-Team: Saul Henríquez<henriquez.saul@gmail.com>\n"
 "Language: es\n"
@@ -25,7 +25,7 @@ msgstr "GNOME Network Displays"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7
 msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Transmitir el escritorio a dispositivos con capacidad Wifi Display"
+msgstr "Transmitir el escritorio a dispositivos con capacidad Wi-Fi Display"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:16
 msgid ""
@@ -40,45 +40,47 @@ msgstr ""
 #: src/nd-codec-install.c:54
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
-msgstr ""
+msgstr "Codificador de video GStreamer OpenH264 (%s)"
 
 #: src/nd-codec-install.c:56
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
-msgstr ""
+msgstr "Codificador de video GStreamer x264 (%s)"
 
 #: src/nd-codec-install.c:58
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
-msgstr ""
+msgstr "Codificador de video GStreamer VA-API H264 (%s)"
 
 #: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
-msgstr ""
+msgstr "Codificador de audio GStreamer FDK AAC (%s)"
 
 #: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
-msgstr ""
+msgstr "Codificador de audio GStreamer libav AAC (%s)"
 
 #: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
-msgstr ""
+msgstr "Codificador de audio GStreamer Free AAC (%s)"
 
 #: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer Element “%s”"
-msgstr ""
+msgstr "Elemento GStreamer “%s”"
 
 #: src/nd-codec-install.c:170
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
+"Por favor instale uno de los siguientes plugins GStreamer haciendo click a "
+"continuación"
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr ""
+msgstr "Revisando e instalando las zonas de cortafuegos requeridas."
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
@@ -153,6 +155,9 @@ msgid ""
 "try again and enter the password when prompted or contact a system "
 "administrator."
 msgstr ""
+"Una zona del cortafuegos requerida no está disponible y no pudo ser "
+"instalada. Por favor intente nuevamente e ingrese la contraseña cuando sea "
+"solicitada o contacte al administrador del sistema."
 
 #~ msgid "org.gnome.NetworkDisplays"
 #~ msgstr "org.gnome.NetworkDisplays"
