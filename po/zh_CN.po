@@ -1,0 +1,156 @@
+# Chinese (China) translation for gnome-network-displays.
+# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 王滋涵 Zephyr Wang <wi24rd@fedoraproject.org>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-06-21 09:09+0000\n"
+"PO-Revision-Date: 2020-06-30 01:51+0800\n"
+"Last-Translator: 王滋涵 Zephyr Wang <wi24rd@fedoraproject.org>\n"
+"Language-Team: Chinese - China <i18n-zh@googlegroups.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"X-Generator: Gtranslator 3.36.0\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "GNOME 网络显示器"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr "将桌面串流至支持 Wi-Fi 显示的设备"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"GNOME 网络显示器允许您将桌面投射到远程显示器上。目前实现的是支持投射到 Wi-Fi "
+"显示的设备（又称 Miracast）。"
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "GStreamer OpenH264 视频编码器 (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "GStreamer x264 视频编码器 (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "GStreamer VA-API 视频编码器 (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "GStreamer FDK AAC 音频编码器 (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "GStreamer libav 音频编码器 (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "GStreamer Free AAC 音频编码器 (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "GStreamer 元素 “%s”"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr "请单击下列的按钮安装其中一个 GStreamer 插件"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "检查并安装所需的防火墙区域中。"
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "建立P2P连接中"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "建立到接收器的连接"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "开始串流"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "找不到 Wi-Fi P2P 适配器"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"找不到可用的无线适配器。 请确认已启用 Wi‑Fi，并且在 NetworkManager 和 "
+"wpa_supplicant 中 Wi‑Fi P2P 操作均可用。"
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "可用的视频接收器"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "连接中"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "取消"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "串流中"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"需要以下其中一个视频编解码器插件。\n"
+"单击将开始安装过程。"
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"音频支持需要以下其中一个音频编解码器插件。\n"
+"单击将开始安装过程。"
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "错误"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "返回"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"所需的防火墙区域不可用且无法安装。 请重试，在出现提示时输入密码或与系统管理员"
+"联系。"
