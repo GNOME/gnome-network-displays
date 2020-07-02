@@ -1,31 +1,33 @@
 # Spanish translation for gnome-network-displays.
-# Copyright © 2020 the gnome-network-displays authors.
+# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
-# Saul Henríquez<henriquez.saul@gmail.com>, 2020.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2020.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-network-displays\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-23 10:26+0200\n"
-"PO-Revision-Date: 2020-06-23 11:51-0600\n"
-"Last-Translator: \n"
-"Language-Team: Saul Henríquez<henriquez.saul@gmail.com>\n"
-"Language: es\n"
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-06-21 09:09+0000\n"
+"PO-Revision-Date: 2020-07-02 12:50+0200\n"
+"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
+"Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.3.1\n"
+"X-Generator: Gtranslator 3.36.0\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:6
 msgid "GNOME Network Displays"
-msgstr "GNOME Network Displays"
+msgstr "Pantallas en red de GNOME"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7
 msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Transmitir el escritorio a dispositivos con capacidad Wi-Fi Display"
+msgstr ""
+"Enviar el escritorio a dispositivos inalámbricos con pantalla dispoibles"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:16
 msgid ""
@@ -33,70 +35,70 @@ msgid ""
 "Currently implemented is support for casting to Wi-Fi Display capable "
 "devices (a.k.a. Miracast)."
 msgstr ""
-"GNOME Network Displays te permite transmitir tu escritorio en una pantalla "
-"remota. Actualmente implementado el soporte a dispositivos con capacidad "
-"Wifi Display (a.k.a. Miracast)."
+"Pantallas en red de GNOME le permite mostrar su escritorio en una pantalla "
+"remota. Actualmente se soporta el envío a dispositivos inalámbricos "
+"(Miracast)."
 
 #: src/nd-codec-install.c:54
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
-msgstr "Codificador de video GStreamer OpenH264 (%s)"
+msgstr "Codificador de vídeo OpenH264 de GStreamer (%s)"
 
 #: src/nd-codec-install.c:56
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
-msgstr "Codificador de video GStreamer x264 (%s)"
+msgstr "Codificador de vídeo x264 de GStreamer (%s)"
 
 #: src/nd-codec-install.c:58
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
-msgstr "Codificador de video GStreamer VA-API H264 (%s)"
+msgstr "Codificador de vídeo VA-API H264 de GStreamer (%s)"
 
 #: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
-msgstr "Codificador de audio GStreamer FDK AAC (%s)"
+msgstr "Codificador de vídeo FDK AAC de GStreamer (%s)"
 
 #: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
-msgstr "Codificador de audio GStreamer libav AAC (%s)"
+msgstr "Codificador de vídeo libav AAC de GStreamer (%s)"
 
 #: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
-msgstr "Codificador de audio GStreamer Free AAC (%s)"
+msgstr "Codificador de vídeo Free AAC de GStreamer (%s)"
 
 #: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer Element “%s”"
-msgstr "Elemento GStreamer “%s”"
+msgstr "Elemento «%s» de GStreamer"
 
 #: src/nd-codec-install.c:170
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
-"Por favor instale uno de los siguientes plugins GStreamer haciendo click a "
+"Instale uno de los siguientes complementos de GStreamer pulsando a "
 "continuación"
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr "Revisando e instalando las zonas de cortafuegos requeridas."
+msgstr "comprobar e instalar zonas de cortafuegos requeridos."
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
-msgstr "Creando conexión P2P"
+msgstr "Crear conexiones P2P"
 
 #: src/nd-window.c:172
 msgid "Establishing connection to sink"
-msgstr "Estableciendo conexión al sink"
+msgstr "Estableciendo conexión al sumidero"
 
 #: src/nd-window.c:179
 msgid "Starting to stream"
-msgstr "Iniciando la transmisión"
+msgstr "Empezar a emitir"
 
 #: src/nd-window.ui:75
 msgid "No Wi‑Fi P2P adapters found"
-msgstr "No se encontraron adapatadores Wi-Fi P2P"
+msgstr "No se han encontrado adaptadores P2P inalámbricos"
 
 #: src/nd-window.ui:90
 msgid ""
@@ -104,13 +106,13 @@ msgid ""
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
 "wpa_supplicant."
 msgstr ""
-"No se encontraron adaptadores de red inalámbrica usables. Por favor "
-"verifique que el Wi-Fi está habilitado y que las operaciones Wi-Fi P2P estén "
-"disponibles en NetworkManager y wpa_suplicant."
+"No se han encontrado adaptadores inalámbricos que poder usar. Compruebe que "
+"la red inalámbrica está activada y que las operaciones P\"P inalámbricas "
+"está disponibles tanto en NetworkManager como en wpa_supplicant."
 
 #: src/nd-window.ui:176
 msgid "Available Video Sinks"
-msgstr "Video Sinks Disponibles"
+msgstr "Sumideros de vídeo disponibles"
 
 #: src/nd-window.ui:337
 msgid "Connecting"
@@ -122,24 +124,23 @@ msgstr "Cancelar"
 
 #: src/nd-window.ui:501
 msgid "Streaming"
-msgstr "Transmitiendo"
+msgstr "Emitir"
 
 #: src/nd-window.ui:558 src/nd-window.ui:786
 msgid ""
 "One of the following video codec plugins is required.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Uno de los siguientes plugins de codec de video es requerido.\n"
-"Al hacer clic se iniciará el proceso de instalación."
+"Se necesita uno de siguientes complementos del codificador de vídeo.\n"
+"Al pulsar se iniciará el proceso de instalación."
 
 #: src/nd-window.ui:603 src/nd-window.ui:802
 msgid ""
 "One of the following audio codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Uno de los siguientes plugins de codec de audio es requerido para el soporte "
-"de audio.\n"
-"Al hacer clic se iniciará el proceso de instalación."
+"Se necesita uno de siguientes complementos del codificador de sonido.\n"
+"Al pulsar se iniciará el proceso de instalación."
 
 #: src/nd-window.ui:700
 msgid "Error"
@@ -147,7 +148,7 @@ msgstr "Error"
 
 #: src/nd-window.ui:762
 msgid "Return"
-msgstr "Regresar"
+msgstr "Volver"
 
 #: src/nd-window.ui:830
 msgid ""
@@ -155,9 +156,6 @@ msgid ""
 "try again and enter the password when prompted or contact a system "
 "administrator."
 msgstr ""
-"Una zona del cortafuegos requerida no está disponible y no pudo ser "
-"instalada. Por favor intente nuevamente e ingrese la contraseña cuando sea "
-"solicitada o contacte al administrador del sistema."
-
-#~ msgid "org.gnome.NetworkDisplays"
-#~ msgstr "org.gnome.NetworkDisplays"
+"Una zona necesaria del cortafuegos no está disponible y no se pudo instalar. "
+"inténtelo de nuevo e introduzca la contraseña cuando se le pida o contacte "
+"con el administrador del sistema."
