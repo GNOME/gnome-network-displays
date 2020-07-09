@@ -40,49 +40,49 @@ msgstr ""
 #: src/nd-codec-install.c:54
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
-msgstr ""
+msgstr "GStreamer OpenH264 video kodlayıcı (%s)"
 
 #: src/nd-codec-install.c:56
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
-msgstr ""
+msgstr "GStreamer x264 video kodlayıcı (%s)"
 
 #: src/nd-codec-install.c:58
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
-msgstr ""
+msgstr "GStreamer VA-API H264 video kodlayıcı (%s)"
 
 #: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
-msgstr ""
+msgstr "GStreamer FDK AAC ses kodlayıcı (%s)"
 
 #: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
-msgstr ""
+msgstr "GStreamer libav AAC ses kodlayıcı (%s)"
 
 #: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
-msgstr ""
+msgstr "GStreamer Ücretsiz AAC ses kodlayıcı (%s)"
 
 #: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer Element “%s”"
-msgstr ""
+msgstr "GStreamer Öğesi “%s”"
 
 #: src/nd-codec-install.c:170
 msgid "Please install one of the following GStreamer plugins by clicking below"
-msgstr ""
+msgstr "Lütfen aşağıya tıklayarak aşağıdaki GStreamer eklentilerinden birini yükleyin"
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr ""
+msgstr "Gerekli güvenlik duvarı bölgelerini kontrol ediyor ve yüklüyor"
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
-msgstr "P2P bağlantısı kurma"
+msgstr "P2P bağlantısı kuruyor"
 
 #: src/nd-window.c:172
 msgid "Establishing connection to sink"
@@ -151,7 +151,7 @@ msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
 "administrator."
-msgstr ""
+msgstr "Gerekli bir güvenlik duvarı bölgesi kullanılamıyor ve yüklenemedi. Lütfen tekrar deneyin ve istendiğinde şifreyi girin veya bir sistem yöneticisine başvurun."
 
 #~ msgid "org.gnome.NetworkDisplays"
 #~ msgstr "org.gnome.NetworkDisplays"
