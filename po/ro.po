@@ -1,0 +1,161 @@
+# Romanian translation for gnome-network-displays.
+# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# Florentina Mușat <florentina.musat.28@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-07-10 08:27+0000\n"
+"PO-Revision-Date: 2020-07-12 14:43+0300\n"
+"Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2);;\n"
+"Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
+"X-Generator: Poedit 2.3.1\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "Afișaje de rețea GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr "Streaming a desktopului la dispozitivele capabile de afișaj Wi-Fi"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"Afișajele de rețea GNOME vă permite să vă proiectați desktop-ul la un afișaj "
+"de la distanță. Implementat în mod curent este suport pentru proiectarea la "
+"dispozitive capabile de afișaj Wi-Fi (adică Miracast)."
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "Codor de video OpenH264 GStreamer (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "Codor de video x264 GStreamer (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "Codor video H264 VA-API GStreamer (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "Codor audio AAC FDK GStreamer (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "Codor audio AAC libav GStreamer (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "Codor audio AAC Free GStreamer (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "Element GStreamer „%s”"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+"Instalați unul din următoarele module GSteamer prin apăsarea clic mai jos"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "Se verifică și se instalează zonele de firewall necesare."
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "Se construiește conexiunea P2P"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "Se stabilește conexiunea la sink"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "Se începe streamingul"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "Nu s-au găsit adaptoare P2P Wi-Fi"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Nu s-au găsit adaptoare wireless utilizabile. Verificați că Wi-Fi-ul este "
+"activat și că operațiile P2P Wi-Fi sunt disponibile în amândouă "
+"NetworkManager și wpa_supplicant."
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "Sink-uri video disponibile"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "Se conectează"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "Anulează"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "Streaming"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Unul din următoarele module de codec video este necesar.\n"
+"Apăsând clic va începe procesul de instalare."
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Unul din următoarele module de codec audio este necesar pentru suportul "
+"audio.\n"
+"Apăsând clic va începe procesul de instalare."
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "Eroare"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "Întoarce"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"O zonă de firewall necesară nu este disponibilă și nu a putut fi instalată. "
+"Încercați din nou și introduceți parola când sunteți solicitat sau "
+"contactați administratorul de sistem."
