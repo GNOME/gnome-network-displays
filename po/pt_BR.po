@@ -7,9 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-23 10:26+0200\n"
-"PO-Revision-Date: 2020-06-06 21:39-0300\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-07-02 10:51+0000\n"
+"PO-Revision-Date: 2020-07-18 08:09-0300\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
@@ -43,45 +44,45 @@ msgstr ""
 #: src/nd-codec-install.c:54
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
-msgstr ""
+msgstr "Codificador de vídeo OpenH264 GStreamer (%s)"
 
 #: src/nd-codec-install.c:56
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
-msgstr ""
+msgstr "Codificador de vídeo x264 GStreamer (%s)"
 
 #: src/nd-codec-install.c:58
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
-msgstr ""
+msgstr "Codificador de vídeo VA-API H264 GStreamer (%s)"
 
 #: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
-msgstr ""
+msgstr "Codificador de áudio FDK AAC GStreamer (%s)"
 
 #: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
-msgstr ""
+msgstr "Codificador de áudio libav AAC GStreamer (%s)"
 
 #: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
-msgstr ""
+msgstr "Codificador de áudio Free AAC GStreamer (%s)"
 
 #: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer Element “%s”"
-msgstr ""
+msgstr "GStreamer Element “%s”"
 
 #: src/nd-codec-install.c:170
 msgid "Please install one of the following GStreamer plugins by clicking below"
-msgstr ""
+msgstr "Por favor, instale um dos seguintes plugins GStreamer clicando abaixo"
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr ""
+msgstr "Verificando e instalando zonas de firewall necessárias."
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
@@ -156,6 +157,9 @@ msgid ""
 "try again and enter the password when prompted or contact a system "
 "administrator."
 msgstr ""
+"Uma zona de firewall necessária não está disponível e não pôde ser "
+"instalada. Tente novamente e insira a senha quando solicitada ou contate um "
+"administrador do sistema."
 
 #~ msgid "org.gnome.NetworkDisplays"
 #~ msgstr "org.gnome.NetworkDisplays"
