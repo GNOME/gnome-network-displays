@@ -34,6 +34,8 @@ gnome_nd_deps = [
   dependency('libnm', version: '>= 1.15'),
   dependency('gstreamer-1.0', version: '>= 1.14'),
   dependency('gstreamer-pbutils-1.0', version: '>= 1.14'),
+  dependency('gstreamer-plugins-base-1.0'),
+  dependency('gstreamer-rtsp-server-1.0'),
   dependency('libpulse-mainloop-glib'),
 ]
 
