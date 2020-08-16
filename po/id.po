@@ -1,0 +1,161 @@
+# Indonesian translation for gnome-network-displays.
+# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# Andika Triwidada <atriwidada@gnome.org>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-07-29 21:08+0000\n"
+"PO-Revision-Date: 2020-08-16 14:31+0700\n"
+"Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural= n!=1;\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
+"X-Generator: Poedit 2.4.1\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "Tampilan Jaringan GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr "Streaming desktop ke perangkat berkemampuan Display Wi-Fi"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"Tampilan Jaringan GNOME memungkinkan Anda untuk menyorot desktop Anda ke "
+"layar jauh. Yang saat ini diimplementasikan adalah dukungan untuk penyorotan "
+"bagi peranti berkemampuan Tampilan Wi-Fi (alias Miracast)."
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "Enkoder video GStreamer OpenH264 (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "Enkoder video GStreamer x264 (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "Enkoder video GStreamer VA-API H264 (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "Enkoder audio GStreamer FDK AAC (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "Enkoder audio GStreamer libav AAC (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "Enkoder audio GStreamer gratis AAC (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "Elemen GStreamer \"%s\""
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+"Silakan instal salah satu plugin GStreamer berikut dengan mengklik di bawah "
+"ini"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "Memeriksa dan menginstal zona firewall yang diperlukan."
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "Membuat koneksi P2P"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "Menjalin hubungan dengan muara"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "Mulai streaming"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "Tidak menemukan adaptor AWi-Fi P2P"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Tidak ditemukan adapter nirkabel yang dapat digunakan. Harap verifikasi "
+"bahwa Wi-Fi diaktifkan dan operasi P2P Wi-Fi tersedia di NetworkManager dan "
+"wpa_supplicant."
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "Muara Video yang Tersedia"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "Menyambung"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "Batal"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "Streaming"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Salah satu plugin kodek video berikut diperlukan.\n"
+"Mengklik akan memulai proses instalasi."
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Salah satu plugin kodek audio berikut diperlukan untuk dukungan audio.\n"
+"Mengklik akan memulai proses instalasi."
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "Kesalahan"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "Kembali"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"Zona firewall yang diperlukan tidak tersedia dan tidak dapat diinstal. "
+"Silakan coba lagi dan masukkan sandi ketika diminta atau hubungi "
+"administrator sistem."
