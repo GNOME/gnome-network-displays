@@ -1,0 +1,157 @@
+# Japanese translation for gnome-network-displays.
+# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# Hiroshi Miura <miurahr@linux.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-23 10:26+0200\n"
+"PO-Revision-Date: 2020-08-28 12:59+0900\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: Hiroshi Miura <miurahr@osmf.jp>\n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.3\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "GNOME ネットワークディスプレイ\t"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr ""
+"デスクトップをWi-Fiディスプレイに対応しているデバイスへストリーム配信\tします"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"GNOMEネットワークディスプレイは、あなたのデスクトップをリモートのディスプレイ"
+"に配信することができます。現在、Wi-Fi ディスプレイ対応デバイス(別名 "
+"Miracast, ミラーリング)に対応しています。"
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "GStreamer OpenH264ビデオエンコーダー(%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "GStreamer x264 ビデオエンコーダー (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "GStreamer VA-API H264 ビデオエンコーダー (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "GStreamer FDK AAC オーディオエンコーダー (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "GStreamer libav AAC オーディオエンコーダー (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "GStreamer Free AAC オーディオエンコーダー (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "GStreamer Element “%s”"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+"次をクリックして以下に示したGStreamerプラグインのうち一つを導入してください。"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "チェックとインストールには、ファイアウオールゾーンが必要です。"
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "P2Pコネクションを張っています。"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "デバイスに接続しています。"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "配信を開始します。"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "Wi-Fi P2Pアダプターがみつかりません。"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"利用可能なワイヤレスアダプターがありません。Wi-Fiが有効化されていることや、"
+"Wi-Fi P2Pに対応していることを、NetworkManagerとwpa_supplicantの双方に対して確"
+"認してください。"
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "利用可能なビデオデバイス"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "接続中\t"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "配信中"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"次のビデオコーデックのうち一つが必要です。\n"
+"クリックして導入してください。"
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"次のオーディオコーデックのうち一つが必要です。\n"
+"クリックして導入してください。"
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "エラー"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "戻る"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"要求されるファイアウォールゾーンが存在せず、導入もできませんでした。再試行し"
+"てパスワード要求へ対応するか、システム管理者の助けを借りてください。"
