@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues\n"
 "POT-Creation-Date: 2020-08-30 21:38+0000\n"
-"PO-Revision-Date: 2020-09-13 17:41+0200\n"
+"PO-Revision-Date: 2020-09-13 17:44+0200\n"
 "Language-Team: Croatian <hr@li.org>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -36,7 +36,7 @@ msgid ""
 "devices (a.k.a. Miracast)."
 msgstr ""
 "GNOME mrežni zasloni omogućuju vam emitiranje vaše radne površine na "
-"udaljeni zaslon. Trenutno je implementirana podrška za emitiranje na bežične "
+"udaljeni zaslon. Trenutno je implementirana podrška emitiranja na bežične "
 "zaslone (poznata kao Miracast)"
 
 #: src/nd-codec-install.c:54
@@ -96,7 +96,7 @@ msgstr "Pokretanje emitiranja"
 
 #: src/nd-window.ui:75
 msgid "No Wi‑Fi P2P adapters found"
-msgstr "Nema pronađenih bežičnih adaptera"
+msgstr "Nema pronađenih P2P bežičnih adaptera"
 
 #: src/nd-window.ui:90
 msgid ""
@@ -105,8 +105,8 @@ msgid ""
 "wpa_supplicant."
 msgstr ""
 "Nema pronađenih upotrebljivih bežičnih adaptera. Provjerite je li bežična "
-"mreža omogućena i jesu li P2P radnje dostupne u Mrežnom upravitelju i "
-"wpa_supplicantu."
+"mreža omogućena i jesu li bežične P2P radnje dostupne u Mrežnom upravitelju "
+"i wpa_supplicantu."
 
 #: src/nd-window.ui:176
 msgid "Available Video Sinks"
