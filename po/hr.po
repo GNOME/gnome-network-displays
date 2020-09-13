@@ -1,0 +1,158 @@
+# Croatian translation for gnome-network-displays.
+# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-08-30 21:38+0000\n"
+"PO-Revision-Date: 2020-09-13 17:41+0200\n"
+"Language-Team: Croatian <hr@li.org>\n"
+"Language: hr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Last-Translator: gogo <trebelnik2@gmail.com>\n"
+"X-Generator: Poedit 2.3\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "GNOME mrežni zasloni"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr "Emitirajte prikaz radne površine na bežične zaslone"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"GNOME mrežni zasloni omogućuju vam emitiranje vaše radne površine na "
+"udaljeni zaslon. Trenutno je implementirana podrška za emitiranje na bežične "
+"zaslone (poznata kao Miracast)"
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "GStreamer OpenH264 enkôder slike (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "GStreamer x264 enkôder slike (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "GStreamer VA-API H264 enkôder slike (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "GStreamer FDK AAC enkôder zvuka (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "GStreamer libav AAC enkôder zvuka (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "GStreamer Free AAC enkôder zvuka (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "GStreamer element “%s”"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr "Instalirajte jedan od sljedećih GStreamer priključaka klikom ispod"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "Provjeravanje i instalacija potrebnih zona vatrozida."
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "Stvaranje P2P povezivanja"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "Uspostavljanje povezivanja sa slivnikom"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "Pokretanje emitiranja"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "Nema pronađenih bežičnih adaptera"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Nema pronađenih upotrebljivih bežičnih adaptera. Provjerite je li bežična "
+"mreža omogućena i jesu li P2P radnje dostupne u Mrežnom upravitelju i "
+"wpa_supplicantu."
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "Dostupni slivnici zvuka"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "Povezivanje"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "Odustani"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "Emitiranje"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Jedan od sljedećih priključaka kôdeka slike je potreban.\n"
+"Klik će pokrenuti postupak instalacije."
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Jedan od sljedećih priključaka kôdeka zvuka je potreban za zvučnu podršku.\n"
+"Klik će pokrenuti postupak instalacije."
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "Greška"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "Povratak"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"Potrebna zona vatrozida nije dostupna i ne može se instalirati. Pokušajte "
+"ponovno i upišite lozinku pri upitu ili kontaktirajte administratora sustava."
