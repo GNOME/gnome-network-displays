@@ -2,20 +2,22 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
 # Gökhan GÖKKAYA <gokhanlnx@gmail.com>, 2019.
+# Emin Tufan Çetin <etcetin@gmail.com>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-23 10:26+0200\n"
-"PO-Revision-Date: 2019-07-26 15:31+0300\n"
-"Last-Translator: Gökhan Gökkaya <gokhanlnx@gmail.com>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2020-07-10 08:27+0000\n"
+"PO-Revision-Date: 2020-09-16 13:07+0300\n"
+"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: \n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.4.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
@@ -25,7 +27,7 @@ msgstr "GNOME Ağ Ekranları"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7
 msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Masaüstünü Kablosuz Ekran özellikli cihazlara aktarır"
+msgstr "Masaüstünü Kablosuz Ekran özellikli aygıtlara aktarır"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:16
 msgid ""
@@ -33,9 +35,9 @@ msgid ""
 "Currently implemented is support for casting to Wi-Fi Display capable "
 "devices (a.k.a. Miracast)."
 msgstr ""
-"GNOME Ağ Ekranları, masaüstünüzü uzaktaki bir ekrana aktarmanıza imkan "
-"tanır. Mevcut uyarlama Kablosuz Görüntüleme özellikli cihazlara (Miracast) "
-"döküm almayı destekler."
+"GNOME Ağ Ekranları, masaüstünüzü uzaktaki ekrana aktarmanızı sağlar. Var "
+"olan uyarlama Kablosuz Görüntüleme özellikli aygıtlara (Miracast) aktarımı "
+"destekler."
 
 #: src/nd-codec-install.c:54
 #, c-format
@@ -70,15 +72,16 @@ msgstr "GStreamer Ücretsiz AAC ses kodlayıcı (%s)"
 #: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer Element “%s”"
-msgstr "GStreamer Öğesi “%s”"
+msgstr "GStreamer Ögesi “%s”"
 
 #: src/nd-codec-install.c:170
 msgid "Please install one of the following GStreamer plugins by clicking below"
-msgstr "Lütfen aşağıya tıklayarak aşağıdaki GStreamer eklentilerinden birini yükleyin"
+msgstr ""
+"Lütfen aşağıya tıklayarak aşağıdaki GStreamer eklentilerinden birini kurun"
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr "Gerekli güvenlik duvarı bölgelerini kontrol ediyor ve yüklüyor"
+msgstr "Gerekli güvenlik duvarı bölgeleri denetleniyor ve kuruluyor."
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
@@ -90,7 +93,7 @@ msgstr "Biriktirici için bağlantı kuruluyor"
 
 #: src/nd-window.c:179
 msgid "Starting to stream"
-msgstr "Aktarma başlıyor"
+msgstr "Aktarım başlıyor"
 
 #: src/nd-window.ui:75
 msgid "No Wi‑Fi P2P adapters found"
@@ -103,12 +106,12 @@ msgid ""
 "wpa_supplicant."
 msgstr ""
 "Kullanılabilir kablosuz ağ bağdaştırıcısı bulunamadı. Lütfen kablosuz ağın "
-"etkin olduğunu ve kablosuz P2P işlemlerinin hem ağ yöneticisi hem de "
-"wpa_supplicant'da mevcut olduğunu kontrol edin."
+"etkin olduğunu ve kablosuz P2P işlemlerinin hem NetworkManager hem de "
+"wpa_supplicantʼda varlığını denetleyin."
 
 #: src/nd-window.ui:176
 msgid "Available Video Sinks"
-msgstr "Mevcut Video Biriktiricileri"
+msgstr "Kullanılabilir Video Biriktiricileri"
 
 #: src/nd-window.ui:337
 msgid "Connecting"
@@ -128,7 +131,7 @@ msgid ""
 "Clicking will start the installation process."
 msgstr ""
 "Aşağıdaki video çözücü eklentilerinden biri gereklidir.\n"
-"Tıkladığınızda yükleme işlemi başlayacaktır."
+"Tıkladığınızda kurulum işlemi başlayacaktır."
 
 #: src/nd-window.ui:603 src/nd-window.ui:802
 msgid ""
@@ -136,7 +139,7 @@ msgid ""
 "Clicking will start the installation process."
 msgstr ""
 "Ses desteği için aşağıdaki ses çözücü eklentilerinden biri gereklidir.\n"
-"Tıkladığınızda yükleme işlemi başlayacaktır."
+"Tıkladığınızda kurulum işlemi başlayacaktır."
 
 #: src/nd-window.ui:700
 msgid "Error"
@@ -151,7 +154,9 @@ msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
 "administrator."
-msgstr "Gerekli bir güvenlik duvarı bölgesi kullanılamıyor ve yüklenemedi. Lütfen tekrar deneyin ve istendiğinde şifreyi girin veya bir sistem yöneticisine başvurun."
+msgstr ""
+"Gerekli güvenlik duvarı bölgesi kullanılamıyor ve kurulamadı. Lütfen yeniden "
+"deneyin ve istendiğinde şifreyi girin veya sistem yöneticisine başvurun."
 
 #~ msgid "org.gnome.NetworkDisplays"
 #~ msgstr "org.gnome.NetworkDisplays"
