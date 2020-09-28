@@ -21,6 +21,16 @@ static const WfdResolution cea_resolutions[] = {
   {1920, 1080, 50, TRUE},
   {1280,  720, 24, FALSE},
   {1920, 1080, 25, FALSE},
+  {3840, 2160, 24, FALSE},
+  {3840, 2160, 25, FALSE},
+  {3840, 2160, 30, FALSE},
+  {3840, 2160, 50, FALSE},
+  {3840, 2160, 60, FALSE},
+  {4096, 2160, 24, FALSE},
+  {4096, 2160, 25, FALSE},
+  {4096, 2160, 30, FALSE},
+  {4096, 2160, 50, FALSE},
+  {4096 ,2160, 60, FALSE},
 };
 
 static const WfdResolution vesa_resolutions[] = {
@@ -53,6 +63,10 @@ static const WfdResolution vesa_resolutions[] = {
   {1680, 1050, 30, FALSE},
   {1680, 1050, 60, FALSE},
   {1920, 1200, 30, FALSE},
+  {2560, 1440, 30, FALSE},
+  {2560, 1440, 60, FALSE},
+  {2560, 1600, 30, FALSE},
+  {2560, 1600, 60, FALSE},
 };
 
 static const WfdResolution hh_resolutions[] = {
