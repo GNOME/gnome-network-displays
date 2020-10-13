@@ -101,6 +101,8 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
           NdMetaSink *merge_meta;
           NdSink *merge_sink;
           merge_meta = g_ptr_array_remove_index_fast (meta_sinks, 0);
+          if (!g_ptr_array_remove (meta_provider->sinks, merge_meta))
+            g_warning ("Could not remove sink from internal list!");
           g_signal_emit_by_name (meta_provider, "sink-removed", merge_meta);
 
           while ((merge_sink = nd_meta_sink_get_sink (merge_meta)))
@@ -116,6 +118,7 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
     {
       meta_sink = nd_meta_sink_new (sink);
       g_signal_emit_by_name (meta_provider, "sink-added", meta_sink);
+      g_ptr_array_add (meta_provider->sinks, meta_sink);
     }
 
   /* Add/Update matches in the deduplication dictionary */
