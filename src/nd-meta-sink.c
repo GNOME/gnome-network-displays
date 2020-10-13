@@ -360,6 +360,23 @@ nd_meta_sink_remove_sink (NdMetaSink *meta_sink,
   return meta_sink->sinks->len <= 0;
 }
 
+/**
+ * nd_meta_sink_has_sink
+ * @meta_sink: a #NdMetaSink
+ * @sink: a #NdSink
+ *
+ * Checks whether meta sink contains the given sink as a child sink.
+ *
+ * Returns:
+ *   Whether @sink is contained in @meta_sink.
+ */
+gboolean
+nd_meta_sink_has_sink (NdMetaSink *meta_sink,
+                       NdSink     *sink)
+{
+  return g_ptr_array_find (meta_sink->sinks, sink, NULL);
+}
+
 NdMetaSink *
 nd_meta_sink_new (NdSink *sink)
 {

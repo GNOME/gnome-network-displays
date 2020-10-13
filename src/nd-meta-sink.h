@@ -32,6 +32,8 @@ void                  nd_meta_sink_add_sink (NdMetaSink *meta_sink,
                                              NdSink     *sink);
 gboolean              nd_meta_sink_remove_sink (NdMetaSink *meta_sink,
                                                 NdSink     *sink);
+gboolean              nd_meta_sink_has_sink (NdMetaSink *meta_sink,
+                                             NdSink     *sink);
 
 
 G_END_DECLS

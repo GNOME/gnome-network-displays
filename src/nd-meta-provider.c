@@ -130,21 +130,21 @@ provider_sink_removed_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvide
 {
   g_autoptr(GPtrArray) sink_matches = NULL;
   NdMetaSink *meta_sink = NULL;
+  guint idx = 0;
 
   g_object_get (sink, "matches", &sink_matches, NULL);
   g_assert (sink_matches != NULL);
 
-  for (gint i = 0; i < sink_matches->len; i++)
-    {
-      gchar *match = sink_matches->pdata[i];
+  /* Search all known meta sinks for the matching one.
+   * Note that we really need to search for it rather than doing
+   * a faster lookup, as sink that is removed may not be reporting
+   * its matches correctly anymore. */
+  g_assert (g_ptr_array_find_with_equal_func (meta_provider->sinks,
+                                              sink,
+                                              (GEqualFunc) nd_meta_sink_has_sink,
+                                              &idx));
 
-      /* Find the first matching meta sink and remove any match*/
-      if (meta_sink == NULL)
-        meta_sink = g_hash_table_lookup (meta_provider->deduplicate, match);
-
-      g_hash_table_remove (meta_provider->deduplicate, match);
-    }
-
+  meta_sink = g_ptr_array_index (meta_provider->sinks, idx);
   g_assert (meta_sink != NULL);
   if (nd_meta_sink_remove_sink (meta_sink, sink))
     {
