@@ -223,7 +223,8 @@ nd_meta_sink_finalize (GObject *object)
   g_ptr_array_free (meta_sink->sinks, TRUE);
   meta_sink->sinks = NULL;
 
-  g_signal_handlers_disconnect_by_data (meta_sink->current_sink, meta_sink);
+  if (meta_sink->current_sink)
+    g_signal_handlers_disconnect_by_data (meta_sink->current_sink, meta_sink);
   g_clear_object (&meta_sink->current_sink);
 
   G_OBJECT_CLASS (nd_meta_sink_parent_class)->finalize (object);
