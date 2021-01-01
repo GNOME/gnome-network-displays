@@ -80,7 +80,7 @@ msgstr ""
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr "S'està comprovant i instal·lant les zones del tallafocs requerides."
+msgstr "S'està comprovant i instal·lant les zones del tallafoc requerides."
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
@@ -104,7 +104,7 @@ msgid ""
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
 "wpa_supplicant."
 msgstr ""
-"No s'ha trobat cap adaptador sense fils usable. Sisplau verifica que el Wi-"
+"No s'ha trobat cap adaptador sense fils usable. Verifiqueu que el Wi-"
 "Fi està habilitat i que les operacions Wi-Fi P2P estan disponibles tant a "
 "NetworkManager com a wpa_supplicant."
 
@@ -155,6 +155,6 @@ msgid ""
 "try again and enter the password when prompted or contact a system "
 "administrator."
 msgstr ""
-"Un zona del tallafocs requerida no està disponible i no s'ha pogut "
-"instal·lar. Sisplau torna-ho a provar i introdueix la contrasenya quan sigui "
-"requerit o contacta amb un administrador del sistema."
+"Una zona del tallafoc requerida no està disponible i no s'ha pogut "
+"instal·lar. Torneu-ho a provar i introduiu la contrasenya quan sigui "
+"requerit o contacteu amb un administrador del sistema."
