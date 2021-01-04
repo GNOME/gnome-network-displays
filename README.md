@@ -32,6 +32,7 @@ The following devices have been tested:
  * LG WebOS TV
  * MontoView (Software Revision 2.18.02)
  * MiraScreen
+ * Clayton TV (model CL43UHD19BSW)
 
 Testing
 =======
