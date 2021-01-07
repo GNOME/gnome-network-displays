@@ -133,7 +133,10 @@ wfd_client_select_codec_and_resolution (WfdClient *self, WfdH264ProfileFlags pro
         codec = item;
     }
 
-  self->params->selected_codec = wfd_video_codec_ref (codec);
+  if (codec)
+    self->params->selected_codec = wfd_video_codec_ref (codec);
+  else
+    g_warning ("No codec/resolution could be found, falling back to defaults!");
 
 #if 0
   /* The native resolution reported by some devices is just useless */
