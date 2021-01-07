@@ -280,11 +280,12 @@ wfd_video_codec_new_from_desc (gint native, const gchar *descr)
   res = wfd_video_codec_new ();
 
   res->profile = (WfdH264ProfileFlags) g_ascii_strtoll (tokens[0], NULL, 16);
-  if (res->profile != WFD_H264_PROFILE_BASE && res->profile != WFD_H264_PROFILE_HIGH)
+  if ((res->profile & WFD_H264_PROFILE_ALL) == 0)
     {
-      g_warning ("Unknown profile 0x%x", res->profile);
+      g_warning ("None of the profiles in 0x%x are supported", res->profile);
       return NULL;
     }
+  res->profile &= WFD_H264_PROFILE_ALL;
 
   res->level = g_ascii_strtoll (tokens[1], NULL, 16);
   if (res->level > 255)

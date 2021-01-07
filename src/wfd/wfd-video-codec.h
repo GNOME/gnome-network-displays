@@ -14,6 +14,7 @@ typedef enum {
   WFD_H264_PROFILE_HIGH = 0x02,
 } WfdH264ProfileFlags;
 
+#define WFD_H264_PROFILE_ALL 0x3
 
 struct _WfdVideoCodec
 {
