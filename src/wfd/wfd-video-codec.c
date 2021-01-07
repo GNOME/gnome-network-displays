@@ -256,7 +256,7 @@ wfd_video_codec_unref (WfdVideoCodec *self)
 }
 
 /**
- * wfd_video_codec_new_from_descr:
+ * wfd_video_codec_new_from_desc:
  * @native: Integer describing the native resolution
  * @descr: A video codec descriptor string
  *
