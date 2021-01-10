@@ -35,7 +35,7 @@ msgid ""
 "devices (a.k.a. Miracast)."
 msgstr ""
 "Pantalles per xarxa del GNOME us permet enviar l'escriptori a una "
-"pantalla remota. Actualment està implementat el suport per enviar a "
+"pantalla remota. Actualment està implementat el suport per a enviar a "
 "dispositius capaços de mostrar pantalles per Wi-Fi (com Miracast)."
 
 #: src/nd-codec-install.c:54
@@ -71,7 +71,7 @@ msgstr "Codificador d'àudio per GStreamer Free AAC (%s)"
 #: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer Element “%s”"
-msgstr "Element de GStreamer “%s”"
+msgstr "Element de GStreamer «%s»"
 
 #: src/nd-codec-install.c:170
 msgid "Please install one of the following GStreamer plugins by clicking below"
@@ -92,7 +92,7 @@ msgstr "S'està establint la connexió al «sink»"
 
 #: src/nd-window.c:179
 msgid "Starting to stream"
-msgstr "S'esta començant a enviar"
+msgstr "S'està començant a enviar"
 
 #: src/nd-window.ui:75
 msgid "No Wi‑Fi P2P adapters found"
