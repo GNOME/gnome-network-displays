@@ -1,0 +1,159 @@
+# Swedish translation for gnome-network-displays.
+# Copyright © 2021 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2021-01-09 15:15+0000\n"
+"PO-Revision-Date: 2021-01-12 23:23+0100\n"
+"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "GNOME Nätverksskärmar"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr "Strömma skrivbordet till enheter kapabla för Wi-Fi-visning"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"GNOME Nätverksskärmar låter dig överföra ditt skrivbord till en fjärrskärm. "
+"För närvarande är stöd för casting till enheter kapabla för Wi-Fi-visning "
+"implementerat (så kallad Miracast)."
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "GStreamer OpenH264-videokodare (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "GStreamer x264-videokodare (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "GStreamer VA-API H264-videokodare (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "GStreamer FDK AAC-ljudkodare (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "GStreamer libav AAC-ljudkodare (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "GStreamer Free AAC-ljudkodare (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "GStreamer-element ”%s”"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+"Installera en av följande GStreamer-insticksmoduler genom att klicka nedan"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "Kontrollerar och installerar brandväggszoner som krävs."
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "Skapar P2P-anslutning"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "Etablerar anslutning till utgång"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "Börjar strömma"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "Ingen Wi-Fi-P2P-adapter hittades"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Inga användbara trådlösa adaptrar hittades. Säkerställ att Wi-Fi är "
+"aktiverat och att Wi‑Fi-P2P-operationer är tillgängliga både i "
+"NetworkManager och wpa_supplicant."
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "Tillgängliga videoutgångar"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "Ansluter"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "Strömmar"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Ett av följande videokodekinstick krävs.\n"
+"Att klicka kommer att starta installationsprocessen."
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Ett av följande ljudkodekinstick krävs för ljudstöd.\n"
+"Att klicka kommer att starta installationsprocessen."
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "Fel"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "Återvänd"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"En brandväggszon som krävs är inte tillgänglig och kunde inte installeras. "
+"Försök igen och ange lösenordet när det efterfrågas, eller kontakta en "
+"systemadministratör."
