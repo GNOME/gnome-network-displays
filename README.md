@@ -33,6 +33,7 @@ The following devices have been tested:
  * MontoView (Software Revision 2.18.02)
  * MiraScreen
  * Clayton TV (model CL43UHD19BSW)
+ * HP Elite x3 Lap Dock
 
 Testing
 =======
