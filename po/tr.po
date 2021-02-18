@@ -2,15 +2,15 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
 # Gökhan GÖKKAYA <gokhanlnx@gmail.com>, 2019.
-# Emin Tufan Çetin <etcetin@gmail.com>, 2020.
+# Emin Tufan Çetin <etcetin@gmail.com>, 2020, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues\n"
-"POT-Creation-Date: 2020-07-10 08:27+0000\n"
-"PO-Revision-Date: 2020-09-16 13:07+0300\n"
+"POT-Creation-Date: 2020-09-16 10:09+0000\n"
+"PO-Revision-Date: 2021-02-18 21:20+0300\n"
 "Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: \n"
 "Language: tr\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.1\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:6
@@ -67,7 +67,7 @@ msgstr "GStreamer libav AAC ses kodlayıcı (%s)"
 #: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
-msgstr "GStreamer Ücretsiz AAC ses kodlayıcı (%s)"
+msgstr "GStreamer Free AAC ses kodlayıcı (%s)"
 
 #: src/nd-codec-install.c:66
 #, c-format
@@ -156,7 +156,7 @@ msgid ""
 "administrator."
 msgstr ""
 "Gerekli güvenlik duvarı bölgesi kullanılamıyor ve kurulamadı. Lütfen yeniden "
-"deneyin ve istendiğinde şifreyi girin veya sistem yöneticisine başvurun."
+"deneyin ve istendiğinde parolayı girin veya sistem yöneticisine başvurun."
 
 #~ msgid "org.gnome.NetworkDisplays"
 #~ msgstr "org.gnome.NetworkDisplays"
