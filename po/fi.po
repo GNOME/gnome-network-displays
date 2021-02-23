@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues\n"
-"POT-Creation-Date: 2020-08-16 14:53+0000\n"
-"PO-Revision-Date: 2021-02-22 17:39+0200\n"
+"POT-Creation-Date: 2021-02-22 15:39+0000\n"
+"PO-Revision-Date: 2021-02-23 09:58+0200\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos+l10n@iki.fi>\n"
 "Language-Team: Finnish <lokalisointi-lista@googlegroups.com>\n"
 "Language: fi\n"
@@ -87,7 +87,7 @@ msgstr "Muodostetaan vertaisyhteys"
 
 #: src/nd-window.c:172
 msgid "Establishing connection to sink"
-msgstr ""
+msgstr "Muodostetaan yhteyttä kohteeseen"
 
 #: src/nd-window.c:179
 msgid "Starting to stream"
@@ -109,7 +109,7 @@ msgstr ""
 
 #: src/nd-window.ui:176
 msgid "Available Video Sinks"
-msgstr ""
+msgstr "Käytettävissä olevat videokohteet"
 
 #: src/nd-window.ui:337
 msgid "Connecting"
@@ -146,7 +146,7 @@ msgstr "Virhe"
 
 #: src/nd-window.ui:762
 msgid "Return"
-msgstr ""
+msgstr "Palaa"
 
 #: src/nd-window.ui:830
 msgid ""
