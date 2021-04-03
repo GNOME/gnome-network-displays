@@ -1,13 +1,13 @@
 # Basque translation for gnome-network-displays.
 # Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
-# Asier Sarasua Garmendia <asiersarasua@ni.eus>, 2020.
+# Asier Sarasua Garmendia <asiersarasua@ni.eus>, 2020, 2021.
 #
 msgid ""
 msgstr "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/issues\n"
-"POT-Creation-Date: 2020-08-28 08:04+0000\n"
-"PO-Revision-Date: 2020-08-30 10:00+0100\n"
+"POT-Creation-Date: 2020-08-30 21:38+0000\n"
+"PO-Revision-Date: 2021-04-03 10:00+0100\n"
 "Last-Translator: Asier Sarasua Garmendia <asier.sarasua@ni.eus>\n"
 "Language-Team: Basque <librezale@librezale.eus>\n"
 "Language: eu\n"
@@ -22,14 +22,14 @@ msgstr "GNOME Sareko Bistaratzeak"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7
 msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr ""
+msgstr "Bidali mahaigainaren korrontea wifi bidez bistaratzeko gai diren gailuetara"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:16
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Currently implemented is support for casting to Wi-Fi Display capable "
 "devices (a.k.a. Miracast)."
-msgstr ""
+msgstr "GNOME Sareko Bistaratzeak aplikazioaren bidez, mahaigaina urruneko pantaila batera bidali daiteke. Une honetan, wifi bidez bistaratzeko gai diren gailuetara (alegia, Miracast gailuetara) bideoa bidaltzea onartzen da."
 
 #: src/nd-codec-install.c:54
 #, c-format
@@ -68,19 +68,19 @@ msgstr "“%s” GStreamer elementua"
 
 #: src/nd-codec-install.c:170
 msgid "Please install one of the following GStreamer plugins by clicking below"
-msgstr ""
+msgstr "Instalatu hurrengo GStreamer pluginak behean klik eginda"
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr ""
+msgstr "Beharrezkoak diren suebaki-zonak egiaztatzen eta instalatzen."
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
-msgstr ""
+msgstr "P2P konexioa sortzen"
 
 #: src/nd-window.c:172
 msgid "Establishing connection to sink"
-msgstr ""
+msgstr "Kolektorearekin konexioa ezartzen"
 
 #: src/nd-window.c:179
 msgid "Starting to stream"
@@ -88,18 +88,18 @@ msgstr "Korrontea bidaltzen"
 
 #: src/nd-window.ui:75
 msgid "No Wi‑Fi P2P adapters found"
-msgstr ""
+msgstr "Ez da wifi P2P moldagailurik aurkitu"
 
 #: src/nd-window.ui:90
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
 "wpa_supplicant."
-msgstr ""
+msgstr "Ez da haririk gabeko moldagailu erabilgarririk aurkitu. Egiaztatu wifia gaitua dagoela eta wifi P2P eragiketak erabilgarri daudela bai NetworkManager bai wpa_supplicant aplikazioetan."
 
 #: src/nd-window.ui:176
 msgid "Available Video Sinks"
-msgstr ""
+msgstr "Erabilgarri dauden bideo-kolektoreak"
 
 #: src/nd-window.ui:337
 msgid "Connecting"
@@ -117,13 +117,15 @@ msgstr "Korrontea"
 msgid ""
 "One of the following video codec plugins is required.\n"
 "Clicking will start the installation process."
-msgstr ""
+msgstr "Hurrengo bideo-kodeken pluginetako bat behar da.\n"
+"Klik egiten bada, instalazio-prozesuari ekingo zaio."
 
 #: src/nd-window.ui:603 src/nd-window.ui:802
 msgid ""
 "One of the following audio codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
-msgstr ""
+msgstr "Hurrengo audio-kodeken pluginetako bat behar da audioa erabili ahal izateko.\n"
+"Klik egiten bada, instalazio-prozesuari ekingo zaio."
 
 #: src/nd-window.ui:700
 msgid "Error"
@@ -138,4 +140,4 @@ msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
 "administrator."
-msgstr ""
+msgstr "Beharrezkoa den suebaki-zona bat ez dago erabilgarri eta ezin izan da instalatu. Saiatu berriro eta sartu pasahitza eskatzen denean, edo kontaktatu sistema-administratzaile batekin."
