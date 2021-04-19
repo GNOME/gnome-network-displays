@@ -450,73 +450,10 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   return (GstElement *) g_steal_pointer (&bin);
 }
 
-static gboolean
-pipeline_bus_watch_cb (GstBus     *bus,
-                       GstMessage *message,
-                       gpointer    data)
-{
-  switch (GST_MESSAGE_TYPE (message))
-    {
-    case GST_MESSAGE_ERROR: {
-        GError *err;
-        gchar *debug;
-
-        gst_message_parse_error (message, &err, &debug);
-        g_print ("Error from %s: %s\n", GST_MESSAGE_SRC_NAME (message), err->message);
-        g_error_free (err);
-        g_free (debug);
-
-        break;
-      }
-
-    case GST_MESSAGE_WARNING: {
-        GError *err;
-        gchar *debug;
-
-        gst_message_parse_warning (message, &err, &debug);
-        g_print ("Warning from %s: %s\n", GST_MESSAGE_SRC_NAME (message), err->message);
-        g_error_free (err);
-        g_free (debug);
-
-        break;
-      }
-
-    case GST_MESSAGE_QOS: {
-        gboolean live;
-        guint64 running_time, stream_time, timestamp, duration;
-        guint64 processed, dropped;
-        gint64 jitter;
-        gdouble proportion;
-        gint quality;
-
-        gst_message_parse_qos (message, &live, &running_time, &stream_time, &timestamp, &duration);
-        gst_message_parse_qos_stats (message, NULL, &processed, &dropped);
-        gst_message_parse_qos_values (message, &jitter, &proportion, &quality);
-
-        g_debug ("QOS: proportion: %.3f, processed: %" G_GUINT64_FORMAT ", dropped: %" G_GUINT64_FORMAT "",
-                 proportion, processed, dropped);
-        break;
-      }
-
-    case GST_MESSAGE_EOS:
-      /* end-of-stream */
-      g_debug ("reached EOS");
-      break;
-
-    default:
-      /* unhandled message */
-      break;
-    }
-
-  return TRUE;
-}
-
 static GstElement *
 wfd_media_factory_create_pipeline (GstRTSPMediaFactory *factory, GstRTSPMedia *media)
 {
   GstElement *pipeline;
-
-  g_autoptr(GstBus) bus = NULL;
 
   pipeline = GST_RTSP_MEDIA_FACTORY_CLASS (wfd_media_factory_parent_class)->create_pipeline (factory, media);
 
@@ -524,9 +461,6 @@ wfd_media_factory_create_pipeline (GstRTSPMediaFactory *factory, GstRTSPMedia *m
    * usage-type is set to "screen". After e.g. scene changes the latency will
    * be very high for short periods of time, and this prevents further issues. */
   gst_pipeline_set_latency (GST_PIPELINE (pipeline), 500 * GST_MSECOND);
-
-  bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
-  gst_bus_add_watch (bus, pipeline_bus_watch_cb, NULL);
 
   return pipeline;
 }
