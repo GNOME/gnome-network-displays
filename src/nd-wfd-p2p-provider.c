@@ -45,12 +45,28 @@ enum {
 static void nd_wfd_p2p_provider_provider_iface_init (NdProviderIface *iface);
 static GList * nd_wfd_p2p_provider_provider_get_sinks (NdProvider *provider);
 
+static void peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device);
+
 G_DEFINE_TYPE_EXTENDED (NdWFDP2PProvider, nd_wfd_p2p_provider, G_TYPE_OBJECT, 0,
                         G_IMPLEMENT_INTERFACE (ND_TYPE_PROVIDER,
                                                nd_wfd_p2p_provider_provider_iface_init);
                        )
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
+
+static void
+on_peer_wfd_ie_notify_cb (NdWFDP2PProvider *provider,
+                          GParamSpec       *pspec,
+                          NMWifiP2PPeer    *peer)
+{
+  g_debug ("WFDP2PProvider: WFDIEs for ignored peer \"%s\" (%s) changed, trying to re-add",
+           nm_wifi_p2p_peer_get_name (peer),
+           nm_wifi_p2p_peer_get_hw_address (peer));
+
+  g_signal_handlers_disconnect_by_func (peer, on_peer_wfd_ie_notify_cb, provider);
+
+  peer_added_cb (provider, peer, provider->nm_device);
+}
 
 static void
 peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device)
@@ -63,9 +79,14 @@ peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device
   /* Assume this is not a WFD Peer if there are no WFDIEs set. */
   if (!wfd_ies || g_bytes_get_size (wfd_ies) == 0)
     {
-      g_debug ("WFDP2PProvider: Ignoring peer \"%s\" (%s) as it has no WFDIEs set",
+      g_debug ("WFDP2PProvider: Ignoring peer \"%s\" (%s) for now as it has no WFDIEs set",
                nm_wifi_p2p_peer_get_name (peer),
                nm_wifi_p2p_peer_get_hw_address (peer));
+
+      g_signal_connect_object (peer, "notify::" NM_WIFI_P2P_PEER_WFD_IES,
+                               G_CALLBACK (on_peer_wfd_ie_notify_cb),
+                               provider,
+                               G_CONNECT_SWAPPED);
       return;
     }
 
@@ -81,6 +102,9 @@ static void
 peer_removed_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device)
 {
   g_debug ("WFDP2PProvider: Peer removed");
+
+  /* Otherwise we may see properties changing to NULL before the object is destroyed. */
+  g_signal_handlers_disconnect_by_func (peer, on_peer_wfd_ie_notify_cb, provider);
 
   for (gint i = 0; i < provider->sinks->len; i++)
     {
