@@ -298,9 +298,9 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
                 NULL);
 
   /* Permit both constrained-baseline and baseline. Would constrained-baseline be sufficient? */
-  caps = gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=constrained-baseline");
+  caps = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=constrained-baseline");
   gst_caps_append (caps,
-                   gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=baseline"));
+                   gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=baseline"));
   codecfilter = gst_element_factory_make ("capsfilter", "wfd-codecfilter");
   g_object_set (codecfilter,
                 "caps", caps,
@@ -578,14 +578,14 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
 
   if (profile == WFD_H264_PROFILE_HIGH)
     {
-      caps_codecfilter = gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=high");
+      caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=high");
     }
   else
     {
       /* Permit both constrained-baseline and baseline. Would constrained-baseline be sufficient? */
-      caps_codecfilter = gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=constrained-baseline");
+      caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=constrained-baseline");
       gst_caps_append (caps_codecfilter,
-                       gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=baseline"));
+                       gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=baseline"));
     }
 
   codecfilter = gst_bin_get_by_name (bin, "wfd-codecfilter");
