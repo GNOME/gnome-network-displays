@@ -239,9 +239,6 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
         encoder = gst_bin_new ("wfd-encoder-bin");
 
         vaapi_convert = gst_element_factory_make ("vaapipostproc", "wfd-vaapi-convert");
-        g_object_set (vaapi_convert,
-                      "format", 2, /* Force I420 */
-                      NULL);
         success &= gst_bin_add (GST_BIN (encoder), vaapi_convert);
 
         vaapi_encoder = gst_element_factory_make ("vaapih264enc", "wfd-encoder");
