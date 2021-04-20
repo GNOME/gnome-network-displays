@@ -377,6 +377,44 @@ nd_meta_sink_has_sink (NdMetaSink *meta_sink,
   return g_ptr_array_find (meta_sink->sinks, sink, NULL);
 }
 
+/**
+ * nd_meta_sink_matches_sink:
+ * @meta_sink: a #NdMetaSink
+ * @sink: a #NdSink
+ *
+ * Checks whether meta sink can be considered equal to the given sink.
+ *
+ * Returns:
+ *   Whether @sink should be contained in @meta_sink.
+ */
+gboolean
+nd_meta_sink_matches_sink (NdMetaSink *meta_sink,
+                           NdSink     *sink)
+{
+  g_autoptr(GPtrArray) needles = NULL;
+
+  g_object_get (sink, "matches", &needles, NULL);
+
+  g_return_val_if_fail (needles, FALSE);
+
+  for (gint i = 0; i < meta_sink->sinks->len; i++)
+    {
+      g_autoptr(GPtrArray) sub_matches = NULL;
+
+      g_object_get (g_ptr_array_index (meta_sink->sinks, i),
+                    "matches", &sub_matches,
+                    NULL);
+
+      for (gint j = 0; j < needles->len; j++)
+        if (g_ptr_array_find_with_equal_func (sub_matches,
+                                              g_ptr_array_index (needles, j),
+                                              g_str_equal, NULL))
+          return TRUE;
+    }
+
+  return FALSE;
+}
+
 NdMetaSink *
 nd_meta_sink_new (NdSink *sink)
 {

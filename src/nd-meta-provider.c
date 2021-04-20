@@ -26,7 +26,6 @@ struct _NdMetaProvider
 
   gboolean    discover;
 
-  GHashTable *deduplicate;
   GPtrArray  *sinks;
   GPtrArray  *providers;
 };
@@ -50,43 +49,21 @@ G_DEFINE_TYPE_EXTENDED (NdMetaProvider, nd_meta_provider, G_TYPE_OBJECT, 0,
 
 
 static void
-deduplicate_add_meta_sink (NdMetaProvider *meta_provider, NdMetaSink *meta_sink)
-{
-  g_autoptr(GPtrArray) meta_matches = NULL;
-
-  g_object_get (meta_sink, "matches", &meta_matches, NULL);
-  g_assert (meta_matches != NULL);
-
-  for (gint i = 0; i < meta_matches->len; i++)
-    {
-      gchar *match;
-      match = meta_matches->pdata[i];
-
-      g_hash_table_insert (meta_provider->deduplicate, g_strdup (match), meta_sink);
-    }
-}
-
-static void
 provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider *provider)
 {
   g_autoptr(GPtrArray) sink_matches = NULL;
   g_autoptr(GPtrArray) meta_sinks = NULL;
   NdMetaSink *meta_sink;
-  gchar *match;
 
   g_object_get (sink, "matches", &sink_matches, NULL);
   g_assert (sink_matches != NULL);
 
   meta_sinks = g_ptr_array_new ();
 
-  for (gint i = 0; i < sink_matches->len; i++)
+  for (gint i = 0; i < meta_provider->sinks->len; i++)
     {
-      match = sink_matches->pdata[i];
-
-      meta_sink = g_hash_table_lookup (meta_provider->deduplicate, match);
-
-      if (meta_sink)
-        g_ptr_array_add (meta_sinks, meta_sink);
+      if (nd_meta_sink_matches_sink (g_ptr_array_index (meta_provider->sinks, i), sink))
+        g_ptr_array_add (meta_sinks, g_ptr_array_index (meta_provider->sinks, i));
     }
 
   if (meta_sinks->len > 1)
@@ -120,9 +97,6 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
       g_signal_emit_by_name (meta_provider, "sink-added", meta_sink);
       g_ptr_array_add (meta_provider->sinks, meta_sink);
     }
-
-  /* Add/Update matches in the deduplication dictionary */
-  deduplicate_add_meta_sink (meta_provider, meta_sink);
 }
 
 static void
@@ -154,10 +128,6 @@ provider_sink_removed_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvide
 
       return;
     }
-
-  /* Add/Update matches in the deduplication dictionary as we will
-   * have removed too many. */
-  deduplicate_add_meta_sink (meta_provider, meta_sink);
 }
 
 static void
@@ -213,8 +183,6 @@ nd_meta_provider_finalize (GObject *object)
 {
   NdMetaProvider *meta_provider = ND_META_PROVIDER (object);
 
-  g_clear_pointer (&meta_provider->deduplicate, g_hash_table_unref);
-
   g_ptr_array_free (meta_provider->sinks, TRUE);
   meta_provider->sinks = NULL;
   g_ptr_array_free (meta_provider->providers, TRUE);
@@ -252,8 +220,6 @@ nd_meta_provider_init (NdMetaProvider *meta_provider)
 
   meta_provider->sinks = g_ptr_array_new_with_free_func (g_object_unref);
   meta_provider->providers = g_ptr_array_new_with_free_func (g_object_unref);
-
-  meta_provider->deduplicate = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 }
 
 /******************************************************************
