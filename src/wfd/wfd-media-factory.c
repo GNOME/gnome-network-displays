@@ -304,7 +304,6 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   caps = gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=constrained-baseline");
   gst_caps_append (caps,
                    gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=baseline"));
-  caps = gst_caps_from_string ("video/x-h264,alignment=nal,stream-format=byte-stream,profile=baseline");
   codecfilter = gst_element_factory_make ("capsfilter", "wfd-codecfilter");
   g_object_set (codecfilter,
                 "caps", caps,
