@@ -1,3 +1,17 @@
+GNOME Network Displays 0.90.5
+=============================
+
+Notet hat there is a known issue with some versions of openh264enc. See
+https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1576
+
+ * Multiple fixes in P2P peer/sink handling
+ * Fix decoding of supported device profiles
+ * Fix issues with WFD media pipeline:
+   * Permit constrained-baseline profile
+   * Do not add a pipeline bus watch
+   * Do not force I420 for vaapipostproc
+   * Do not force alignment=nal
+
 GNOME Network Displays 0.90.4
 =============================
 
