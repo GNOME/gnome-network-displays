@@ -1,0 +1,142 @@
+# Slovak translation for gnome-network-displays.
+# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# Jose Riha <jose 1711 gmail com>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/issues\n"
+"POT-Creation-Date: 2020-10-13 15:33+0000\n"
+"PO-Revision-Date: 2021-07-26 09:04+0200\n"
+"Last-Translator: Jose Riha <jose1711@gmail.com>\n"
+"Language-Team: Slovak <gnome-sk-list@gnome.org>\n"
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Poedit 3.0\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3 data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "Sieťové displeje GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr "Vysielajte svoju plochu na zariadenie s podporou displejov Wi-Fi"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. Currently implemented is support for casting to Wi-Fi Display capable devices (a.k.a. Miracast)."
+msgstr ""
+"Sieťové displeje GNOME vám umožnia vysielať aktivitu na vašej ploche na vzdialený displej. V súčasnosti je implementovaná podpora pre vysielanie na zariadenia s podporou "
+"displejov Wi-Fi (tiež známe ako Miracast)."
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "Kodér videa OpenH264 z knižnice GStreamer (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "Kodér videa x264 z knižnice GStreamer (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "Kodér videa VA-API H264 z knižnice GStreamer (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "Kodér zvuku FDK AAC z knižnice GStreamer (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "Kodér zvuku libav AAC z knižnice GStreamer (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "Kodér zvuku Free AAC z knižnice GStreamer (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "Prvok GStreamer „%s“"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr "Prosím, kliknutím nižšie nainštalujte jeden z nasledujúcich zásuvných modulov GStreamer"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "Kontrolujú a inštalujú sa potrebné firewallové zóny."
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "Vytvára sa P2P spojenie"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "Nadväzuje sa spojenie k cieľu"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "Spúšťa sa vysielanie"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "Nebol nájdený žiaden adaptér Wi-Fi P2P"
+
+#: src/nd-window.ui:90
+msgid "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled and Wi‑Fi P2P operations are available in both NetworkManager and wpa_supplicant."
+msgstr ""
+"Nenašiel sa žiaden použiteľný bezdrôtový adaptér. Skontrolujte, prosím, či je Wi-Fi zapnuté a či NetworkManager i wpa_supplicant uvádzajú Wi-Fi P2P medzi dostupnými operáciami."
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "Dostupné ciele videa"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "Pripája sa"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "Zrušiť"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "Vysiela sa"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Vyžaduje sa jeden z nasledujúcich zásuvných modulov s kodekmi videa.\n"
+"Kliknutím spustíte inštaláciu."
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Pre podporu zvuku je vyžadovaný jeden z nasledujúcich zásuvných modulov so zvukovými kodekmi.\n"
+"Kliknutím spustíte inštaláciu."
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "Chyba"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "Návrat"
+
+#: src/nd-window.ui:830
+msgid "A required firewall zone is not available and could not be installed. Please try again and enter the password when prompted or contact a system administrator."
+msgstr "Požadovaná zóna firewallu nie je dostupná a nedá sa nainštalovať. Skúste to prosím znova. Po zobrazení výzvy zadajte heslo alebo kontaktujte správcu systému."
