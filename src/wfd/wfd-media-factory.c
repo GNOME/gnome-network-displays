@@ -81,7 +81,7 @@ encoding_perf_handoff_cb (GstElement *elem, GstBuffer *buf, gpointer user_data)
       late = MAX (0, now - pts);
 
       /* Ignore the first few frames. */
-      if (pts > 100 * GST_MSECOND)
+      if (pts > 100 * GST_MSECOND && (late - 50 * GST_MSECOND >= 0 || -(late - 50 * GST_MSECOND) <= pts))
         {
           /* We stop accepting things at more than 50ms delay;
            * Just use late / 50ms for the long term proportion. */
