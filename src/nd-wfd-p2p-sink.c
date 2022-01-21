@@ -219,10 +219,10 @@ nd_wfd_p2p_sink_finalize (GObject *object)
 {
   NdWFDP2PSink *sink = ND_WFD_P2P_SINK (object);
 
+  nd_wfd_p2p_sink_sink_stop_stream_int (sink);
+
   g_cancellable_cancel (sink->cancellable);
   g_clear_object (&sink->cancellable);
-
-  nd_wfd_p2p_sink_sink_stop_stream_int (sink);
 
   g_clear_object (&sink->nm_client);
   g_clear_object (&sink->nm_device);
