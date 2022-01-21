@@ -50,6 +50,7 @@ wfd_server_create_client (GstRTSPServer *server)
 {
   g_autoptr(WfdClient) client = NULL;
   GstRTSPClient *rtsp_client;
+
   g_autoptr(GstRTSPSessionPool) session_pool = NULL;
   g_autoptr(GstRTSPMountPoints) mount_points = NULL;
   g_autoptr(GstRTSPAuth) auth = NULL;

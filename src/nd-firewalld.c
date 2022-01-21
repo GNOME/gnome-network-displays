@@ -227,6 +227,7 @@ nd_firewalld_ensure_wfd_zone (NdFirewalld        *self,
   g_autoptr(GTask) task = NULL;
   g_autoptr(GDBusConnection) connection = NULL;
   GError *error = NULL;
+
   /* We only support a single zone (for WFD) for now, so don't bother
    * with creating a more generic API as it is only internal anyway.
    */

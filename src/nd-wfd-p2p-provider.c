@@ -45,7 +45,9 @@ enum {
 static void nd_wfd_p2p_provider_provider_iface_init (NdProviderIface *iface);
 static GList * nd_wfd_p2p_provider_provider_get_sinks (NdProvider *provider);
 
-static void peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device);
+static void peer_added_cb (NdWFDP2PProvider *provider,
+                           NMWifiP2PPeer    *peer,
+                           NMDevice         *device);
 
 G_DEFINE_TYPE_EXTENDED (NdWFDP2PProvider, nd_wfd_p2p_provider, G_TYPE_OBJECT, 0,
                         G_IMPLEMENT_INTERFACE (ND_TYPE_PROVIDER,

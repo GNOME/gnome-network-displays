@@ -176,6 +176,7 @@ portal_select_source_response_received (GDBusConnection *connection,
 
   g_autoptr(GVariant) ret = NULL;
   guint32 response;
+
   g_auto(GVariantBuilder) builder = G_VARIANT_BUILDER_INIT (G_VARIANT_TYPE ("(osa{sv})"));
   g_autofree gchar *token = NULL;
   g_autofree gchar *handle = NULL;
@@ -242,6 +243,7 @@ portal_create_session_response_received (GDBusConnection *connection,
 
   g_autoptr(GVariant) ret = NULL;
   guint32 response;
+
   g_auto(GVariantBuilder) builder = G_VARIANT_BUILDER_INIT (G_VARIANT_TYPE ("(oa{sv})"));
   g_autofree gchar *token = NULL;
   g_autofree gchar *handle = NULL;
@@ -307,6 +309,7 @@ on_portal_nd_proxy_acquired (GObject      *source_object,
 
   g_autoptr(GError) error = NULL;
   GDBusProxy *screencast = NULL;
+
   g_auto(GVariantBuilder) builder = G_VARIANT_BUILDER_INIT (G_VARIANT_TYPE ("(a{sv})"));
   g_autofree gchar *session_token = NULL;
   g_autofree gchar *session_handle = NULL;
@@ -499,6 +502,7 @@ nd_screencast_portal_get_source (NdScreencastPortal *self)
   g_auto(GVariantBuilder) builder = G_VARIANT_BUILDER_INIT (G_VARIANT_TYPE ("(oa{sv})"));
   g_autoptr(GVariant) res = NULL;
   GUnixFDList *out_fd_list = NULL;
+
   g_autoptr(GError) error = NULL;
   g_autoptr(GstElement) src = NULL;
   g_autofree gint *fds = NULL;

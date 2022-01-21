@@ -30,7 +30,7 @@ static const WfdResolution cea_resolutions[] = {
   {4096, 2160, 25, FALSE},
   {4096, 2160, 30, FALSE},
   {4096, 2160, 50, FALSE},
-  {4096 ,2160, 60, FALSE},
+  {4096, 2160, 60, FALSE},
 };
 
 static const WfdResolution vesa_resolutions[] = {
