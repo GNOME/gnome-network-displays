@@ -18,6 +18,7 @@ Build
 To build it locally:
 
 - clone the repository
+- install build dependencies (e.g. on Fedora with `dnf build-dep gnome-network-displays`)
 - install `meson`
 - run `meson build` on the cloned repository
 - run `meson install` on the `build` folder created by meson
