@@ -76,10 +76,13 @@ nd_meta_sink_update (NdMetaSink *meta_sink)
 
       g_object_get (sink, "priority", &priority, NULL);
       if (priority == best_priority)
-        g_debug ("MetaSink: Found two sinks with identical priority! Prefered order is undefined.\n");
+        g_debug ("MetaSink: Found two sinks with identical priority! Preferred order is undefined. Priority: %i", priority);
 
       if (priority > best_priority)
-        best_sink = sink;
+        {
+          best_sink = sink;
+          best_priority = priority;
+        }
     }
 
   /* Nothing has changed */
@@ -98,6 +101,7 @@ nd_meta_sink_update (NdMetaSink *meta_sink)
       g_signal_connect_object (meta_sink->current_sink,
                                "notify", (GCallback) nd_meta_sink_notify_sink_cb,
                                meta_sink, G_CONNECT_SWAPPED);
+      g_debug ("MetaSink: Priority sink updated. Priority: %i", best_priority);
     }
   else
     {
