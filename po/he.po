@@ -1,0 +1,155 @@
+# Hebrew translation for gnome-network-displays.
+# Copyright (C) 2022 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues\n"
+"POT-Creation-Date: 2022-03-29 00:05+0000\n"
+"PO-Revision-Date: 2022-03-29 14:54+0300\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
+"Language-Team: Hebrew <he@li.org>\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+msgid "GNOME Network Displays"
+msgstr "צגי רשת של GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+msgid "Stream the desktop to Wi-Fi Display capable devices"
+msgstr "הזרמת שולחן העבודה להתקנים שאפשר לשדר אליהם תצוגה דרך רשת אלחוטית"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Currently implemented is support for casting to Wi-Fi Display capable "
+"devices (a.k.a. Miracast)."
+msgstr ""
+"צגי הרשת של GNOME מאפשר לך לשדר את המסך של לתצוגה מרוחקת. התמיכה שמומשה נכון "
+"לעכשיו מאפשרת שידור להתקנים תומכי Wi-Fi Display (ידועים גם בשם Miracast)."
+
+#: src/nd-codec-install.c:54
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "מצפין וידאו GStreamer OpenH264‏ (%s)"
+
+#: src/nd-codec-install.c:56
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "מצפין וידאו GStreamer x264‏ (%s)"
+
+#: src/nd-codec-install.c:58
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "מצפין וידאו GStreamer VA-API H264‏ (%s)"
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "מצפין שמע GStreamer FDK AAC‏ (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "מצפין שמע GStreamer libav AAC‏ (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "מצפין שמע GStreamer Free AAC‏ (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "רכיב GStreamer‏ „%s”"
+
+#: src/nd-codec-install.c:170
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr "נא להתקין את אחד מתוספי ה־GStreamer הבאים בלחיצה להלן"
+
+#: src/nd-window.c:158
+msgid "Checking and installing required firewall zones."
+msgstr "מתבצעת בדיקה והתקנה של האזורים הנחוצים בחומת האש."
+
+#: src/nd-window.c:165
+msgid "Making P2P connection"
+msgstr "נוצר חיבור עמית לעמית"
+
+#: src/nd-window.c:172
+msgid "Establishing connection to sink"
+msgstr "נוצר חיבור למקלט"
+
+#: src/nd-window.c:179
+msgid "Starting to stream"
+msgstr "ההזרמה מתחילה"
+
+#: src/nd-window.ui:75
+msgid "No Wi‑Fi P2P adapters found"
+msgstr "לא נמצאו מתאמי רשת אלחוטית עם יכולת חיבור עמית לעמית"
+
+#: src/nd-window.ui:90
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"לא נמצאו מתאמי רשת אלחוטית שימושיים. נא לוודא שהרשת האלחוטית פעילה ושפעולות "
+"עמית לעמית דרך קישור אלחוטי זמינות הן ב־NetworkManager והן ב־wpa_supplicant."
+
+#: src/nd-window.ui:176
+msgid "Available Video Sinks"
+msgstr "מקלטי וידאו זמינים"
+
+#: src/nd-window.ui:337
+msgid "Connecting"
+msgstr "מתבצעת התחברות"
+
+#: src/nd-window.ui:396 src/nd-window.ui:579
+msgid "Cancel"
+msgstr "ביטול"
+
+#: src/nd-window.ui:501
+msgid "Streaming"
+msgstr "מתבצעת הזרמה"
+
+#: src/nd-window.ui:558 src/nd-window.ui:786
+msgid ""
+"One of the following video codec plugins is required.\n"
+"Clicking will start the installation process."
+msgstr ""
+"אחד מתוספי מפענחי הווידאו הבאים נחוץ.\n"
+"לחיצה תתחיל את תהליך ההתקנה."
+
+#: src/nd-window.ui:603 src/nd-window.ui:802
+msgid ""
+"One of the following audio codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"אחד מתוספי מפענחי השמע הבאים נחוץ.\n"
+"לחיצה תתחיל את תהליך ההתקנה."
+
+#: src/nd-window.ui:700
+msgid "Error"
+msgstr "שגיאה"
+
+#: src/nd-window.ui:762
+msgid "Return"
+msgstr "חזרה"
+
+#: src/nd-window.ui:830
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"אזור נחוץ בחומת האש אינו זמין ולא ניתן להתקין אותו. נא לנסות שוב ולמלא את "
+"הססמה כשמופיעה הבקשה או ליצור קשר עם הנהלת המערכת."
