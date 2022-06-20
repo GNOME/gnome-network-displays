@@ -14,7 +14,7 @@ gnome_nd_sources = [
   'nd-meta-provider.c',
   'nd-wfd-p2p-sink.c',
   'nd-wfd-p2p-provider.c',
-  'nd-wfd-p2p-registry.c',
+  'nd-nm-device-registry.c',
   'nd-dummy-provider.c',
   'nd-dummy-wfd-sink.c',
   'nd-screencast-portal.c',

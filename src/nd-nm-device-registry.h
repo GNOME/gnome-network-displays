@@ -1,4 +1,4 @@
-/* nd-wfd-p2p-registry.h
+/* nd-nm-device-registry.h
  *
  * Copyright 2018 Benjamin Berg <bberg@redhat.com>
  *
@@ -22,9 +22,9 @@
 
 G_BEGIN_DECLS
 
-#define ND_TYPE_WFD_P2P_REGISTRY (nd_wfd_p2p_registry_get_type ())
-G_DECLARE_FINAL_TYPE (NdWFDP2PRegistry, nd_wfd_p2p_registry, ND, WFD_P2P_REGISTRY, GObject)
+#define ND_TYPE_NM_DEVICE_REGISTRY (nd_nm_device_registry_get_type ())
+G_DECLARE_FINAL_TYPE (NdNMDeviceRegistry, nd_nm_device_registry, ND, NM_DEVICE_REGISTRY, GObject)
 
-NdWFDP2PRegistry * nd_wfd_p2p_registry_new (NdMetaProvider * meta_provider);
+NdNMDeviceRegistry * nd_nm_device_registry_new (NdMetaProvider * meta_provider);
 
 G_END_DECLS

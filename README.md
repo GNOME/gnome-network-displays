@@ -79,9 +79,9 @@ ensuring that support exists:
    a lot more information. Theoretically it may be that we see the device, but
    think that it is not WiFi Display capable (e.g. because the `wpa_supplicant`
    support is missing, see further below). Look out for the following messages:
-   * `WFDP2PRegistry: Got NMClient`:
+   * `NdNMDeviceRegistry: Got NMClient`:
       The connection to NetworkManager works.
-   * `WFDP2PRegistry: Found a new device, creating provider`:
+   * `NdNMDeviceRegistry: Found a new device, creating provider`:
       This means that we have a seemingly usable P2P device installed.
    * `WFDP2PProvider: Ignoring peer "XX:XX:XX:XX:XX" (Y) as it has no WFDIEs set`:
       This means there is a P2P device, but it does not seem to support WiFi

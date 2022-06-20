@@ -1,4 +1,4 @@
-/* nd-wfd-p2p-registry.c
+/* nd-nm-device-registry.c
  *
  * Copyright 2018 Benjamin Berg <bberg@redhat.com>
  *
@@ -18,10 +18,10 @@
 
 #include "gnome-network-displays-config.h"
 #include "NetworkManager.h"
-#include "nd-wfd-p2p-registry.h"
+#include "nd-nm-device-registry.h"
 #include "nd-wfd-p2p-provider.h"
 
-struct _NdWFDP2PRegistry
+struct _NdNMDeviceRegistry
 {
   GObject         parent_instance;
 
@@ -37,19 +37,19 @@ enum {
   PROP_LAST,
 };
 
-G_DEFINE_TYPE (NdWFDP2PRegistry, nd_wfd_p2p_registry, G_TYPE_OBJECT)
+G_DEFINE_TYPE (NdNMDeviceRegistry, nd_nm_device_registry, G_TYPE_OBJECT)
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
 static void
-device_added_cb (NdWFDP2PRegistry *registry, NMDevice *device, NMClient *client)
+device_added_cb (NdNMDeviceRegistry *registry, NMDevice *device, NMClient *client)
 {
   g_autoptr(NdWFDP2PProvider) provider = NULL;
 
   if (!NM_IS_DEVICE_WIFI_P2P (device))
     return;
 
-  g_debug ("WFDP2PRegistry: Found a new device, creating provider");
+  g_debug ("NdNMDeviceRegistry: Found a new device, creating provider");
 
   provider = nd_wfd_p2p_provider_new (client, device);
 
@@ -59,12 +59,12 @@ device_added_cb (NdWFDP2PRegistry *registry, NMDevice *device, NMClient *client)
 }
 
 static void
-device_removed_cb (NdWFDP2PRegistry *registry, NMDevice *device, NMClient *client)
+device_removed_cb (NdNMDeviceRegistry *registry, NMDevice *device, NMClient *client)
 {
   if (!NM_IS_DEVICE_WIFI_P2P (device))
     return;
 
-  g_debug ("WFDP2PRegistry: Lost a device, removing provider");
+  g_debug ("NdNMDeviceRegistry: Lost a device, removing provider");
 
   for (gint i = 0; i < registry->providers->len; i++)
     {
@@ -80,12 +80,12 @@ device_removed_cb (NdWFDP2PRegistry *registry, NMDevice *device, NMClient *clien
 }
 
 static void
-nd_wfd_p2p_registry_get_property (GObject    *object,
-                                  guint       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
+nd_nm_device_registry_get_property (GObject    *object,
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
-  NdWFDP2PRegistry *registry = ND_WFD_P2P_REGISTRY (object);
+  NdNMDeviceRegistry *registry = ND_NM_DEVICE_REGISTRY (object);
 
   switch (prop_id)
     {
@@ -100,12 +100,12 @@ nd_wfd_p2p_registry_get_property (GObject    *object,
 }
 
 static void
-nd_wfd_p2p_registry_set_property (GObject      *object,
-                                  guint         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec)
+nd_nm_device_registry_set_property (GObject      *object,
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
 {
-  NdWFDP2PRegistry *registry = ND_WFD_P2P_REGISTRY (object);
+  NdNMDeviceRegistry *registry = ND_NM_DEVICE_REGISTRY (object);
 
   switch (prop_id)
     {
@@ -125,7 +125,7 @@ nd_wfd_p2p_registry_set_property (GObject      *object,
 static void
 client_init_async_finished (GObject *source, GAsyncResult *res, gpointer user_data)
 {
-  NdWFDP2PRegistry *registry = NULL;
+  NdNMDeviceRegistry *registry = NULL;
 
   g_autoptr(GError) error = NULL;
 
@@ -135,23 +135,23 @@ client_init_async_finished (GObject *source, GAsyncResult *res, gpointer user_da
       if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         return;
 
-      registry = ND_WFD_P2P_REGISTRY (user_data);
+      registry = ND_NM_DEVICE_REGISTRY (user_data);
       g_clear_object (&registry->nm_client);
       g_warning ("Error initialising NMClient: %s", error->message);
     }
 
-  g_debug ("WFDP2PRegistry: Got NMClient");
+  g_debug ("NdNMDeviceRegistry: Got NMClient");
 
-  registry = ND_WFD_P2P_REGISTRY (user_data);
+  registry = ND_NM_DEVICE_REGISTRY (user_data);
 
   /* Everything good, we already connected and possibly received
    * the device-added/device-removed signals. */
 }
 
 static void
-nd_wfd_p2p_registry_constructed (GObject *object)
+nd_nm_device_registry_constructed (GObject *object)
 {
-  NdWFDP2PRegistry *registry = ND_WFD_P2P_REGISTRY (object);
+  NdNMDeviceRegistry *registry = ND_NM_DEVICE_REGISTRY (object);
 
   registry->cancellable = g_cancellable_new ();
   registry->nm_client = g_object_new (NM_TYPE_CLIENT, NULL);
@@ -176,9 +176,9 @@ nd_wfd_p2p_registry_constructed (GObject *object)
 }
 
 static void
-nd_wfd_p2p_registry_finalize (GObject *object)
+nd_nm_device_registry_finalize (GObject *object)
 {
-  NdWFDP2PRegistry *registry = ND_WFD_P2P_REGISTRY (object);
+  NdNMDeviceRegistry *registry = ND_NM_DEVICE_REGISTRY (object);
 
   while (registry->providers->len)
     {
@@ -192,18 +192,18 @@ nd_wfd_p2p_registry_finalize (GObject *object)
   g_clear_object (&registry->meta_provider);
   g_clear_pointer (&registry->providers, g_ptr_array_unref);
 
-  G_OBJECT_CLASS (nd_wfd_p2p_registry_parent_class)->finalize (object);
+  G_OBJECT_CLASS (nd_nm_device_registry_parent_class)->finalize (object);
 }
 
 static void
-nd_wfd_p2p_registry_class_init (NdWFDP2PRegistryClass *klass)
+nd_nm_device_registry_class_init (NdNMDeviceRegistryClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->get_property = nd_wfd_p2p_registry_get_property;
-  object_class->set_property = nd_wfd_p2p_registry_set_property;
-  object_class->constructed = nd_wfd_p2p_registry_constructed;
-  object_class->finalize = nd_wfd_p2p_registry_finalize;
+  object_class->get_property = nd_nm_device_registry_get_property;
+  object_class->set_property = nd_nm_device_registry_set_property;
+  object_class->constructed = nd_nm_device_registry_constructed;
+  object_class->finalize = nd_nm_device_registry_finalize;
 
   props[PROP_META_PROVIDER] =
     g_param_spec_object ("meta-provider", "MetaProvider",
@@ -215,15 +215,15 @@ nd_wfd_p2p_registry_class_init (NdWFDP2PRegistryClass *klass)
 }
 
 static void
-nd_wfd_p2p_registry_init (NdWFDP2PRegistry *registry)
+nd_nm_device_registry_init (NdNMDeviceRegistry *registry)
 {
   registry->providers = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
-NdWFDP2PRegistry *
-nd_wfd_p2p_registry_new (NdMetaProvider *meta_provider)
+NdNMDeviceRegistry *
+nd_nm_device_registry_new (NdMetaProvider *meta_provider)
 {
-  return g_object_new (ND_TYPE_WFD_P2P_REGISTRY,
+  return g_object_new (ND_TYPE_NM_DEVICE_REGISTRY,
                        "meta-provider", meta_provider,
                        NULL);
 }

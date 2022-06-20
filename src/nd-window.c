@@ -23,7 +23,7 @@
 #include "nd-sink-row.h"
 #include "nd-codec-install.h"
 #include "nd-meta-provider.h"
-#include "nd-wfd-p2p-registry.h"
+#include "nd-nm-device-registry.h"
 #include "nd-dummy-provider.h"
 
 #include <gst/gst.h>
@@ -36,7 +36,7 @@ struct _NdWindow
   GtkApplicationWindow parent_instance;
 
   NdMetaProvider      *meta_provider;
-  NdWFDP2PRegistry    *wfd_p2p_registry;
+  NdNMDeviceRegistry  *nm_device_registry;
 
   NdScreencastPortal  *portal;
   gboolean             use_x11;
@@ -329,7 +329,7 @@ gnome_nd_window_finalize (GObject *obj)
   g_clear_object (&self->stream_sink);
 
   g_clear_object (&self->meta_provider);
-  g_clear_object (&self->wfd_p2p_registry);
+  g_clear_object (&self->nm_device_registry);
 
   g_clear_pointer (&self->sink_property_bindings, g_ptr_array_unref);
 
@@ -459,7 +459,7 @@ gnome_nd_window_init (NdWindow *self)
                            self,
                            G_CONNECT_SWAPPED);
 
-  self->wfd_p2p_registry = nd_wfd_p2p_registry_new (self->meta_provider);
+  self->nm_device_registry = nd_nm_device_registry_new (self->meta_provider);
   nd_sink_list_set_provider (self->find_sink_list, ND_PROVIDER (self->meta_provider));
 
   if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_DUMMY"), "1") == 0)
