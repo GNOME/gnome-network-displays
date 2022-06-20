@@ -101,7 +101,7 @@ static void
 provider_sink_removed_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider *provider)
 {
   g_autoptr(GPtrArray) sink_matches = NULL;
-  NdMetaSink *meta_sink = NULL;
+  g_autoptr(NdMetaSink) meta_sink = NULL;
   guint idx = 0;
 
   g_object_get (sink, "matches", &sink_matches, NULL);
@@ -116,7 +116,7 @@ provider_sink_removed_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvide
                                               (GEqualFunc) nd_meta_sink_has_sink,
                                               &idx));
 
-  meta_sink = g_ptr_array_index (meta_provider->sinks, idx);
+  meta_sink = g_object_ref (g_ptr_array_index (meta_provider->sinks, idx));
   g_assert (meta_sink != NULL);
   if (nd_meta_sink_remove_sink (meta_sink, sink))
     {
