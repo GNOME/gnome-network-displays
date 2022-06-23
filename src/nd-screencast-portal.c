@@ -286,7 +286,7 @@ portal_create_session_response_received (GDBusConnection *connection,
 
   g_variant_builder_open (&builder, G_VARIANT_TYPE_VARDICT);
   g_variant_builder_add (&builder, "{sv}", "handle_token", g_variant_new_string (token));
-  g_variant_builder_add (&builder, "{sv}", "types", g_variant_new_uint32 (0x1));
+  g_variant_builder_add (&builder, "{sv}", "types", g_variant_new_uint32 (0x5));
   g_variant_builder_close (&builder);
 
   g_dbus_proxy_call (self->screencast,
