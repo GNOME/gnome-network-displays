@@ -131,15 +131,15 @@ nd_wfd_p2p_sink_get_property (GObject    *object,
     case PROP_MATCHES:
       {
         g_autoptr(GPtrArray) res = NULL;
-        const char *hw_addr;
+        const char *name;
         res = g_ptr_array_new_with_free_func (g_free);
 
         /* Should not usually happen, but it can if something is holding on
          * to the sink. So guard against NULL being returned if the peer
          * object is not valid anymore. */
-        hw_addr = nm_wifi_p2p_peer_get_hw_address (sink->nm_peer);
-        if (hw_addr)
-          g_ptr_array_add (res, g_strdup (hw_addr));
+        name = nm_wifi_p2p_peer_get_name (sink->nm_peer);
+        if (name)
+          g_ptr_array_add (res, g_strdup (name));
 
         g_value_take_boxed (value, g_steal_pointer (&res));
         break;
