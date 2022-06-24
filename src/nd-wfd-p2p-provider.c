@@ -92,7 +92,10 @@ peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device
       return;
     }
 
-  g_debug ("WFDP2PProvider: Found a new sink with peer %p on device %p", peer, device);
+  g_debug ("WFDP2PProvider: Found a new sink with peer \"%s\" (%s) on device %p",
+           nm_wifi_p2p_peer_get_name (peer),
+           nm_wifi_p2p_peer_get_hw_address (peer),
+           device);
 
   sink = nd_wfd_p2p_sink_new (provider->nm_client, provider->nm_device, peer);
 
@@ -158,7 +161,9 @@ log_start_find_error (GObject *source, GAsyncResult *res, gpointer user_data)
   NMDeviceWifiP2P *p2p_dev = NM_DEVICE_WIFI_P2P (source);
 
   if (!nm_device_wifi_p2p_start_find_finish (p2p_dev, res, &error))
-    g_warning ("Could not start P2P find: %s", error->message);
+    g_warning ("WFDP2PProvider: Could not start P2P find: %s", error->message);
+  else
+    g_debug ("WFDP2PProvider: Started P2P discovery");
 }
 
 static gboolean
@@ -166,9 +171,43 @@ device_restart_find_timeout (gpointer user_data)
 {
   NdWFDP2PProvider *provider = ND_WFD_P2P_PROVIDER (user_data);
 
+  g_debug ("WFDP2PProvider: Restarting P2P discovery");
   nm_device_wifi_p2p_start_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, log_start_find_error, NULL);
 
   return G_SOURCE_CONTINUE;
+}
+
+static void
+discovery_start_stop (NdWFDP2PProvider *provider, NMDeviceState state)
+{
+  if (provider->discover && state > NM_DEVICE_STATE_UNAVAILABLE)
+    {
+      g_debug ("WFDP2PProvider: Starting P2P discovery.");
+      nm_device_wifi_p2p_start_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, log_start_find_error, NULL);
+      if (!provider->p2p_find_source_id)
+        provider->p2p_find_source_id = g_timeout_add_seconds (20, device_restart_find_timeout, provider);
+    }
+  else
+    {
+      g_debug ("WFDP2PProvider: Stopping P2P discovery.");
+      if (provider->p2p_find_source_id)
+        g_source_remove (provider->p2p_find_source_id);
+      provider->p2p_find_source_id = 0;
+
+      nm_device_wifi_p2p_stop_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, NULL);
+    }
+}
+
+static void
+device_state_changed_cb (NdWFDP2PProvider   *provider,
+                         NMDeviceState       new_state,
+                         NMDeviceState       old_state,
+                         NMDeviceStateReason reason,
+                         NMDevice           *device)
+{
+  g_debug ("WFDP2PProvider: Device state changed. It is now %i.", new_state);
+
+  discovery_start_stop (provider, new_state);
 }
 
 static void
@@ -179,6 +218,10 @@ nd_wfd_p2p_provider_set_property (GObject      *object,
 {
   NdWFDP2PProvider *provider = ND_WFD_P2P_PROVIDER (object);
   const GPtrArray *peers;
+  NMDeviceState state = NM_DEVICE_STATE_UNKNOWN;
+
+  if (provider->nm_device)
+    state = nm_device_get_state (provider->nm_device);
 
   switch (prop_id)
     {
@@ -203,11 +246,13 @@ nd_wfd_p2p_provider_set_property (GObject      *object,
                                provider,
                                G_CONNECT_SWAPPED);
 
-      if (provider->discover)
-        {
-          nm_device_wifi_p2p_start_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, log_start_find_error, NULL);
-          provider->p2p_find_source_id = g_timeout_add_seconds (20, device_restart_find_timeout, provider);
-        }
+      g_signal_connect_object (provider->nm_device,
+                               "state-changed",
+                               (GCallback) device_state_changed_cb,
+                               provider,
+                               G_CONNECT_SWAPPED);
+
+      discovery_start_stop (provider, state);
 
       peers = nm_device_wifi_p2p_get_peers (NM_DEVICE_WIFI_P2P (provider->nm_device));
       for (gint i = 0; i < peers->len; i++)
@@ -217,22 +262,9 @@ nd_wfd_p2p_provider_set_property (GObject      *object,
 
     case PROP_DISCOVER:
       provider->discover = g_value_get_boolean (value);
-      g_debug ("WfdP2PProvider: Discover is now set to %d", provider->discover);
+      g_debug ("WFDP2PProvider: Discover is now set to %d", provider->discover);
 
-      if (provider->discover)
-        {
-          nm_device_wifi_p2p_start_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, log_start_find_error, NULL);
-          if (!provider->p2p_find_source_id)
-            provider->p2p_find_source_id = g_timeout_add_seconds (20, device_restart_find_timeout, provider);
-        }
-      else
-        {
-          if (provider->p2p_find_source_id)
-            g_source_remove (provider->p2p_find_source_id);
-          provider->p2p_find_source_id = 0;
-
-          nm_device_wifi_p2p_stop_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, NULL);
-        }
+      discovery_start_stop (provider, state);
 
       break;
 
@@ -251,8 +283,7 @@ nd_wfd_p2p_provider_finalize (GObject *object)
     g_source_remove (provider->p2p_find_source_id);
   provider->p2p_find_source_id = 0;
 
-  g_ptr_array_free (provider->sinks, TRUE);
-  provider->sinks = NULL;
+  g_clear_pointer (&provider->sinks, g_ptr_array_unref);
   g_clear_object (&provider->nm_client);
   g_clear_object (&provider->nm_device);
 
