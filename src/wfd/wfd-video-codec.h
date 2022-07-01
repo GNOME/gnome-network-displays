@@ -12,9 +12,10 @@ typedef struct _WfdVideoCodec WfdVideoCodec;
 typedef enum {
   WFD_H264_PROFILE_BASE = 0x01,
   WFD_H264_PROFILE_HIGH = 0x02,
+  WFD_H264_PROFILE_CHROMECAST = 0x04,
 } WfdH264ProfileFlags;
 
-#define WFD_H264_PROFILE_ALL 0x3
+#define WFD_H264_PROFILE_ALL 0x7
 
 struct _WfdVideoCodec
 {

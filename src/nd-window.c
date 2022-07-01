@@ -28,6 +28,7 @@
 #include "nd-nm-device-registry.h"
 #include "nd-dummy-provider.h"
 #include "nd-wfd-mice-provider.h"
+#include "nd-cc-provider.h"
 
 #include <gst/gst.h>
 
@@ -324,6 +325,7 @@ gnome_nd_window_constructed (GObject *obj)
 {
   g_autoptr(GError) error = NULL;
   g_autoptr(NdWFDMiceProvider) mice_provider = NULL;
+  g_autoptr(NdCCProvider) cc_provider = NULL;
   NdWindow *self = ND_WINDOW (obj);
 
   self->cancellable = g_cancellable_new ();
@@ -341,8 +343,9 @@ gnome_nd_window_constructed (GObject *obj)
   g_debug ("NdWindow: Got avahi client");
 
   mice_provider = nd_wfd_mice_provider_new (self->avahi_client);
+  cc_provider = nd_cc_provider_new (self->avahi_client);
 
-  if (!nd_wfd_mice_provider_browse (mice_provider, error))
+  if (!nd_wfd_mice_provider_browse (mice_provider, error) || !nd_cc_provider_browse (cc_provider, error))
     {
       g_warning ("NdWindow: Avahi client failed to browse: %s", error->message);
       return;
@@ -350,6 +353,7 @@ gnome_nd_window_constructed (GObject *obj)
 
   g_debug ("NdWindow: Got avahi browser");
   nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (mice_provider));
+  nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (cc_provider));
 }
 
 static void

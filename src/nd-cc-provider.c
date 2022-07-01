@@ -1,6 +1,7 @@
-/* nd-wfd-mice-provider.c
+/* nd-cc-provider.c
  *
  * Copyright 2022 Christian Glombek <lorbus@fedoraproject.org>
+ * Copyright 2022 Anupam Kumar <kyteinsky@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,20 +21,20 @@
 #include <avahi-gobject/ga-service-resolver.h>
 #include <avahi-common/address.h>
 #include "gnome-network-displays-config.h"
-#include "nd-wfd-mice-provider.h"
+#include "nd-cc-provider.h"
 #include "nd-sink.h"
-#include "nd-wfd-mice-sink.h"
+#include "nd-cc-sink.h"
 
-struct _NdWFDMiceProvider
+struct _NdCCProvider
 {
-  GObject         parent_instance;
+  GObject        parent_instance;
 
-  GPtrArray      *sinks;
-  GaClient       *avahi_client;
+  GPtrArray     *sinks;
+  GaClient      *avahi_client;
 
-  GSocketService *signalling_server;
+  GSocketClient *signalling_client;
 
-  gboolean        discover;
+  gboolean       discover;
 };
 
 enum {
@@ -44,27 +45,30 @@ enum {
   PROP_LAST = PROP_DISCOVER,
 };
 
-static void nd_wfd_mice_provider_provider_iface_init (NdProviderIface *iface);
-static GList * nd_wfd_mice_provider_provider_get_sinks (NdProvider *provider);
+static void nd_cc_provider_provider_iface_init (NdProviderIface *iface);
+static GList *nd_cc_provider_provider_get_sinks (NdProvider *provider);
 
-G_DEFINE_TYPE_EXTENDED (NdWFDMiceProvider, nd_wfd_mice_provider, G_TYPE_OBJECT, 0,
+G_DEFINE_TYPE_EXTENDED (NdCCProvider, nd_cc_provider, G_TYPE_OBJECT, 0,
                         G_IMPLEMENT_INTERFACE (ND_TYPE_PROVIDER,
-                                               nd_wfd_mice_provider_provider_iface_init);
+                                               nd_cc_provider_provider_iface_init);
                        )
 
-static GParamSpec * props[PROP_LAST] = { NULL, };
+static GParamSpec *props[PROP_LAST] = {
+  NULL,
+};
 
 static void
-nd_wfd_mice_provider_get_property (GObject    *object,
-                                   guint       prop_id,
-                                   GValue     *value,
-                                   GParamSpec *pspec)
+nd_cc_provider_get_property (GObject    *object,
+                             guint       prop_id,
+                             GValue     *value,
+                             GParamSpec *pspec)
 {
-  NdWFDMiceProvider *provider = ND_WFD_MICE_PROVIDER (object);
+  NdCCProvider *provider = ND_CC_PROVIDER (object);
 
   switch (prop_id)
     {
     case PROP_CLIENT:
+      g_assert (provider->avahi_client == NULL);
       g_value_set_object (value, provider->avahi_client);
       break;
 
@@ -78,14 +82,13 @@ nd_wfd_mice_provider_get_property (GObject    *object,
     }
 }
 
-
 static void
-nd_wfd_mice_provider_set_property (GObject      *object,
-                                   guint         prop_id,
-                                   const GValue *value,
-                                   GParamSpec   *pspec)
+nd_cc_provider_set_property (GObject      *object,
+                             guint         prop_id,
+                             const GValue *value,
+                             GParamSpec   *pspec)
 {
-  NdWFDMiceProvider *provider = ND_WFD_MICE_PROVIDER (object);
+  NdCCProvider *provider = ND_CC_PROVIDER (object);
 
   switch (prop_id)
     {
@@ -104,27 +107,27 @@ nd_wfd_mice_provider_set_property (GObject      *object,
     }
 }
 
-
 static void
-nd_wfd_mice_provider_finalize (GObject *object)
+nd_cc_provider_finalize (GObject *object)
 {
-  NdWFDMiceProvider *provider = ND_WFD_MICE_PROVIDER (object);
+  NdCCProvider *provider = ND_CC_PROVIDER (object);
 
   g_clear_pointer (&provider->sinks, g_ptr_array_unref);
-  g_clear_object (&provider->avahi_client);
-  g_clear_object (&provider->signalling_server);
 
-  G_OBJECT_CLASS (nd_wfd_mice_provider_parent_class)->finalize (object);
+  if (provider->signalling_client)
+    g_object_unref (provider->signalling_client);
+
+  G_OBJECT_CLASS (nd_cc_provider_parent_class)->finalize (object);
 }
 
 static void
-nd_wfd_mice_provider_class_init (NdWFDMiceProviderClass *klass)
+nd_cc_provider_class_init (NdCCProviderClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->get_property = nd_wfd_mice_provider_get_property;
-  object_class->set_property = nd_wfd_mice_provider_set_property;
-  object_class->finalize = nd_wfd_mice_provider_finalize;
+  object_class->get_property = nd_cc_provider_get_property;
+  object_class->set_property = nd_cc_provider_set_property;
+  object_class->finalize = nd_cc_provider_finalize;
 
   props[PROP_CLIENT] =
     g_param_spec_object ("client", "Client",
@@ -149,19 +152,19 @@ resolver_found_cb (GaServiceResolver  *resolver,
                    gint                port,
                    AvahiStringList    *txt,
                    GaLookupResultFlags flags,
-                   NdWFDMiceProvider  *provider)
+                   NdCCProvider       *provider)
 {
-  NdWFDMiceSink * sink = NULL;
+  NdCCSink *sink = NULL;
   gchar address[AVAHI_ADDRESS_STR_MAX];
 
-  g_debug ("NdWFDMiceProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
+  g_debug ("NdCCProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
 
   if (avahi_address_snprint (address, sizeof (address), addr) == NULL)
-    g_warning ("NdWFDMiceProvider: Failed to convert AvahiAddress to string");
+    g_warning ("NdCCProvider: Failed to convert AvahiAddress to string");
 
-  g_debug ("NdWFDMiceProvider: Resolved %s to %s", hostname, address);
+  g_debug ("NdCCProvider: Resolved %s to %s", hostname, address);
 
-  sink = nd_wfd_mice_sink_new (name, address);
+  sink = nd_cc_sink_new (provider->signalling_client, name, address);
 
   g_object_unref (resolver);
 
@@ -172,9 +175,9 @@ resolver_found_cb (GaServiceResolver  *resolver,
 static void
 resolver_failure_cb (GaServiceResolver *resolver,
                      GError            *error,
-                     NdWFDMiceProvider *provider)
+                     NdCCProvider      *provider)
 {
-  g_warning ("NdWFDMiceProvider: Failed to resolve Avahi service: %s", error->message);
+  g_warning ("NdCCProvider: Failed to resolve Avahi service: %s", error->message);
   g_object_unref (resolver);
 }
 
@@ -186,7 +189,7 @@ service_added_cb (GaServiceBrowser   *browser,
                   gchar              *type,
                   gchar              *domain,
                   GaLookupResultFlags flags,
-                  NdWFDMiceProvider  *provider)
+                  NdCCProvider       *provider)
 {
   GaServiceResolver *resolver;
   GError *error = NULL;
@@ -213,7 +216,7 @@ service_added_cb (GaServiceBrowser   *browser,
                                    provider->avahi_client,
                                    &error))
     {
-      g_warning ("NdWFDMiceProvider: Failed to attach Avahi resolver: %s", error->message);
+      g_warning ("NdCCProvider: Failed to attach Avahi resolver: %s", error->message);
       g_error_free (error);
     }
 }
@@ -226,24 +229,24 @@ service_removed_cb (GaServiceBrowser   *browser,
                     gchar              *type,
                     gchar              *domain,
                     GaLookupResultFlags flags,
-                    NdWFDMiceProvider  *provider)
+                    NdCCProvider       *provider)
 {
-  g_debug ("NdWFDMiceProvider: mDNS service \"%s\" removed from interface %i", name, iface);
+  g_debug ("NdCCProvider: mDNS service \"%s\" removed from interface %i", name, iface);
 
   for (gint i = 0; i < provider->sinks->len; i++)
     {
-      g_autoptr(NdWFDMiceSink) sink = g_object_ref (g_ptr_array_index (provider->sinks, i));
+      g_autoptr(NdCCSink) sink = g_object_ref (g_ptr_array_index (provider->sinks, i));
 
-      NdSinkState state = nd_wfd_mice_sink_get_state (sink);
+      NdSinkState state = nd_cc_sink_get_state (sink);
       if (state == ND_SINK_STATE_WAIT_STREAMING ||
           state == ND_SINK_STATE_STREAMING)
         continue;
 
-      gchar * remote_name = NULL;
+      gchar *remote_name = NULL;
       g_object_get (sink, "name", &remote_name, NULL);
       if (remote_name == name)
         {
-          g_debug ("NdWFDMiceProvider: Removing sink");
+          g_debug ("NdCCProvider: Removing sink");
           g_ptr_array_remove_index (provider->sinks, i);
           g_signal_emit_by_name (provider, "sink-removed", sink);
           break;
@@ -252,62 +255,11 @@ service_removed_cb (GaServiceBrowser   *browser,
 }
 
 static void
-signalling_incoming_cb (GSocketService     *service,
-                        GSocketConnection * connection,
-                        GObject           * source,
-                        gpointer            user_data)
+nd_cc_provider_init (NdCCProvider *provider)
 {
-  /*
-   * XXX: we should read the full, variable-length message,
-   * find the respective sink,
-   * and appropriately respond with sink's signalling client.
-   */
-
-  /* NdWFDMiceProvider * self = ND_WFD_MICE_PROVIDER (user_data); */
-
-  gchar buffer[1024];
-  GInputStream * istream;
-  GError * error;
-
-  istream = g_io_stream_get_input_stream (G_IO_STREAM (connection));
-
-  g_input_stream_read (istream, buffer, sizeof (buffer), NULL, &error);
-  if (error != NULL)
-    g_warning ("NdWFDMiceProvider: Failed to connect to signalling host: %s", error->message);
-
-  g_debug ("NdWFDMiceProvider: Received Message: %s", buffer);
-
-  return;
-}
-
-static void
-nd_wfd_mice_provider_init (NdWFDMiceProvider *provider)
-{
-  g_autoptr(GError) error = NULL;
-  GSocketService * server;
-
   provider->discover = TRUE;
   provider->sinks = g_ptr_array_new_with_free_func (g_object_unref);
-  server = g_socket_service_new ();
-
-  g_socket_listener_add_inet_port ((GSocketListener *) server,
-                                   7250,
-                                   NULL,
-                                   &error);
-  if (error != NULL)
-    {
-      g_warning ("NdWFDMiceProvider: Error starting signal listener: %s", error->message);
-      return;
-    }
-
-  g_signal_connect (server,
-                    "incoming",
-                    G_CALLBACK (signalling_incoming_cb),
-                    provider);
-
-  g_socket_service_start (server);
-
-  provider->signalling_server = server;
+  provider->signalling_client = g_socket_client_new ();
 }
 
 /******************************************************************
@@ -315,57 +267,57 @@ nd_wfd_mice_provider_init (NdWFDMiceProvider *provider)
 ******************************************************************/
 
 static void
-nd_wfd_mice_provider_provider_iface_init (NdProviderIface *iface)
+nd_cc_provider_provider_iface_init (NdProviderIface *iface)
 {
-  iface->get_sinks = nd_wfd_mice_provider_provider_get_sinks;
+  iface->get_sinks = nd_cc_provider_provider_get_sinks;
 }
 
 static GList *
-nd_wfd_mice_provider_provider_get_sinks (NdProvider *provider)
+nd_cc_provider_provider_get_sinks (NdProvider *provider)
 {
-  NdWFDMiceProvider *wfd_mice_provider = ND_WFD_MICE_PROVIDER (provider);
+  NdCCProvider *cc_provider = ND_CC_PROVIDER (provider);
   GList *res = NULL;
 
-  for (gint i = 0; i < wfd_mice_provider->sinks->len; i++)
-    res = g_list_prepend (res, g_ptr_array_index (wfd_mice_provider->sinks, i));
+  for (gint i = 0; i < cc_provider->sinks->len; i++)
+    res = g_list_prepend (res, g_ptr_array_index (cc_provider->sinks, i));
 
   return res;
 }
 
 /******************************************************************
-* NdWFDMiceProvider public functions
+* NdCCProvider public functions
 ******************************************************************/
 
 GaClient *
-nd_wfd_mice_provider_get_client (NdWFDMiceProvider *provider)
+nd_cc_provider_get_client (NdCCProvider *provider)
 {
   return provider->avahi_client;
 }
 
-GSocketService *
-nd_wfd_mice_provider_get_signalling_server (NdWFDMiceProvider *provider)
+GSocketClient *
+nd_cc_provider_get_signalling_client (NdCCProvider *provider)
 {
-  return provider->signalling_server;
+  return provider->signalling_client;
 }
 
-NdWFDMiceProvider *
-nd_wfd_mice_provider_new (GaClient *client)
+NdCCProvider *
+nd_cc_provider_new (GaClient *client)
 {
-  return g_object_new (ND_TYPE_WFD_MICE_PROVIDER,
+  return g_object_new (ND_TYPE_CC_PROVIDER,
                        "client", client,
                        NULL);
 }
 
 gboolean
-nd_wfd_mice_provider_browse (NdWFDMiceProvider *provider, GError * error)
+nd_cc_provider_browse (NdCCProvider *provider, GError *error)
 {
-  GaServiceBrowser * avahi_browser;
+  GaServiceBrowser *avahi_browser;
 
-  avahi_browser = ga_service_browser_new ("_display._tcp");
+  avahi_browser = ga_service_browser_new ("_googlecast._tcp");
 
   if (provider->avahi_client == NULL)
     {
-      g_warning ("NdWFDMiceProvider: No Avahi client found");
+      g_warning ("NdCCProvider: No Avahi client found");
       return FALSE;
     }
 
@@ -383,7 +335,7 @@ nd_wfd_mice_provider_browse (NdWFDMiceProvider *provider, GError * error)
                                   provider->avahi_client,
                                   &error))
     {
-      g_warning ("NdWFDMiceProvider: Failed to attach Avahi Service Browser: %s", error->message);
+      g_warning ("NdCCProvider: Failed to attach Avahi Service Browser: %s", error->message);
       return FALSE;
     }
 

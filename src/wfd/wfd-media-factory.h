@@ -21,7 +21,13 @@ gboolean          wfd_get_missing_codecs (GStrv *video,
                                           GStrv *audio);
 
 /* Just because it is convenient to have next to the pipeline creation code */
+GstElement * wfd_media_factory_create_element (GstRTSPMediaFactory *factory,
+                                               const GstRTSPUrl    *url);
+GstElement * wfd_media_factory_create_video_element (WfdMediaFactory *self,
+                                                     GstBin          *bin);
+GstBin * wfd_media_factory_create_audio_element (WfdMediaFactory *self);
 WfdMediaQuirks wfd_configure_media_element (GstBin    *bin,
                                             WfdParams *params);
+void wfd_media_factory_finalize (GObject *object);
 
 G_END_DECLS
