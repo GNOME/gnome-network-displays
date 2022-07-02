@@ -12,6 +12,8 @@ gnome_nd_sources = [
   'nd-provider.c',
   'nd-meta-sink.c',
   'nd-meta-provider.c',
+  'nd-wfd-mice-sink.c',
+  'nd-wfd-mice-provider.c',
   'nd-wfd-p2p-sink.c',
   'nd-wfd-p2p-provider.c',
   'nd-nm-device-registry.c',
@@ -29,13 +31,15 @@ gnome_nd_sources += gnome.mkenums_simple(
 )
 
 gnome_nd_deps = [
+  dependency('avahi-client'),
+  dependency('avahi-gobject'),
   dependency('gio-2.0', version: '>= 2.50'),
-  dependency('gtk+-3.0', version: '>= 3.22'),
-  dependency('libnm', version: '>= 1.15'),
   dependency('gstreamer-1.0', version: '>= 1.14'),
   dependency('gstreamer-pbutils-1.0', version: '>= 1.14'),
   dependency('gstreamer-plugins-base-1.0'),
   dependency('gstreamer-rtsp-server-1.0'),
+  dependency('gtk+-3.0', version: '>= 3.22'),
+  dependency('libnm', version: '>= 1.15'),
   dependency('libpulse-mainloop-glib'),
 ]
 
