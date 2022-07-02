@@ -188,6 +188,7 @@ nd_nm_device_registry_finalize (GObject *object)
     }
 
   g_cancellable_cancel (registry->cancellable);
+  g_clear_object (&registry->nm_client);
   g_clear_object (&registry->cancellable);
   g_clear_object (&registry->meta_provider);
   g_clear_pointer (&registry->providers, g_ptr_array_unref);
