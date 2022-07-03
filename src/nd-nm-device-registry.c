@@ -137,7 +137,7 @@ client_init_async_finished (GObject *source, GAsyncResult *res, gpointer user_da
 
       registry = ND_NM_DEVICE_REGISTRY (user_data);
       g_clear_object (&registry->nm_client);
-      g_warning ("Error initialising NMClient: %s", error->message);
+      g_warning ("NdNMDeviceRegistry: Error initialising NMClient: %s", error->message);
     }
 
   g_debug ("NdNMDeviceRegistry: Got NMClient");
