@@ -1,241 +1,264 @@
 {
-    "app-id" : "org.gnome.NetworkDisplays",
-    "runtime" : "org.gnome.Platform",
-    "runtime-version" : "3.32",
-    "sdk" : "org.gnome.Sdk",
-    "command" : "gnome-network-displays",
-    "finish-args" : [
+    "app-id": "org.gnome.NetworkDisplays",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "42",
+    "sdk": "org.gnome.Sdk",
+    "command": "gnome-network-displays",
+    "finish-args": [
         "--share=ipc",
         "--share=network",
-        "--socket=x11",
         "--socket=pulseaudio",
-        "--socket=session-bus",
-        "--socket=system-bus",
         "--socket=wayland",
-        "--device=all"
+        "--socket=fallback-x11",
+        "--filesystem=xdg-run/gvfs",
+        "--filesystem=xdg-run/gvfsd",
+        "--talk-name=org.gtk.vfs",
+        "--talk-name=org.gtk.vfs.*",
+        "--system-talk-name=org.freedesktop.NetworkManager",
+        "--system-talk-name=org.fedoraproject.FirewallD1"
     ],
-    "modules" : [
+    "modules": [
+	{
+	  "name": "intltool",
+	  "cleanup": [ "*" ],
+	  "sources": [
+	    {
+	      "type": "archive",
+	      "url": "https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz",
+	      "sha256": "67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334e959cd"
+	    },
+	    {
+	      "type": "patch",
+	      "path": "intltool-perl5.26-regex-fixes.patch"
+	    }
+	  ]
+	},
         {
-            "name" : "gstreamer",
-            "buildsystem" : "meson",
-            "builddir" : true,
-            "config-opts" : [
-                "-Ddisable_gtkdoc=true"
+            "name": "gst-rtsp-server",
+            "buildsystem": "meson",
+            "builddir": true,
+            "config-opts": [
+                "-Dexamples=disabled",
+                "-Dtests=disabled",
+                "-Dintrospection=disabled"
             ],
-            "sources" : [
-                {
-                    "type" : "git",
-                    "branch" : "1.14.2",
-                    "url" : "git://anongit.freedesktop.org/gstreamer/gstreamer",
-                    "commit" : "afb3d1b3e0d02da8b0eb5bb501356650b38e5644"
-                }
-            ]
-        },
-        {
-            "name" : "gst-plugins-base",
-            "buildsystem" : "meson",
-            "config-opts" : [
-                "-Ddisable_gtkdoc=true"
-            ],
-            "builddir" : true,
-            "sources" : [
-                {
-                    "type" : "git",
-                    "branch" : "1.14.2",
-                    "url" : "git://anongit.freedesktop.org/gstreamer/gst-plugins-base",
-                    "commit" : "24f097564657bd630e68931c932ec9fd992a3785"
-                }
-            ]
-        },
-        {
-            "name" : "gst-plugins-good",
-            "buildsystem" : "meson",
-            "builddir" : true,
-            "config-opts" : [
-                "-Ddisable_gtkdoc=true"
-            ],
-            "sources" : [
-                {
-                    "type" : "git",
-                    "branch" : "1.14.2",
-                    "url" : "git://anongit.freedesktop.org/gstreamer/gst-plugins-good",
-                    "commit" : "4733e9715675d2dc52ed00e58d52388c56411cd2"
-                }
-            ]
-        },
-        {
-            "name" : "gst-plugins-ugly",
-            "buildsystem" : "meson",
-            "builddir" : true,
-            "config-opts" : [
-                "-Ddisable_gtkdoc=true"
-            ],
-            "sources" : [
-                {
-                    "type" : "git",
-                    "branch" : "1.14.2",
-                    "url" : "git://anongit.freedesktop.org/gstreamer/gst-plugins-ugly",
-                    "commit" : "df1bcfa0ba57859eb39610ef53f1eb744ca57465"
-                }
-            ]
-        },
-        {
-           "name" : "gst-plugins-bad",
-           "buildsystem" : "meson",
-           "builddir" : true,
-           "config-opts" : [
-                "-Ddisable_gtkdoc=true"
-            ],
-            "sources" : [
-                {
-                    "type" : "git",
-                    "branch" : "1.14.5",
-                    "url" : "git://anongit.freedesktop.org/gstreamer/gst-plugins-bad.git",
-                    "commit" : "dc1b94a15290172ffcc57c57f2b7ff6ee9322a5d"
-                }
-            ]
-        },
-        {
-            "name" : "gst-rtsp-server",
-            "buildsystem" : "meson",
-            "builddir" : true,
-            "config-opts" : [
-                "-Ddisable_gtkdoc=true"
-            ],
-            "sources" : [
-                {
-                    "type" : "git",
-                    "branch" : "1.14.5",
-                    "url" : "https://gitlab.freedesktop.org/gstreamer/gst-rtsp-server.git",
-                    "commit" : "1ad54eecfdf634ab6eb672c81df1602d004d75b8"
-                }
-            ]
-        },
-        {
-            "name" : "udev",
-            "config-opts" : [
-                "--disable-hwdb",
-                "--disable-logging",
-                "--disable-gudev",
-                "--disable-introspection",
-                "--disable-keymap",
-                "--disable-mtd_probe"
-            ],
-            "cleanup" : [
+            "cleanup": [
                 "/include",
-                "/etc",
-                "/libexec",
-                "/sbin",
-                "/lib/pkgconfig",
-                "/man",
-                "/share/aclocal",
-                "/share/doc",
-                "/share/gtk-doc",
-                "/share/man",
-                "/share/pkgconfig",
-                "*.la",
-                "*.a"
+                "/lib/pkgconfig"
             ],
-            "sources" : [
+            "sources": [
                 {
-                    "type" : "git",
-                    "url" : "git://github.com/gentoo/eudev.git"
+                    "type": "archive",
+                    "url": "https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-1.18.6.tar.xz",
+                    "sha256": "826f32afbcf94b823541efcac4a0dacdb62f6145ef58f363095749f440262be9",
+                    "x-checker-data": {
+                        "type": "json",
+                        "url": "https://gitlab.freedesktop.org/api/v4/projects/1362/repository/tags?search=^1.18.",
+                        "version-query": ".[0].name",
+                        "url-query": "\"https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-\" + $version + \".tar.xz\""
+                    }
                 }
             ]
         },
         {
-            "name" : "libndp",
-            "buildsystem" : "autotools",
-            "sources" : [
+            "name": "eudev",
+            "cleanup": [
+                "/bin",
+                "/sbin",
+                "/include",
+                "/lib*/udev",
+                "/share/pkgconfig"
+            ],
+            "post-install": [
+                "udevadm hwdb --update"
+            ],
+            "sources": [
                 {
-                    "type" : "git",
-                    "branch" : "v1.6",
-                    "url" : "https://github.com/jpirko/libndp.git",
-                    "commit" : "2f721c4ff519f38f46695a60d9f9d88f35bf3c1d"
+                    "type": "archive",
+                    "url": "https://github.com/eudev-project/eudev/releases/download/v3.2.11/eudev-3.2.11.tar.gz",
+                    "sha256": "19847cafec67897da855fde56f9dc7d92e21c50e450aa79068a7e704ed44558b",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 13466,
+                        "stable-only": true,
+                        "url-template": "https://github.com/eudev-project/eudev/releases/download/v$version/eudev-$version.tar.gz"
+                    }
                 }
             ]
         },
         {
-            "name" : "polkit",
-            "config-opts" : [
+            "name": "libndp",
+            "buildsystem": "autotools",
+            "cleanup": [
+                "/bin",
+                "/include",
+                "/lib/pkgconfig",
+                "/share/man"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/jpirko/libndp/archive/v1.8.tar.gz",
+                    "sha256": "c3ea76e253def89869651686a827da75b56896fe94fabd87d8c14b1d4588fd05",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 14944,
+                        "stable-only": true,
+                        "url-template": "https://github.com/jpirko/libndp/archive/v$version.tar.gz"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "polkit",
+            "config-opts": [
                 "--disable-polkitd",
                 "--disable-man-pages",
                 "--disable-introspection",
-                "--enable-libsystemd-login=no",
-                "--with-systemdsystemunitdir=no"
+                "--disable-examples",
+                "--disable-gtk-doc",
+                "--disable-libelogind",
+                "--disable-libsystemd-login",
+                "--with-systemdsystemunitdir=no",
+                "--with-authdb=dummy",
+                "--with-authfw=none"
             ],
-            "rm-configure" : true,
-            "cleanup" : [
+            "rm-configure": true,
+            "cleanup": [
                 "/bin/*",
                 "/etc/pam.d",
                 "/etc/dbus-1",
                 "/share/dbus-1/system-services/*",
                 "/share/polkit-1",
-                "/lib/polkit-1"
+                "/lib/polkit-1",
+                "/include"
             ],
-            "sources" : [
+            "sources": [
                 {
-                    "type" : "archive",
-                    "url" : "http://www.freedesktop.org/software/polkit/releases/polkit-0.113.tar.gz",
-                    "sha256" : "e1c095093c654951f78f8618d427faf91cf62abdefed98de40ff65eca6413c81"
+                    "type": "archive",
+                    "url": "https://www.freedesktop.org/software/polkit/releases/polkit-0.120.tar.gz",
+                    "sha256": "ee7a599a853117bf273548725719fa92fabd2f136915c7a4906cee98567aee03",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 3682,
+                        "stable-only": true,
+                        "url-template": "https://www.freedesktop.org/software/polkit/releases/polkit-$version.tar.gz"
+                    }
                 },
                 {
-                    "type" : "patch",
-                    "path" : "polkit-build-Add-option-to-build-without-polkitd.patch"
+                    "type": "patch",
+                    "path": "polkit-build-Add-option-to-build-without-polkitd.patch"
                 },
                 {
-                    "type" : "file",
-                    "path" : "polkit-autogen",
-                    "dest-filename" : "autogen.sh"
+                    "type": "file",
+                    "path": "polkit-autogen",
+                    "dest-filename": "autogen.sh"
                 }
             ]
         },
         {
-            "name" : "NetworkManager",
-            "buildsystem" : "meson",
-            "build-options" : {
-                "cflags" : "-ltinfo",
-                "cxxflags" : "-ltinfo"
-            },
-            "config-opts" : [
-                "-Dlibaudit=no",
-                "-Ddbus_conf_dir=/app/etc/dbus-1/system.d",
-                "-Ddbus_ifaces_dir=/app/share/dbus-1/interfaces",
-                "-Ddbus_sys_dir=/app/share/dbus-1/system.d",
-                "-Ddnsmasq=/usr/bin/true",
-                "-Ddocs=false",
-                "-Dintrospection=false",
-                "-Diptables=/usr/bin/true",
-                "-Djson_validation=false",
-                "-Dlibnm_glib=false",
-                "-Dlibpsl=false",
-                "-Dmodem_manager=false",
-                "-Dnmtui=false",
-                "-Dovs=false",
-                "-Dppp=false",
-                "-Dqt=false",
-                "-Dselinux=false",
-                "-Dsession_tracking=no",
-                "-Dsystemdsystemunitdir='no'",
-                "-Dsystemd_journal=false",
-                "-Dtests=no",
-                "-Dvapi=false",
-                "-Dwifi=true"
+            "name": "firewalld",
+            "config-opts": [
+                "--disable-schemas-compile",
+                "--disable-docs",
+                "--disable-systemd",
+                "--disable-nls",
+                "--without-iptables",
+                "--without-iptables-restore",
+                "--without-ip6tables",
+                "--without-ip6tables-restore",
+                "--without-ebtables",
+                "--without-ebtables-restore",
+                "--without-ipset",
+                "--with-python_prefix=/app",
+                "--with-python_exec_prefix=/app"
             ],
-            "sources" : [
+            "cleanup": [
+                "/bin",
+                "/etc",
+                "/include",
+                "/lib/pkgconfig",
+                "/share",
+                "/sbin"
+            ],
+            "sources": [
                 {
-                    "type" : "git",
-                    "url" : "https://gitlab.freedesktop.org/NetworkManager/NetworkManager.git"
+                    "type": "archive",
+                    "url": "https://github.com/firewalld/firewalld/releases/download/v1.1.1/firewalld-1.1.1.tar.gz",
+                    "sha256": "1dcd314ff836b2ce69f15f60fc7d50bd77ed359d784f9b3c07f2d394ea570e4c",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 9989,
+                        "stable-only": true,
+                        "url-template": "https://github.com/firewalld/firewalld/releases/download/v$version/firewalld-$version.tar.gz"
+                    }
                 }
             ]
         },
         {
-            "name" : "gnome-network-displays",
+            "name": "NetworkManager",
             "buildsystem": "meson",
-            "sources" : [
+            "build-options": {
+                "cflags": "-ltinfo",
+                "cxxflags": "-ltinfo"
+            },
+            "config-opts": [
+                "-Dsystemdsystemunitdir=no",
+                "-Ddbus_conf_dir=/app/etc/dbus-1/system.d",
+                "-Diptables=/usr/bin/true",
+                "-Ddnsmasq=/usr/bin/true",
+                "-Dsession_tracking=no",
+                "-Dselinux=false",
+                "-Dsystemd_journal=false",
+                "-Dlibaudit=no",
+                "-Dwext=false",
+                "-Dwifi=true",
+                "-Dppp=false",
+                "-Dmodem_manager=false",
+                "-Dovs=false",
+                "-Dnmcli=false",
+                "-Dnmtui=false",
+                "-Dintrospection=false",
+                "-Dvapi=false",
+                "-Ddocs=false",
+                "-Dtests=no",
+                "-Dfirewalld_zone=false",
+                "-Dlibpsl=false",
+                "-Dqt=false"
+            ],
+            "cleanup": [
+                "/bin",
+                "/etc",
+                "/include",
+                "/lib/pkgconfig",
+                "/libexec",
+                "/sbin",
+                "/var"
+            ],
+            "sources": [
                 {
-                    "type" : "git",
-                    "url" : "https://github.com/benzea/gnome-network-displays.git"
+                    "type": "git",
+                    "url": "https://gitlab.freedesktop.org/NetworkManager/NetworkManager.git",
+                    "tag": "1.38.2",
+                    "commit": "abfd2d6ea729926bff0ddafa1367a54f6d6f4230",
+                    "x-checker-data": {
+                        "type": "git",
+                        "tag-pattern": "^([\\d.]+)$"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "gnome-network-displays",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dfirewalld_zone=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://gitlab.gnome.org/GNOME/gnome-network-displays.git",
+                    "branch": "master"
                 }
             ]
         }
