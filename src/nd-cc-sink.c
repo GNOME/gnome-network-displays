@@ -41,7 +41,7 @@ struct _NdCCSink
   gchar             *remote_name;
 
   GSocketClient     *comm_client;
-  GSocketConnection *comm_client_conn; 
+  GIOStream         *connection; 
 
   WfdServer         *server;
   guint              server_source_id;
@@ -77,21 +77,26 @@ G_DEFINE_TYPE_EXTENDED (NdCCSink, nd_cc_sink, G_TYPE_OBJECT, 0,
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
-static gchar msg_stop_projection[] = {
-  0x00, 0x24, /* Length (36 bytes) */
-  0x01, /* MICE Protocol Version */
-  0x02, /* Command STOP_PROJECTION */
+static void
+dump_message (guint8 *msg, gsize length)
+{
+  g_autoptr(GString) line = NULL;
 
-  0x00, /* Friendly Name TLV */
-  0x00, 0x0A, /* Length (10 bytes) */
-  /* GNOME (UTF-16-encoded) */
-  0x47, 0x00, 0x4E, 0x00, 0x4F, 0x00, 0x4D, 0x00, 0x45, 0x00,
+  line = g_string_new ("");
+  /* Dump the buffer. */
+  for (gint i = 0; i < length; i++)
+    {
+      g_string_append_printf (line, "%02x ", msg[i]);
+      if ((i + 1) % 16 == 0)
+        {
+          g_debug ("%s", line->str);
+          g_string_set_size (line, 0);
+        }
+    }
 
-  0x03, /* Source ID TLV */
-  0x00, 0x10, /* Length (16 bytes) */
-  /* Source ID GnomeMICEDisplay (ascii) */
-  0x47, 0x6E, 0x6F, 0x6D, 0x65, 0x4D, 0x49, 0x43, 0x45, 0x44, 0x69, 0x73, 0x70, 0x6C, 0x61, 0x79
-};
+  if (line->len)
+    g_debug ("%s", line->str);
+}
 
 static void
 nd_cc_sink_get_property (GObject *    object,
@@ -289,90 +294,182 @@ parse_received_data(uint8_t * input_buffer, gssize input_size)
   castchannel__cast_message__free_unpacked(message, NULL);
 }
 
-gboolean
-comm_client_send (NdCCSink      * self,
-                  GSocketClient * client,
-                  gchar         * remote_address,
-                  const void    * message,
-                  gssize          size,
-                  GCancellable  * cancellable,
-                  GError        * error)
+static gboolean
+accept_certificate (GTlsClientConnection *conn,
+		    GTlsCertificate      *cert,
+		    GTlsCertificateFlags  errors,
+		    gpointer              user_data)
 {
-  GOutputStream * ostream;
-  GInputStream *  istream;
-  gssize input_size;
-  uint8_t * input_buffer = malloc(MAX_MSG_SIZE);
+  g_print ("Certificate would have been rejected ( ");
+  if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA)
+    g_print ("unknown-ca ");
+  if (errors & G_TLS_CERTIFICATE_BAD_IDENTITY)
+    g_print ("bad-identity ");
+  if (errors & G_TLS_CERTIFICATE_NOT_ACTIVATED)
+    g_print ("not-activated ");
+  if (errors & G_TLS_CERTIFICATE_EXPIRED)
+    g_print ("expired ");
+  if (errors & G_TLS_CERTIFICATE_REVOKED)
+    g_print ("revoked ");
+  if (errors & G_TLS_CERTIFICATE_INSECURE)
+    g_print ("insecure ");
+  g_print (") but accepting anyway.\n");
 
-  if (self->comm_client_conn == NULL)
-    self->comm_client_conn = g_socket_client_connect_to_host (client,
-                                                              (gchar *) remote_address,
-                                                              8009,
-                                                              // 8010,
-                                                              NULL,
-                                                              &error);
+  return TRUE;
+}
 
-  if (!self->comm_client_conn || error != NULL)
+static gboolean
+make_connection (NdCCSink         * sink,
+                 GSocket         ** socket,
+                 GInputStream    ** istream,
+                 GOutputStream   ** ostream,
+                 GError          ** error)
+{
+  NdCCSink * self = ND_CC_SINK (sink);
+  GSocketType socket_type;
+  GSocketFamily socket_family;
+  GSocketConnectable * connectable;
+  GIOStream *tls_conn;
+  // GError *err = NULL;
+  // GSocketAddressEnumerator * enumerator;
+
+  // return true if already connected
+  if (*socket != NULL && G_IS_TLS_CONNECTION (self->connection))
+    return TRUE;
+
+  socket_type = G_SOCKET_TYPE_STREAM;
+  socket_family = G_SOCKET_FAMILY_IPV4;
+  *socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, error);
+  if (*socket == NULL)
   {
-    if (error != NULL)
-      g_warning ("NdCCSink: Failed to write to communication stream: %s", error->message);
+    g_warning ("NdCCSink: Failed to create socket: %s", (*error)->message);
     return FALSE;
   }
 
-  g_assert (G_IO_STREAM (self->comm_client_conn));
-  g_debug ("NdCCSink: Client connection established");
+  // XXX
+  // g_socket_set_timeout (*socket, 10);
 
-  ostream = g_io_stream_get_output_stream (G_IO_STREAM (self->comm_client_conn));
-  if (!ostream)
+  connectable = g_network_address_parse (self->remote_address, 8009, error);
+  if (connectable == NULL)
   {
-    g_warning ("NdCCSink: Could not signal to sink");
+    g_warning ("NdCCSink: Failed to create connectable: %s", (*error)->message);
     return FALSE;
   }
 
-  size = g_output_stream_write (ostream, message, size, cancellable, &error);
-  if (error != NULL)
-  {
-    if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
-    {
-      g_warning ("NdCCSink: Communication client socket send would block");
-      return FALSE;
-    }
-    else
-    {
-      g_warning ("NdCCSink: Error writing to client socket output: %s", error->message);
-      return FALSE;
-    }
-  }
-
-  g_debug ("NdCCSink: Sent %" G_GSSIZE_FORMAT " bytes of data", size);
-  
-  g_debug ("NdCCSink: Waiting for response from sink");
-
-  // get input stream from the connection
-  istream = g_io_stream_get_input_stream (G_IO_STREAM (self->comm_client_conn));
-  if (!istream)
-  {
-    g_warning ("NdCCSink: Could not get input stream from client connection");
-    return FALSE;
-  }
-
-  // read the response from the sink
-  input_size = g_input_stream_read (istream, input_buffer, MAX_MSG_SIZE, NULL, &error);
-  if (error != NULL)
-  {
-    g_warning ("NdCCSink: Error reading from client socket input: %s", error->message);
-    // return FALSE;
-  }
-
-  g_debug("NdCCSink: Received %" G_GSSIZE_FORMAT " bytes of data", input_size);
-  // for (int i = 0; i < input_size; i++)
+  // enumerator = g_socket_connectable_enumerate (connectable);
+  // while (TRUE)
   // {
-  //   g_debug ("NdCCSink: Received byte %", input_buffer[i]);
+  //   *address = g_socket_address_enumerator_next (enumerator, cancellable, error);
+  //   if (*address == NULL)
+  //   {
+  //     g_warning ("NdCCSink: Failed to create address: %s", error->message);
+  //     return FALSE;
+  //   }
+
+  //   if (g_socket_connect (*socket, *address, cancellable, &err))
+  //     break;
+    
+  //   g_message ("Connection to %s failed: %s, trying next", socket_address_to_string (*address), err->message);
+  //   g_clear_error (&err);
+
+  //   g_object_unref (*address);
+  // }
+  // g_object_unref (enumerator);
+
+  // g_debug ("NdCCSink: Connected to %s",  (*address));
+
+  self->connection = G_IO_STREAM (g_socket_connection_factory_create_connection (*socket));
+
+  tls_conn = g_tls_client_connection_new (self->connection, connectable, error);
+  if (tls_conn == NULL)
+  {
+    g_warning ("NdCCSink: Failed to create TLS connection: %s", (*error)->message);
+    return FALSE;
+  }
+
+  g_signal_connect (tls_conn, "accept-certificate", G_CALLBACK (accept_certificate), NULL);
+  g_object_unref (self->connection);
+
+  self->connection = G_IO_STREAM (tls_conn);
+
+  // see what should be done about cancellable
+  // FIXME: handshake fails
+  // if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn), NULL, error))
+  // {
+  //   g_warning ("NdCCSink: Failed to handshake: %s", (*error)->message);
+  //   return FALSE;
   // }
 
-  g_debug("NdCCSink: Received Message: %s", input_buffer);
-  parse_received_data(input_buffer, input_size);
+  *istream = g_io_stream_get_input_stream (self->connection);
+  *ostream = g_io_stream_get_output_stream (self->connection);
 
-  free(input_buffer);
+  g_debug ("NdCCSink: Connected to %s", self->remote_address);
+
+  return TRUE;
+}
+
+gboolean
+tls_send (NdCCSink      * sink,
+          uint8_t       * message,
+          gssize          size,
+          GError        * error)
+{
+  NdCCSink * self = ND_CC_SINK (sink);
+  GSocket * socket;
+  GInputStream * istream;
+  GOutputStream * ostream;
+  gssize io_bytes;
+  uint8_t buffer[MAX_MSG_SIZE];
+
+  if (!make_connection (self, &socket, &istream, &ostream, &error))
+  {
+    g_warning ("NdCCSink: Failed to make connection: %s", error->message);
+    g_error_free (error);
+    return FALSE;
+  }
+
+  g_assert (G_IS_TLS_CONNECTION (self->connection));
+
+  // start sending data
+  g_debug ("Writing data:");
+  dump_message (message, size);
+
+  while (size > 0)
+  {
+    g_socket_condition_check (socket, G_IO_OUT);
+    io_bytes = g_output_stream_write (ostream, message, size, NULL, &error);
+
+    if (io_bytes <= 0)
+    {
+      g_warning ("NdCCSink: Failed to write: %s", error->message);
+      g_error_free (error);
+      return FALSE;
+    }
+  
+    g_debug ("NdCCSink: Sent %" G_GSSIZE_FORMAT " bytes", io_bytes);
+
+    size -= io_bytes;
+  }
+
+  // wait for response
+  g_socket_condition_check (socket, G_IO_IN);
+  io_bytes = g_input_stream_read (istream, buffer, MAX_MSG_SIZE, NULL, &error);
+
+  if (io_bytes <= 0)
+  {
+    g_warning ("NdCCSink: Failed to read: %s", error->message);
+    g_error_free (error);
+    return FALSE;
+  }
+
+  g_debug ("NdCCSink: Received %" G_GSSIZE_FORMAT " bytes", io_bytes);
+  g_debug ("Received data:");
+  dump_message (buffer, io_bytes);
+
+  g_print ("-------------------------\n"
+           "%.*s"
+           "-------------------------\n",
+           (int)io_bytes, buffer);
 
   return TRUE;
 }
@@ -380,29 +477,29 @@ comm_client_send (NdCCSink      * self,
 static void
 closed_cb (NdCCSink *sink, CCClient *client)
 {
-  g_autoptr(GError) error = NULL;
+  // g_autoptr(GError) error = NULL;
 
-  /* Connection was closed, do a clean shutdown*/
-  gboolean comm_client_ok = comm_client_send (sink,
-                                              sink->comm_client,
-                                              sink->remote_address,
-                                              msg_stop_projection,
-                                              sizeof (msg_stop_projection),
-                                              NULL,
-                                              error);
+  // /* Connection was closed, do a clean shutdown*/
+  // gboolean comm_client_ok = comm_client_send (sink,
+  //                                             sink->comm_client,
+  //                                             sink->remote_address,
+  //                                             msg_stop_projection,
+  //                                             sizeof (msg_stop_projection),
+  //                                             NULL,
+  //                                             error);
 
-  if (!comm_client_ok || error != NULL)
-    {
-      if (error != NULL)
-        g_warning ("NdCCSink: Failed to send stop projection cmd to client: %s", error->message);
-      else
-        g_warning ("NdCCSink: Failed to send stop projection cmd to client");
+  // if (!comm_client_ok || error != NULL)
+  //   {
+  //     if (error != NULL)
+  //       g_warning ("NdCCSink: Failed to send stop projection cmd to client: %s", error->message);
+  //     else
+  //       g_warning ("NdCCSink: Failed to send stop projection cmd to client");
 
-      sink->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (sink), "state");
-      g_clear_object (&sink->server);
-    }
-  nd_cc_sink_sink_stop_stream (ND_SINK (sink));
+  //     sink->state = ND_SINK_STATE_ERROR;
+  //     g_object_notify (G_OBJECT (sink), "state");
+  //     g_clear_object (&sink->server);
+  //   }
+  // nd_cc_sink_sink_stop_stream (ND_SINK (sink));
 }
 
 static void
@@ -548,16 +645,10 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
   castchannel__cast_message__pack(&message, 4 + sock_buffer);
 
   g_debug("Sending message to %s:%s", self->remote_address, self->remote_name);
-  send_ok = comm_client_send (self,
-                              self->comm_client,
-                              self->remote_address,
-                              sock_buffer,
-                              packed_size+4,
-                              NULL,
-                              error);
-
-  // g_debug("Waiting for response");
-  // g_io_add_watch(self->comm_client_conn, G_IO_IN | G_IO_HUP, msg_received_cb, self);
+  send_ok = tls_send (self,
+                      sock_buffer,
+                      packed_size+4,
+                      error);
 
   if (!send_ok || error != NULL)
     {
@@ -585,6 +676,9 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 
   // self->state = ND_SINK_STATE_ENSURE_FIREWALL;
   // g_object_notify (G_OBJECT (self), "state");
+
+  self->state = ND_SINK_STATE_WAIT_SOCKET;
+  g_object_notify (G_OBJECT (self), "state");
 
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
@@ -643,30 +737,30 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
-  g_autoptr(GError) error;
-  gboolean close_ok;
+  // g_autoptr(GError) error;
+  // gboolean close_ok;
 
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
 
   self->cancellable = g_cancellable_new ();
 
-  /* Close the client connection */
-  if (self->comm_client_conn != NULL)
-    {
-      close_ok = g_io_stream_close (G_IO_STREAM (self->comm_client_conn), NULL, &error);
-      if (error != NULL)
-        {
-          g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
-        }
-      if (!close_ok)
-        {
-          g_warning ("NdCCSink: Communication client connection not closed");
-        }
+  /* TODO: Close the client connection */
+  // if (self->comm_client_conn != NULL)
+  //   {
+  //     close_ok = g_io_stream_close (G_IO_STREAM (self->comm_client_conn), NULL, &error);
+  //     if (error != NULL)
+  //       {
+  //         g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
+  //       }
+  //     if (!close_ok)
+  //       {
+  //         g_warning ("NdCCSink: Communication client connection not closed");
+  //       }
 
-      g_clear_object (&self->comm_client_conn);
-      g_debug ("NdCCSink: Client connection removed");
-    }
+  //     g_clear_object (&self->comm_client_conn);
+  //     g_debug ("NdCCSink: Client connection removed");
+  //   }
 
   /* Destroy the server that is streaming. */
   if (self->server_source_id)
@@ -701,6 +795,7 @@ nd_cc_sink_sink_stop_stream (NdSink *sink)
 * NdCCSink public functions
 ******************************************************************/
 
+// XXX: no use for client
 NdCCSink *
 nd_cc_sink_new (GSocketClient *client,
                 gchar         *name,
