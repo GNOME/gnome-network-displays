@@ -2,9 +2,9 @@
 #include <gst/rtsp/gstrtspmessage.h>
 #include <gst/video/video.h>
 #include "cc-client.h"
-#include "wfd-media-factory.h"
-#include "wfd-media.h"
-#include "wfd-params.h"
+#include "../wfd/wfd-media-factory.h"
+#include "../wfd/wfd-media.h"
+#include "../wfd/wfd-params.h"
 
 typedef enum {
   INIT_STATE_M0_INVALID = 0,

@@ -315,6 +315,8 @@ nd_cc_provider_init(NdCCProvider *provider)
   //   return;
   // }
 
+  // g_debug("NdCCProvider: Started signalling server on port 8009, listening for clients");
+
   // g_signal_connect(server,
   //                  "incoming",
   //                  G_CALLBACK(signalling_incoming_cb),

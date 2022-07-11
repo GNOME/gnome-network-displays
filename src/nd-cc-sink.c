@@ -21,6 +21,9 @@
 #include "cc/cc-client.h"
 #include "wfd/wfd-media-factory.h"
 #include "wfd/wfd-server.h"
+#include "cc/cast_channel.pb-c.h"
+
+#define MAX_MSG_SIZE 4096
 
 struct _NdCCSink
 {
@@ -73,28 +76,6 @@ G_DEFINE_TYPE_EXTENDED (NdCCSink, nd_cc_sink, G_TYPE_OBJECT, 0,
                        )
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
-
-// TODO: this should be the protobuf msg
-// msg sent after connection
-static gchar msg_source_ready[] = {
-  0x00, 0x29, /* Length (41 bytes) */
-  0x01, /* MICE Protocol Version */
-  0x01, /* Command SOURCE_READY */
-
-  0x00, /* Friendly Name TLV */
-  0x00, 0x0A, /* Length (10 bytes) */
-  /* GNOME (UTF-16-encoded) */
-  0x47, 0x00, 0x4E, 0x00, 0x4F, 0x00, 0x4D, 0x00, 0x45, 0x00,
-
-  0x02, /* RTSP Port TLV */
-  0x00, 0x02, /* Length (2 bytes) */
-  0x1C, 0x44, /* Port 7236 */
-
-  0x03, /* Source ID TLV */
-  0x00, 0x10, /* Length (16 bits) */
-  /* Source ID GnomeMICEDisplay (ascii) */
-  0x47, 0x6E, 0x6F, 0x6D, 0x65, 0x4D, 0x49, 0x43, 0x45, 0x44, 0x69, 0x73, 0x70, 0x6C, 0x61, 0x79
-};
 
 static gchar msg_stop_projection[] = {
   0x00, 0x24, /* Length (36 bytes) */
@@ -291,6 +272,23 @@ play_request_cb (NdCCSink *sink, GstRTSPContext *ctx, CCClient *client)
   g_object_notify (G_OBJECT (sink), "state");
 }
 
+void
+parse_received_data(uint8_t * input_buffer, gssize input_size)
+{
+  Castchannel__CastMessage *message;
+
+  message = castchannel__cast_message__unpack(NULL, input_size-4, input_buffer+4);
+  if (message == NULL)
+  {
+    g_warning ("NdCCSink: Failed to unpack received data");
+    return;
+  }
+
+  g_debug("NdCCSink: Received data: %s", message->payload_utf8);
+
+  castchannel__cast_message__free_unpacked(message, NULL);
+}
+
 gboolean
 comm_client_send (NdCCSink      * self,
                   GSocketClient * client,
@@ -301,6 +299,9 @@ comm_client_send (NdCCSink      * self,
                   GError        * error)
 {
   GOutputStream * ostream;
+  GInputStream *  istream;
+  gssize input_size;
+  uint8_t * input_buffer = malloc(MAX_MSG_SIZE);
 
   if (self->comm_client_conn == NULL)
     self->comm_client_conn = g_socket_client_connect_to_host (client,
@@ -311,42 +312,67 @@ comm_client_send (NdCCSink      * self,
                                                               &error);
 
   if (!self->comm_client_conn || error != NULL)
-    {
-      if (error != NULL)
-        g_warning ("NdCCSink: Failed to write to communication stream: %s", error->message);
-
-      return FALSE;
-
-    }
+  {
+    if (error != NULL)
+      g_warning ("NdCCSink: Failed to write to communication stream: %s", error->message);
+    return FALSE;
+  }
 
   g_assert (G_IO_STREAM (self->comm_client_conn));
-
   g_debug ("NdCCSink: Client connection established");
 
   ostream = g_io_stream_get_output_stream (G_IO_STREAM (self->comm_client_conn));
   if (!ostream)
-    {
-      g_warning ("NdCCSink: Could not signal to sink");
-
-      return FALSE;
-    }
+  {
+    g_warning ("NdCCSink: Could not signal to sink");
+    return FALSE;
+  }
 
   size = g_output_stream_write (ostream, message, size, cancellable, &error);
   if (error != NULL)
+  {
+    if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
     {
-      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
-        {
-          g_warning ("NdCCSink: Communication client socket send would block");
-          return FALSE;
-        }
-      else
-        {
-          g_warning ("NdCCSink: Error writing to client socket output: %s", error->message);
-          return FALSE;
-        }
+      g_warning ("NdCCSink: Communication client socket send would block");
+      return FALSE;
     }
+    else
+    {
+      g_warning ("NdCCSink: Error writing to client socket output: %s", error->message);
+      return FALSE;
+    }
+  }
 
   g_debug ("NdCCSink: Sent %" G_GSSIZE_FORMAT " bytes of data", size);
+  
+  g_debug ("NdCCSink: Waiting for response from sink");
+
+  // get input stream from the connection
+  istream = g_io_stream_get_input_stream (G_IO_STREAM (self->comm_client_conn));
+  if (!istream)
+  {
+    g_warning ("NdCCSink: Could not get input stream from client connection");
+    return FALSE;
+  }
+
+  // read the response from the sink
+  input_size = g_input_stream_read (istream, input_buffer, MAX_MSG_SIZE, NULL, &error);
+  if (error != NULL)
+  {
+    g_warning ("NdCCSink: Error reading from client socket input: %s", error->message);
+    // return FALSE;
+  }
+
+  g_debug("NdCCSink: Received %" G_GSSIZE_FORMAT " bytes of data", input_size);
+  // for (int i = 0; i < input_size; i++)
+  // {
+  //   g_debug ("NdCCSink: Received byte %", input_buffer[i]);
+  // }
+
+  g_debug("NdCCSink: Received Message: %s", input_buffer);
+  parse_received_data(input_buffer, input_size);
+
+  free(input_buffer);
 
   return TRUE;
 }
@@ -423,12 +449,135 @@ server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
   return res;
 }
 
-static NdSink *
-nd_cc_sink_sink_start_stream (NdSink *sink)
+// builds message based on available types
+Castchannel__CastMessage
+build_message (
+  gchar *namespace_,
+  Castchannel__CastMessage__PayloadType payload_type,
+  ProtobufCBinaryData * binary_payload,
+  gchar *utf8_payload)
+{
+  Castchannel__CastMessage message;
+  castchannel__cast_message__init(&message);
+
+  message.protocol_version = CASTCHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
+  message.source_id = "gnd-0";
+  message.destination_id = "destination-0";
+  message.namespace_ = namespace_;
+  message.payload_type = payload_type;
+
+  switch (payload_type)
+  {
+  case CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY:
+    message.payload_binary = *binary_payload;
+    message.has_payload_binary = 1;
+    break;
+  case CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING:
+  default:
+    message.payload_utf8 = utf8_payload;
+    message.has_payload_binary = 0;
+    break;
+  }
+
+  return message;
+}
+
+void
+send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload)
 {
   NdCCSink *self = ND_CC_SINK (sink);
   g_autoptr(GError) error = NULL;
   gboolean send_ok;
+  Castchannel__CastMessage message;
+  // ProtobufCBinaryData binary_payload;
+  // binary_payload.data = NULL;
+  // binary_payload.len = 0;
+  guint32 packed_size = 0;
+
+  // TODO: how to do this again?
+  // g_autoptr(uint8_t) *sock_buffer = NULL;
+  uint8_t *sock_buffer = NULL;
+
+  g_debug("Send request: %d", message_type);
+
+  switch (message_type)
+  {
+  case MESSAGE_TYPE_CONNECT:
+    message = build_message(
+      "urn:x-cast:com.google.cast.tp.connection",
+      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+      NULL,
+      "{ \"type\": \"CONNECT\" }");
+    break;
+
+  case MESSAGE_TYPE_DISCONNECT:
+    message = build_message(
+      "urn:x-cast:com.google.cast.tp.connection",
+      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+      NULL,
+      "{ \"type\": \"CLOSE\" }");
+    break;
+
+  case MESSAGE_TYPE_PING:
+    message = build_message(
+      "urn:x-cast:com.google.cast.tp.heartbeat",
+      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+      NULL,
+      "{ \"type\": \"PING\" }");
+    break;
+
+  case MESSAGE_TYPE_RECEIVER:
+    message = build_message(
+      "urn:x-cast:com.google.cast.receiver",
+      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+      NULL,
+      utf8_payload);
+    break;
+
+  default:
+    break;
+  }
+
+  packed_size = castchannel__cast_message__get_packed_size(&message);
+  sock_buffer = malloc(4 + packed_size);
+
+  // TODO: look for gobject way of doing this: like with g_autoptr
+
+  guint32 packed_size_be = GUINT32_TO_BE(packed_size);
+  memcpy(sock_buffer, &packed_size_be, 4);
+  castchannel__cast_message__pack(&message, 4 + sock_buffer);
+
+  g_debug("Sending message to %s:%s", self->remote_address, self->remote_name);
+  send_ok = comm_client_send (self,
+                              self->comm_client,
+                              self->remote_address,
+                              sock_buffer,
+                              packed_size+4,
+                              NULL,
+                              error);
+
+  // g_debug("Waiting for response");
+  // g_io_add_watch(self->comm_client_conn, G_IO_IN | G_IO_HUP, msg_received_cb, self);
+
+  if (!send_ok || error != NULL)
+    {
+      if (error != NULL)
+        g_warning ("NdCCSink: Failed to connect to Chromecast: %s", error->message);
+      else
+        g_warning ("NdCCSink: Failed to connect to Chromecast");
+
+      self->state = ND_SINK_STATE_ERROR;
+      g_object_notify (G_OBJECT (self), "state");
+      g_clear_object (&self->server);
+    }
+
+  free(sock_buffer);
+}
+
+static NdSink *
+nd_cc_sink_sink_start_stream (NdSink *sink)
+{
+  NdCCSink *self = ND_CC_SINK (sink);
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
@@ -439,7 +588,18 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
-  // not using server for now
+  // send connection request to client
+  send_request(self, MESSAGE_TYPE_CONNECT, NULL);
+
+  // send ping to client
+  send_request(self, MESSAGE_TYPE_PING, NULL);
+
+  // send req to get status
+  send_request(self, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}");
+
+  // send req to open youtube
+  send_request(self, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }");
+
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
 
@@ -449,7 +609,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
       g_object_notify (G_OBJECT (self), "state");
       g_clear_object (&self->server);
 
-      return;
+      return NULL;
     }
 
   g_signal_connect_object (self->server,
@@ -473,24 +633,9 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
 
-  send_ok = comm_client_send (self,
-                              self->comm_client,
-                              self->remote_address,
-                              msg_source_ready,
-                              sizeof (msg_source_ready),
-                              NULL,
-                              error);
-  if (!send_ok || error != NULL)
-    {
-      if (error != NULL)
-        g_warning ("NdCCSink: Failed to connect to Chromecast: %s", error->message);
-      else
-        g_warning ("NdCCSink: Failed to connect to Chromecast");
-
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
-      g_clear_object (&self->server);
-    }
+  // these were originally here
+  // 1. send connect request
+  // 2. send ping
 
   return g_object_ref (sink);
 }

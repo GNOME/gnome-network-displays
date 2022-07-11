@@ -33,4 +33,11 @@ NdCCSink * nd_cc_sink_new (GSocketClient *client,
 
 NdSinkState nd_cc_sink_get_state (NdCCSink *sink);
 
+enum MessageType {
+    MESSAGE_TYPE_CONNECT,
+    MESSAGE_TYPE_DISCONNECT,
+    MESSAGE_TYPE_PING,
+    MESSAGE_TYPE_RECEIVER,
+};
+
 G_END_DECLS
