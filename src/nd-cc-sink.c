@@ -41,7 +41,7 @@ struct _NdCCSink
   gchar             *remote_name;
 
   GSocketClient     *comm_client;
-  GIOStream         *connection; 
+  GIOStream         *connection;
 
   WfdServer         *server;
   guint              server_source_id;
@@ -330,8 +330,9 @@ make_connection (NdCCSink         * sink,
   GSocketFamily socket_family;
   GSocketConnectable * connectable;
   GIOStream *tls_conn;
-  // GError *err = NULL;
-  // GSocketAddressEnumerator * enumerator;
+  GSocketAddressEnumerator * enumerator;
+  GSocketAddress * address = NULL;
+  GError * err = NULL;
 
   // return true if already connected
   if (*socket != NULL && G_IS_TLS_CONNECTION (self->connection))
@@ -356,27 +357,28 @@ make_connection (NdCCSink         * sink,
     return FALSE;
   }
 
-  // enumerator = g_socket_connectable_enumerate (connectable);
-  // while (TRUE)
-  // {
-  //   *address = g_socket_address_enumerator_next (enumerator, cancellable, error);
-  //   if (*address == NULL)
-  //   {
-  //     g_warning ("NdCCSink: Failed to create address: %s", error->message);
-  //     return FALSE;
-  //   }
+  enumerator = g_socket_connectable_enumerate (connectable);
+  while (TRUE)
+  {
+    address = g_socket_address_enumerator_next (enumerator, NULL, error);
+    if (address == NULL)
+    {
+      g_warning ("NdCCSink: Failed to create address: %s", (*error)->message);
+      return FALSE;
+    }
 
-  //   if (g_socket_connect (*socket, *address, cancellable, &err))
-  //     break;
-    
-  //   g_message ("Connection to %s failed: %s, trying next", socket_address_to_string (*address), err->message);
-  //   g_clear_error (&err);
+    if (g_socket_connect (*socket, address, NULL, &err))
+      break;
 
-  //   g_object_unref (*address);
-  // }
-  // g_object_unref (enumerator);
+    // g_message ("Connection to %s failed: %s, trying next", socket_address_to_string (address), err->message);
+    g_clear_error (&err);
 
-  // g_debug ("NdCCSink: Connected to %s",  (*address));
+    g_object_unref (address);
+  }
+  g_object_unref (enumerator);
+
+  // g_debug ("NdCCSink: Connected to %s",  (address));
+  g_debug ("NdCCSink: Connected to %s", self->remote_address);
 
   self->connection = G_IO_STREAM (g_socket_connection_factory_create_connection (*socket));
 
@@ -393,12 +395,11 @@ make_connection (NdCCSink         * sink,
   self->connection = G_IO_STREAM (tls_conn);
 
   // see what should be done about cancellable
-  // FIXME: handshake fails
-  // if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn), NULL, error))
-  // {
-  //   g_warning ("NdCCSink: Failed to handshake: %s", (*error)->message);
-  //   return FALSE;
-  // }
+  if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn), NULL, error))
+  {
+    g_warning ("NdCCSink: Failed to handshake: %s", (*error)->message);
+    return FALSE;
+  }
 
   *istream = g_io_stream_get_input_stream (self->connection);
   *ostream = g_io_stream_get_output_stream (self->connection);
@@ -412,10 +413,11 @@ gboolean
 tls_send (NdCCSink      * sink,
           uint8_t       * message,
           gssize          size,
+          gboolean        expect_input,
           GError        * error)
 {
   NdCCSink * self = ND_CC_SINK (sink);
-  GSocket * socket;
+   GSocket * socket;
   GInputStream * istream;
   GOutputStream * ostream;
   gssize io_bytes;
@@ -445,15 +447,20 @@ tls_send (NdCCSink      * sink,
       g_error_free (error);
       return FALSE;
     }
-  
+
     g_debug ("NdCCSink: Sent %" G_GSSIZE_FORMAT " bytes", io_bytes);
 
     size -= io_bytes;
   }
 
   // wait for response
+  if (!expect_input) return TRUE;
+
+  g_debug("before");
   g_socket_condition_check (socket, G_IO_IN);
+  g_debug("after");
   io_bytes = g_input_stream_read (istream, buffer, MAX_MSG_SIZE, NULL, &error);
+  g_debug("after2");
 
   if (io_bytes <= 0)
   {
@@ -466,10 +473,7 @@ tls_send (NdCCSink      * sink,
   g_debug ("Received data:");
   dump_message (buffer, io_bytes);
 
-  g_print ("-------------------------\n"
-           "%.*s"
-           "-------------------------\n",
-           (int)io_bytes, buffer);
+  parse_received_data (buffer, io_bytes);
 
   return TRUE;
 }
@@ -558,8 +562,8 @@ build_message (
   castchannel__cast_message__init(&message);
 
   message.protocol_version = CASTCHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
-  message.source_id = "gnd-0";
-  message.destination_id = "destination-0";
+  message.source_id = "sender-0";
+  message.destination_id = "receiver-0";
   message.namespace_ = namespace_;
   message.payload_type = payload_type;
 
@@ -590,6 +594,7 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
   // binary_payload.data = NULL;
   // binary_payload.len = 0;
   guint32 packed_size = 0;
+  gboolean expect_input = TRUE;
 
   // TODO: how to do this again?
   // g_autoptr(uint8_t) *sock_buffer = NULL;
@@ -605,6 +610,7 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
       NULL,
       "{ \"type\": \"CONNECT\" }");
+    expect_input = FALSE;
     break;
 
   case MESSAGE_TYPE_DISCONNECT:
@@ -613,6 +619,7 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
       NULL,
       "{ \"type\": \"CLOSE\" }");
+    expect_input = FALSE;
     break;
 
   case MESSAGE_TYPE_PING:
@@ -648,6 +655,7 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
   send_ok = tls_send (self,
                       sock_buffer,
                       packed_size+4,
+                      expect_input,
                       error);
 
   if (!send_ok || error != NULL)
@@ -683,6 +691,8 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
   // send connection request to client
+  // send_request(self, MESSAGE_TYPE_DISCONNECT, NULL);
+
   send_request(self, MESSAGE_TYPE_CONNECT, NULL);
 
   // send ping to client
