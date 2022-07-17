@@ -289,7 +289,12 @@ parse_received_data(uint8_t * input_buffer, gssize input_size)
     return;
   }
 
-  g_debug("NdCCSink: Received data: %s", message->payload_utf8);
+  g_debug("NdCCSink: Received data:");
+  g_debug("source_id: %s", message->source_id);
+  g_debug("destination_id: %s", message->destination_id);
+  g_debug("namespace_: %s", message->namespace_);
+  g_debug("payload_type: %d", message->payload_type);
+  g_debug("payload_utf8: %s", message->payload_utf8);
 
   castchannel__cast_message__free_unpacked(message, NULL);
 }
@@ -609,7 +614,7 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
       "urn:x-cast:com.google.cast.tp.connection",
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
       NULL,
-      "{ \"type\": \"CONNECT\" }");
+      "{\"type\":\"CONNECT\"}");
     expect_input = FALSE;
     break;
 
