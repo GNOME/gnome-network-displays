@@ -483,78 +483,6 @@ tls_send (NdCCSink      * sink,
   return TRUE;
 }
 
-static void
-closed_cb (NdCCSink *sink, CCClient *client)
-{
-  // g_autoptr(GError) error = NULL;
-
-  // /* Connection was closed, do a clean shutdown*/
-  // gboolean comm_client_ok = comm_client_send (sink,
-  //                                             sink->comm_client,
-  //                                             sink->remote_address,
-  //                                             msg_stop_projection,
-  //                                             sizeof (msg_stop_projection),
-  //                                             NULL,
-  //                                             error);
-
-  // if (!comm_client_ok || error != NULL)
-  //   {
-  //     if (error != NULL)
-  //       g_warning ("NdCCSink: Failed to send stop projection cmd to client: %s", error->message);
-  //     else
-  //       g_warning ("NdCCSink: Failed to send stop projection cmd to client");
-
-  //     sink->state = ND_SINK_STATE_ERROR;
-  //     g_object_notify (G_OBJECT (sink), "state");
-  //     g_clear_object (&sink->server);
-  //   }
-  // nd_cc_sink_sink_stop_stream (ND_SINK (sink));
-}
-
-static void
-client_connected_cb (NdCCSink *sink, CCClient *client, WfdServer *server)
-{
-  g_debug ("NdCCSink: Got client connection");
-
-  g_signal_handlers_disconnect_by_func (sink->server, client_connected_cb, sink);
-  sink->state = ND_SINK_STATE_WAIT_STREAMING;
-  g_object_notify (G_OBJECT (sink), "state");
-
-  /* XXX: connect to further events. */
-  g_signal_connect_object (client,
-                           "play-request",
-                           (GCallback) play_request_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
-
-  g_signal_connect_object (client,
-                           "closed",
-                           (GCallback) closed_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
-}
-
-static GstElement *
-server_create_source_cb (NdCCSink *sink, WfdServer *server)
-{
-  GstElement *res;
-
-  g_signal_emit_by_name (sink, "create-source", &res);
-  g_debug ("NdCCSink: Create source signal emitted");
-  return res;
-}
-
-static GstElement *
-server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
-{
-  GstElement *res;
-
-  g_signal_emit_by_name (sink, "create-audio-source", &res);
-  g_debug ("NdCCSink: Create audio source signal emitted");
-
-  return res;
-}
-
 // builds message based on available types
 Castchannel__CastMessage
 build_message (
@@ -674,8 +602,59 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
       g_object_notify (G_OBJECT (self), "state");
       g_clear_object (&self->server);
     }
+}
 
-  free(sock_buffer);
+static void
+closed_cb (NdCCSink *sink, CCClient *client)
+{
+  /* Connection was closed, do a clean shutdown */
+  send_request(ND_CC_SINK (sink), MESSAGE_TYPE_DISCONNECT, NULL);
+
+  nd_cc_sink_sink_stop_stream (ND_SINK (sink));
+}
+
+static void
+client_connected_cb (NdCCSink *sink, CCClient *client, WfdServer *server)
+{
+  g_debug ("NdCCSink: Got client connection");
+
+  g_signal_handlers_disconnect_by_func (sink->server, client_connected_cb, sink);
+  sink->state = ND_SINK_STATE_WAIT_STREAMING;
+  g_object_notify (G_OBJECT (sink), "state");
+
+  /* XXX: connect to further events. */
+  g_signal_connect_object (client,
+                           "play-request",
+                           (GCallback) play_request_cb,
+                           sink,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (client,
+                           "closed",
+                           (GCallback) closed_cb,
+                           sink,
+                           G_CONNECT_SWAPPED);
+}
+
+static GstElement *
+server_create_source_cb (NdCCSink *sink, WfdServer *server)
+{
+  GstElement *res;
+
+  g_signal_emit_by_name (sink, "create-source", &res);
+  g_debug ("NdCCSink: Create source signal emitted");
+  return res;
+}
+
+static GstElement *
+server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
+{
+  GstElement *res;
+
+  g_signal_emit_by_name (sink, "create-audio-source", &res);
+  g_debug ("NdCCSink: Create audio source signal emitted");
+
+  return res;
 }
 
 static NdSink *
@@ -752,30 +731,30 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
-  // g_autoptr(GError) error;
-  // gboolean close_ok;
+  g_autoptr(GError) error;
+  gboolean close_ok;
 
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
 
   self->cancellable = g_cancellable_new ();
 
-  /* TODO: Close the client connection */
-  // if (self->comm_client_conn != NULL)
-  //   {
-  //     close_ok = g_io_stream_close (G_IO_STREAM (self->comm_client_conn), NULL, &error);
-  //     if (error != NULL)
-  //       {
-  //         g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
-  //       }
-  //     if (!close_ok)
-  //       {
-  //         g_warning ("NdCCSink: Communication client connection not closed");
-  //       }
+  /* Close the client connection */
+  if (self->connection != NULL)
+    {
+      close_ok = g_io_stream_close (G_IO_STREAM (self->connection), NULL, &error);
+      if (error != NULL)
+        {
+          g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
+        }
+      if (!close_ok)
+        {
+          g_warning ("NdCCSink: Communication client connection not closed");
+        }
 
-  //     g_clear_object (&self->comm_client_conn);
-  //     g_debug ("NdCCSink: Client connection removed");
-  //   }
+      g_clear_object (&self->connection);
+      g_debug ("NdCCSink: Client connection removed");
+    }
 
   /* Destroy the server that is streaming. */
   if (self->server_source_id)
