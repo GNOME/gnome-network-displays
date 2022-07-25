@@ -23,7 +23,8 @@
 #include "wfd/wfd-server.h"
 #include "cc/cast_channel.pb-c.h"
 
-#define MAX_MSG_SIZE 4096
+#define MAX_MSG_SIZE 64 * 1024
+// TODO: add cancellable everywhere
 
 struct _NdCCSink
 {
@@ -422,7 +423,7 @@ tls_send (NdCCSink      * sink,
           GError        * error)
 {
   NdCCSink * self = ND_CC_SINK (sink);
-   GSocket * socket;
+  GSocket * socket;
   GInputStream * istream;
   GOutputStream * ostream;
   gssize io_bytes;
@@ -458,14 +459,10 @@ tls_send (NdCCSink      * sink,
     size -= io_bytes;
   }
 
-  // wait for response
   if (!expect_input) return TRUE;
 
-  g_debug("before");
   g_socket_condition_check (socket, G_IO_IN);
-  g_debug("after");
   io_bytes = g_input_stream_read (istream, buffer, MAX_MSG_SIZE, NULL, &error);
-  g_debug("after2");
 
   if (io_bytes <= 0)
   {
@@ -523,15 +520,9 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
   g_autoptr(GError) error = NULL;
   gboolean send_ok;
   Castchannel__CastMessage message;
-  // ProtobufCBinaryData binary_payload;
-  // binary_payload.data = NULL;
-  // binary_payload.len = 0;
   guint32 packed_size = 0;
   gboolean expect_input = TRUE;
-
-  // TODO: how to do this again?
-  // g_autoptr(uint8_t) *sock_buffer = NULL;
-  uint8_t *sock_buffer = NULL;
+  g_autofree uint8_t *sock_buffer = NULL;
 
   g_debug("Send request: %d", message_type);
 
@@ -563,6 +554,14 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
       "{ \"type\": \"PING\" }");
     break;
 
+  case MESSAGE_TYPE_PONG:
+    message = build_message(
+      "urn:x-cast:com.google.cast.tp.heartbeat",
+      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+      NULL,
+      "{ \"type\": \"PONG\" }");
+    break;
+
   case MESSAGE_TYPE_RECEIVER:
     message = build_message(
       "urn:x-cast:com.google.cast.receiver",
@@ -577,8 +576,6 @@ send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload
 
   packed_size = castchannel__cast_message__get_packed_size(&message);
   sock_buffer = malloc(4 + packed_size);
-
-  // TODO: look for gobject way of doing this: like with g_autoptr
 
   guint32 packed_size_be = GUINT32_TO_BE(packed_size);
   memcpy(sock_buffer, &packed_size_be, 4);
