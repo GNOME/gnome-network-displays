@@ -269,24 +269,6 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
 }
 
 gboolean
-cc_comm_ensure_connection (NdCCSink * sink, GError ** error)
-{
-  NdCCSink * self = ND_CC_SINK (sink);
-  g_autoptr(GError) err = NULL;
-
-  if (!G_IS_TLS_CONNECTION (self->connection) && !cc_comm_make_connection (self, &err))
-  {
-    g_warning ("CCComm: Failed to make connection: %s", err->message);
-    g_propagate_error (error, g_steal_pointer (&err));
-    return FALSE;
-  }
-
-  g_assert (G_IS_TLS_CONNECTION (self->connection));
-
-  return TRUE;
-}
-
-gboolean
 cc_comm_tls_send (NdCCSink      * sink,
                   uint8_t       * message,
                   gssize          size,
@@ -304,7 +286,7 @@ cc_comm_tls_send (NdCCSink      * sink,
       return FALSE:
     }
 
-  g_debug ("Writing data:");
+  g_debug ("Writing data to Chromecast command channel:");
   cc_comm_dump_message (message, size);
 
   ostream = g_io_stream_get_output_stream (G_IO_STREAM (self->connection))
@@ -365,10 +347,9 @@ cc_comm_build_message (gchar *namespace_,
 }
 
 gboolean
-cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_payload)
+cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_payload, GError **error)
 {
   NdCCSink *self = ND_CC_SINK (sink);
-  g_autoptr(GError) error = NULL;
   gboolean send_ok;
   Castchannel__CastMessage message;
   guint32 packed_size = 0;
@@ -432,27 +413,11 @@ cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_
   memcpy(sock_buffer, &packed_size_be, 4);
   castchannel__cast_message__pack(&message, 4 + sock_buffer);
 
-  g_debug("Sending message to %s:%s", self->remote_address, self->remote_name);
-  send_ok = cc_comm_tls_send (self,
-                              sock_buffer,
-                              packed_size+4,
-                              expect_input,
-                              &error);
-
-  if (!send_ok || error != NULL)
-  {
-    if (error != NULL)
-      g_warning ("CCComm: Failed to connect to Chromecast: %s", error->message);
-    else
-      g_warning ("CCComm: Failed to connect to Chromecast");
-
-    self->state = ND_SINK_STATE_ERROR;
-    g_object_notify (G_OBJECT (self), "state");
-    g_clear_object (&self->server);
-    return FALSE;
-  }
-
-  return TRUE;
+  return cc_comm_tls_send (self,
+                           sock_buffer,
+                           packed_size+4,
+                           expect_input,
+                           error);
 }
 
 gboolean
@@ -460,7 +425,6 @@ cc_comm_send_ping (gpointer userdata)
 {
   NdCCSink *self = ND_CC_SINK (userdata);
 
-  if (!cc_comm_ensure_connection(self, &error)) return FALSE;
   cc_comm_send_request(self, MESSAGE_TYPE_PING, NULL);
 
   return TRUE;

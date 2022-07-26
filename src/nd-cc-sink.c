@@ -261,7 +261,7 @@ static void
 closed_cb (NdCCSink *sink, CCClient *client)
 {
   /* Connection was closed, do a clean shutdown */
-  cc_comm_send_request(ND_CC_SINK (sink), MESSAGE_TYPE_DISCONNECT, NULL);
+  cc_comm_send_request(ND_CC_SINK (sink), MESSAGE_TYPE_DISCONNECT, NULL, NULL);
 
   nd_cc_sink_sink_stop_stream (ND_SINK (sink));
 }
@@ -329,7 +329,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
   // open a TLS connection to the CC device
-  if (!cc_comm_ensure_connection(self, &error))
+  if (!cc_comm_make_connection(self, &error))
     {
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
@@ -341,16 +341,16 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   // TODO: listen to all incoming messages
 
   // open up a virtual connection to the device
-  cc_comm_send_request(self, MESSAGE_TYPE_CONNECT, NULL);
+  cc_comm_send_request(self, MESSAGE_TYPE_CONNECT, NULL, NULL);
 
   // send pings to device every 5 seconds
   self->ping_timeout_handle = g_timeout_add_seconds(5, cc_comm_send_ping, self);
 
   // send req to get status
-  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}");
+  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
 
   // send req to open youtube
-  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }");
+  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }", NULL);
 
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);

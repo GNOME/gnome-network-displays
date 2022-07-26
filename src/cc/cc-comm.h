@@ -23,8 +23,8 @@
 
 G_BEGIN_DECLS
 
-gboolean cc_comm_ensure_connection (NdCCSink * sink, GError ** error);
-gboolean cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_payload);
+gboolean cc_comm_make_connection (NdCCSink * sink, GError ** error);
+gboolean cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_payload, GError **error);
 gboolean cc_comm_send_ping (gpointer userdata);
 
 G_END_DECLS
