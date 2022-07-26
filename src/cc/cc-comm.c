@@ -144,7 +144,6 @@ cc_comm_read (NdCCSink *sink, uint8_t *buffer, gsize io_bytes)
   NdCCSink * self = ND_CC_SINK (sink);
   GInputStream *istream;
 
-  g_socket_condition_check (self->socket, G_IO_IN);
   istream = g_io_stream_get_input_stream (G_IO_STREAM (self->connection))
 
   g_input_stream_read_all_async (istream,
@@ -190,6 +189,7 @@ static gboolean
 cc_comm_make_connection (NdCCSink *sink, GError **error)
 {
   NdCCSink * self = ND_CC_SINK (sink);
+  g_autopr(GSocket) socket = NULL;
   GSocketType socket_type;
   GSocketFamily socket_family;
   GSocketConnectable * connectable;
@@ -200,15 +200,15 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
 
   socket_type = G_SOCKET_TYPE_STREAM;
   socket_family = G_SOCKET_FAMILY_IPV4;
-  self->socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, error);
-  if (self->socket == NULL)
+  socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, error);
+  if (socket == NULL)
   {
     g_warning ("CCComm: Failed to create socket: %s", (*error)->message);
     return FALSE;
   }
 
   // XXX
-  // g_socket_set_timeout (self->socket, 10);
+  // g_socket_set_timeout (socket, 10);
 
   connectable = g_network_address_parse (self->remote_address, 8009, error);
   if (connectable == NULL)
@@ -227,7 +227,7 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
       return FALSE;
     }
 
-    if (g_socket_connect (self->socket, address, NULL, &err))
+    if (g_socket_connect (socket, address, NULL, &err))
       break;
 
     // g_message ("Connection to %s failed: %s, trying next", socket_address_to_string (address), err->message);
@@ -239,7 +239,7 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
 
   g_debug ("CCComm: Connected to %s", self->remote_address);
 
-  self->connection = G_IO_STREAM (g_socket_connection_factory_create_connection (self->socket));
+  self->connection = G_IO_STREAM (g_socket_connection_factory_create_connection (socket));
 
   tls_conn = g_tls_client_connection_new (self->connection, connectable, error);
   if (tls_conn == NULL)
@@ -307,7 +307,6 @@ cc_comm_tls_send (NdCCSink      * sink,
   g_debug ("Writing data:");
   cc_comm_dump_message (message, size);
 
-  g_socket_condition_check (self->socket, G_IO_OUT);
   ostream = g_io_stream_get_output_stream (G_IO_STREAM (self->connection))
 
   // start sending data synchronously

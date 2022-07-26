@@ -42,7 +42,6 @@ struct _NdCCSink
 
   GSocketClient     *comm_client;
   GIOStream         *connection;
-  GSocket           *socket;
   guint              ping_timeout_handle;
 
   WfdServer         *server;
