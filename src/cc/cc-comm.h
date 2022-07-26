@@ -19,12 +19,19 @@
 #pragma once
 
 #include <gio/gio.h>
-#include "../nd-cc-sink.h"
 
 G_BEGIN_DECLS
 
-gboolean cc_comm_make_connection (NdCCSink * sink, GError ** error);
-gboolean cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_payload, GError **error);
-gboolean cc_comm_send_ping (gpointer userdata);
+struct _CcComm
+{
+  /*< public >*/
+  GIOStream *con;
+};
+
+typedef struct _CcComm CcComm;
+
+gboolean cc_comm_make_connection (CcComm *comm, GError ** error);
+gboolean cc_comm_send_request (CcComm *sink, enum MessageType message_type, char *utf8_payload, GError **error);
+gboolean cc_comm_send_ping (CcComm *sink);
 
 G_END_DECLS

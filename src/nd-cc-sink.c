@@ -41,7 +41,7 @@ struct _NdCCSink
   gchar             *remote_name;
 
   GSocketClient     *comm_client;
-  GIOStream         *connection;
+  CcComm             comm;
   guint              ping_timeout_handle;
 
   WfdServer         *server;
@@ -261,7 +261,7 @@ static void
 closed_cb (NdCCSink *sink, CCClient *client)
 {
   /* Connection was closed, do a clean shutdown */
-  cc_comm_send_request(ND_CC_SINK (sink), MESSAGE_TYPE_DISCONNECT, NULL, NULL);
+  cc_comm_send_request(&sink->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL);
 
   nd_cc_sink_sink_stop_stream (ND_SINK (sink));
 }
@@ -329,7 +329,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
   // open a TLS connection to the CC device
-  if (!cc_comm_make_connection(self, &error))
+  if (!cc_comm_make_connection(&self->comm, &error))
     {
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
@@ -341,16 +341,16 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   // TODO: listen to all incoming messages
 
   // open up a virtual connection to the device
-  cc_comm_send_request(self, MESSAGE_TYPE_CONNECT, NULL, NULL);
+  cc_comm_send_request(&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL);
 
   // send pings to device every 5 seconds
-  self->ping_timeout_handle = g_timeout_add_seconds(5, cc_comm_send_ping, self);
+  self->ping_timeout_handle = g_timeout_add_seconds(5, G_SOURCE_FUNC (cc_comm_send_ping), &self->comm);
 
   // send req to get status
-  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
+  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
 
   // send req to open youtube
-  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }", NULL);
+  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }", NULL);
 
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
@@ -403,10 +403,11 @@ nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 
   self->cancellable = g_cancellable_new ();
 
-  /* Close the client connection */
-  if (self->connection != NULL)
+  /* Close the client connection
+   * TODO: This should be moved into cc-comm.c */
+  if (self->comm.con != NULL)
     {
-      close_ok = g_io_stream_close (G_IO_STREAM (self->connection), NULL, &error);
+      close_ok = g_io_stream_close (G_IO_STREAM (self->comm.con), NULL, &error);
       if (error != NULL)
         {
           g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
@@ -416,7 +417,7 @@ nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
           g_warning ("NdCCSink: Communication client connection not closed");
         }
 
-      g_clear_object (&self->connection);
+      g_clear_object (&self->comm.con);
       g_debug ("NdCCSink: Client connection removed");
     }
 

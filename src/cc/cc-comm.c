@@ -20,7 +20,7 @@
 #include "cast_channel.pb-c.h"
 
 // function decl
-void cc_comm_listen (NdCCSink *sink);
+void cc_comm_listen (CcComm *comm);
 
 
 static void
@@ -98,7 +98,7 @@ cc_comm_header_read_cb (GObject *source_object,
                         GAsyncResult *res,
                         gpointer user_data) 
 {
-  NdCCSink * self = ND_CC_SINK (user_data);
+  CcComm * comm = (CcComm*) user_data;
   g_autoptr(GError) error = NULL;
   gboolean success;
   gsize io_bytes;
@@ -113,11 +113,11 @@ cc_comm_header_read_cb (GObject *source_object,
    * If this error is for an old connection (that should be closed already),
    * then just give up immediately with a CLOSED error.
    */
-  if (self->connection &&
-    g_io_stream_get_input_stream (G_IO_STREAM (self->connection)) != G_INPUT_STREAM (source_object))
+  if (comm->con &&
+    g_io_stream_get_input_stream (G_IO_STREAM (comm->con)) != G_INPUT_STREAM (source_object))
   {
     g_error ("CCComm: Error on old read connection, ignoring.");
-    cc_comm_listen (self);
+    cc_comm_listen (comm);
     return;
   }
 
@@ -126,25 +126,24 @@ cc_comm_header_read_cb (GObject *source_object,
     if (error)
     {
       g_error ("CCComm: Error reading from stream: %s", error->message);
-      cc_comm_listen (self);
+      cc_comm_listen (comm);
       return;
     }
     g_error ("CCComm: Error reading from stream, couldn't read 4 bytes header.");
-    cc_comm_listen (self);
+    cc_comm_listen (comm);
     return;
   }
 
   // if everything is well, read all `io_bytes`
-  cc_comm_read (self, )
+  cc_comm_read (comm);
 }
 
 void
-cc_comm_read (NdCCSink *sink, uint8_t *buffer, gsize io_bytes)
+cc_comm_read (CcComm *comm, uint8_t *buffer, gsize io_bytes)
 {
-  NdCCSink * self = ND_CC_SINK (sink);
   GInputStream *istream;
 
-  istream = g_io_stream_get_input_stream (G_IO_STREAM (self->connection))
+  istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
 
   g_input_stream_read_all_async (istream,
                                  buffer,
@@ -152,20 +151,19 @@ cc_comm_read (NdCCSink *sink, uint8_t *buffer, gsize io_bytes)
                                  G_PRIORITY_DEFAULT,
                                  NULL,
                                  (*GAsyncReadyCallback) cc_comm_header_read_cb,
-                                 self);
+                                 comm);
 }
 
 // listen to all incoming messages from Chromecast
 void
-cc_comm_listen (NdCCSink *sink)
+cc_comm_listen (CcComm *comm)
 {
-  NdCCSink * self = ND_CC_SINK (sink);
   GInputStream *istream;
   gssize io_bytes;
   g_autofree uint8_t buffer[MAX_MSG_SIZE];
   g_autofree uint8_t header_buffer[4];
 
-  cc_comm_read (self, header_buffer, 4)
+  cc_comm_read (comm, header_buffer, 4);
 
 
 
@@ -186,9 +184,8 @@ cc_comm_listen (NdCCSink *sink)
 }
 
 static gboolean
-cc_comm_make_connection (NdCCSink *sink, GError **error)
+cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 {
-  NdCCSink * self = ND_CC_SINK (sink);
   g_autopr(GSocket) socket = NULL;
   GSocketType socket_type;
   GSocketFamily socket_family;
@@ -197,6 +194,11 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
   GSocketAddressEnumerator * enumerator;
   GSocketAddress * address = NULL;
   g_autoptr(GError) err = NULL;
+
+  /* It is a programming error if ->con is not NULL at this point
+   * i.e. when disconnecting con needs to be set to NULL!
+   */
+  g_assert (comm->con == NULL);
 
   socket_type = G_SOCKET_TYPE_STREAM;
   socket_family = G_SOCKET_FAMILY_IPV4;
@@ -210,7 +212,7 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
   // XXX
   // g_socket_set_timeout (socket, 10);
 
-  connectable = g_network_address_parse (self->remote_address, 8009, error);
+  connectable = g_network_address_parse (remote_address, 8009, error);
   if (connectable == NULL)
   {
     g_warning ("CCComm: Failed to create connectable: %s", (*error)->message);
@@ -237,11 +239,11 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
   }
   g_object_unref (enumerator);
 
-  g_debug ("CCComm: Connected to %s", self->remote_address);
+  g_debug ("CCComm: Connected to %s", remote_address);
 
-  self->connection = G_IO_STREAM (g_socket_connection_factory_create_connection (socket));
+  comm->con = G_IO_STREAM (g_socket_connection_factory_create_connection (socket));
 
-  tls_conn = g_tls_client_connection_new (self->connection, connectable, error);
+  tls_conn = g_tls_client_connection_new (comm->con, connectable, error);
   if (tls_conn == NULL)
   {
     g_warning ("CCComm: Failed to create TLS connection: %s", (*error)->message);
@@ -249,9 +251,9 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
   }
 
   g_signal_connect (tls_conn, "accept-certificate", G_CALLBACK (cc_comm_accept_certificate), NULL);
-  g_object_unref (self->connection);
+  g_object_unref (comm->con);
 
-  self->connection = G_IO_STREAM (tls_conn);
+  comm->con = G_IO_STREAM (tls_conn);
 
   // see what should be done about cancellable
   if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn), NULL, error))
@@ -260,26 +262,25 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
     return FALSE;
   }
 
-  g_debug ("CCComm: Connected to %s", self->remote_address);
+  g_debug ("CCComm: Connected to %s", remote_address);
 
   // start listening to all incoming messages
-  cc_comm_listen_all (self);
+  cc_comm_listen_all (comm);
 
   return TRUE;
 }
 
 gboolean
-cc_comm_tls_send (NdCCSink      * sink,
+cc_comm_tls_send (CcComm        * comm,
                   uint8_t       * message,
                   gssize          size,
                   gboolean        expect_input,
                   GError        **error)
 {
-  NdCCSink * self = ND_CC_SINK (sink);
   GOutputStream *ostream;
   gssize io_bytes;
 
-  if (!G_IS_TLS_CONNECTION (self->connection))
+  if (!G_IS_TLS_CONNECTION (comm->con))
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_CONNECTED,
                            "Connection has not been established");
@@ -289,7 +290,7 @@ cc_comm_tls_send (NdCCSink      * sink,
   g_debug ("Writing data to Chromecast command channel:");
   cc_comm_dump_message (message, size);
 
-  ostream = g_io_stream_get_output_stream (G_IO_STREAM (self->connection))
+  ostream = g_io_stream_get_output_stream (G_IO_STREAM (comm->con))
 
   // start sending data synchronously
   while (size > 0)
@@ -347,9 +348,8 @@ cc_comm_build_message (gchar *namespace_,
 }
 
 gboolean
-cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_payload, GError **error)
+cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_payload, GError **error)
 {
-  NdCCSink *self = ND_CC_SINK (sink);
   gboolean send_ok;
   Castchannel__CastMessage message;
   guint32 packed_size = 0;
@@ -413,7 +413,7 @@ cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_
   memcpy(sock_buffer, &packed_size_be, 4);
   castchannel__cast_message__pack(&message, 4 + sock_buffer);
 
-  return cc_comm_tls_send (self,
+  return cc_comm_tls_send (comm,
                            sock_buffer,
                            packed_size+4,
                            expect_input,
@@ -421,11 +421,9 @@ cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_
 }
 
 gboolean
-cc_comm_send_ping (gpointer userdata)
+cc_comm_send_ping (CcComm * comm)
 {
-  NdCCSink *self = ND_CC_SINK (userdata);
-
-  cc_comm_send_request(self, MESSAGE_TYPE_PING, NULL);
+  cc_comm_send_request(comm, MESSAGE_TYPE_PING, NULL);
 
   return TRUE;
 }
