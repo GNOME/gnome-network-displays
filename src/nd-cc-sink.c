@@ -262,7 +262,7 @@ static void
 closed_cb (NdCCSink *sink, CCClient *client)
 {
   /* Connection was closed, do a clean shutdown */
-  send_request(ND_CC_SINK (sink), MESSAGE_TYPE_DISCONNECT, NULL);
+  cc_comm_send_request(ND_CC_SINK (sink), MESSAGE_TYPE_DISCONNECT, NULL);
 
   nd_cc_sink_sink_stop_stream (ND_SINK (sink));
 }
@@ -330,8 +330,14 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
   // open a TLS connection to the CC device
-  if (!cc_comm_ensure_connection(self))
-    return NULL;
+  if (!cc_comm_ensure_connection(self, &error))
+    {
+      self->state = ND_SINK_STATE_ERROR;
+      g_object_notify (G_OBJECT (self), "state");
+      g_clear_object (&self->server);
+
+      return NULL;
+    }
 
   // TODO: listen to all incoming messages
 

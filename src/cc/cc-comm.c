@@ -269,17 +269,15 @@ cc_comm_make_connection (NdCCSink *sink, GError **error)
 }
 
 gboolean
-cc_comm_ensure_connection (NdCCSink * sink)
+cc_comm_ensure_connection (NdCCSink * sink, GError ** error)
 {
   NdCCSink * self = ND_CC_SINK (sink);
-  g_autoptr(GError) error = NULL;
+  g_autoptr(GError) err = NULL;
 
-  if (!G_IS_TLS_CONNECTION (self->connection) && !cc_comm_make_connection (self, &error))
+  if (!G_IS_TLS_CONNECTION (self->connection) && !cc_comm_make_connection (self, &err))
   {
-    g_warning ("CCComm: Failed to make connection: %s", error->message);
-    g_error_free (error);
-    self->state = ND_SINK_STATE_ERROR;
-    g_object_notify (G_OBJECT (self), "state");
+    g_warning ("CCComm: Failed to make connection: %s", err->message);
+    g_propagate_error (error, g_steal_pointer (&err));
     return FALSE;
   }
 
@@ -293,13 +291,18 @@ cc_comm_tls_send (NdCCSink      * sink,
                   uint8_t       * message,
                   gssize          size,
                   gboolean        expect_input,
-                  GError        * error)
+                  GError        **error)
 {
   NdCCSink * self = ND_CC_SINK (sink);
   GOutputStream *ostream;
   gssize io_bytes;
 
-  cc_comm_ensure_connection (self);
+  if (!G_IS_TLS_CONNECTION (self->connection))
+    {
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_CONNECTED,
+                           "Connection has not been established");
+      return FALSE:
+    }
 
   g_debug ("Writing data:");
   cc_comm_dump_message (message, size);
@@ -435,7 +438,7 @@ cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_
                               sock_buffer,
                               packed_size+4,
                               expect_input,
-                              error);
+                              &error);
 
   if (!send_ok || error != NULL)
   {
@@ -459,7 +462,7 @@ cc_comm_send_ping (gpointer userdata)
   NdCCSink *self = ND_CC_SINK (userdata);
 
   if (!cc_comm_ensure_connection(self, &error)) return FALSE;
-  send_request(self, MESSAGE_TYPE_PING, NULL);
+  cc_comm_send_request(self, MESSAGE_TYPE_PING, NULL);
 
   return TRUE;
 }
