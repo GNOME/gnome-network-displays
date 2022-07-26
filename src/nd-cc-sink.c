@@ -21,9 +21,8 @@
 #include "cc/cc-client.h"
 #include "wfd/wfd-media-factory.h"
 #include "wfd/wfd-server.h"
-#include "cc/cast_channel.pb-c.h"
+#include "cc/cc-comm.h"
 
-#define MAX_MSG_SIZE 64 * 1024
 // TODO: add cancellable everywhere
 
 struct _NdCCSink
@@ -43,6 +42,8 @@ struct _NdCCSink
 
   GSocketClient     *comm_client;
   GIOStream         *connection;
+  GSocket           *socket;
+  guint              ping_timeout_handle;
 
   WfdServer         *server;
   guint              server_source_id;
@@ -77,27 +78,6 @@ G_DEFINE_TYPE_EXTENDED (NdCCSink, nd_cc_sink, G_TYPE_OBJECT, 0,
                        )
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
-
-static void
-dump_message (guint8 *msg, gsize length)
-{
-  g_autoptr(GString) line = NULL;
-
-  line = g_string_new ("");
-  /* Dump the buffer. */
-  for (gint i = 0; i < length; i++)
-    {
-      g_string_append_printf (line, "%02x ", msg[i]);
-      if ((i + 1) % 16 == 0)
-        {
-          g_debug ("%s", line->str);
-          g_string_set_size (line, 0);
-        }
-    }
-
-  if (line->len)
-    g_debug ("%s", line->str);
-}
 
 static void
 nd_cc_sink_get_property (GObject *    object,
@@ -278,329 +258,6 @@ play_request_cb (NdCCSink *sink, GstRTSPContext *ctx, CCClient *client)
   g_object_notify (G_OBJECT (sink), "state");
 }
 
-void
-parse_received_data(uint8_t * input_buffer, gssize input_size)
-{
-  Castchannel__CastMessage *message;
-
-  message = castchannel__cast_message__unpack(NULL, input_size-4, input_buffer+4);
-  if (message == NULL)
-  {
-    g_warning ("NdCCSink: Failed to unpack received data");
-    return;
-  }
-
-  g_debug("NdCCSink: Received data:");
-  g_debug("source_id: %s", message->source_id);
-  g_debug("destination_id: %s", message->destination_id);
-  g_debug("namespace_: %s", message->namespace_);
-  g_debug("payload_type: %d", message->payload_type);
-  g_debug("payload_utf8: %s", message->payload_utf8);
-
-  castchannel__cast_message__free_unpacked(message, NULL);
-}
-
-static gboolean
-accept_certificate (GTlsClientConnection *conn,
-		    GTlsCertificate      *cert,
-		    GTlsCertificateFlags  errors,
-		    gpointer              user_data)
-{
-  g_print ("Certificate would have been rejected ( ");
-  if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA)
-    g_print ("unknown-ca ");
-  if (errors & G_TLS_CERTIFICATE_BAD_IDENTITY)
-    g_print ("bad-identity ");
-  if (errors & G_TLS_CERTIFICATE_NOT_ACTIVATED)
-    g_print ("not-activated ");
-  if (errors & G_TLS_CERTIFICATE_EXPIRED)
-    g_print ("expired ");
-  if (errors & G_TLS_CERTIFICATE_REVOKED)
-    g_print ("revoked ");
-  if (errors & G_TLS_CERTIFICATE_INSECURE)
-    g_print ("insecure ");
-  g_print (") but accepting anyway.\n");
-
-  return TRUE;
-}
-
-static gboolean
-make_connection (NdCCSink         * sink,
-                 GSocket         ** socket,
-                 GInputStream    ** istream,
-                 GOutputStream   ** ostream,
-                 GError          ** error)
-{
-  NdCCSink * self = ND_CC_SINK (sink);
-  GSocketType socket_type;
-  GSocketFamily socket_family;
-  GSocketConnectable * connectable;
-  GIOStream *tls_conn;
-  GSocketAddressEnumerator * enumerator;
-  GSocketAddress * address = NULL;
-  GError * err = NULL;
-
-  // return true if already connected
-  if (*socket != NULL && G_IS_TLS_CONNECTION (self->connection))
-    return TRUE;
-
-  socket_type = G_SOCKET_TYPE_STREAM;
-  socket_family = G_SOCKET_FAMILY_IPV4;
-  *socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, error);
-  if (*socket == NULL)
-  {
-    g_warning ("NdCCSink: Failed to create socket: %s", (*error)->message);
-    return FALSE;
-  }
-
-  // XXX
-  // g_socket_set_timeout (*socket, 10);
-
-  connectable = g_network_address_parse (self->remote_address, 8009, error);
-  if (connectable == NULL)
-  {
-    g_warning ("NdCCSink: Failed to create connectable: %s", (*error)->message);
-    return FALSE;
-  }
-
-  enumerator = g_socket_connectable_enumerate (connectable);
-  while (TRUE)
-  {
-    address = g_socket_address_enumerator_next (enumerator, NULL, error);
-    if (address == NULL)
-    {
-      g_warning ("NdCCSink: Failed to create address: %s", (*error)->message);
-      return FALSE;
-    }
-
-    if (g_socket_connect (*socket, address, NULL, &err))
-      break;
-
-    // g_message ("Connection to %s failed: %s, trying next", socket_address_to_string (address), err->message);
-    g_clear_error (&err);
-
-    g_object_unref (address);
-  }
-  g_object_unref (enumerator);
-
-  // g_debug ("NdCCSink: Connected to %s",  (address));
-  g_debug ("NdCCSink: Connected to %s", self->remote_address);
-
-  self->connection = G_IO_STREAM (g_socket_connection_factory_create_connection (*socket));
-
-  tls_conn = g_tls_client_connection_new (self->connection, connectable, error);
-  if (tls_conn == NULL)
-  {
-    g_warning ("NdCCSink: Failed to create TLS connection: %s", (*error)->message);
-    return FALSE;
-  }
-
-  g_signal_connect (tls_conn, "accept-certificate", G_CALLBACK (accept_certificate), NULL);
-  g_object_unref (self->connection);
-
-  self->connection = G_IO_STREAM (tls_conn);
-
-  // see what should be done about cancellable
-  if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn), NULL, error))
-  {
-    g_warning ("NdCCSink: Failed to handshake: %s", (*error)->message);
-    return FALSE;
-  }
-
-  *istream = g_io_stream_get_input_stream (self->connection);
-  *ostream = g_io_stream_get_output_stream (self->connection);
-
-  g_debug ("NdCCSink: Connected to %s", self->remote_address);
-
-  return TRUE;
-}
-
-gboolean
-tls_send (NdCCSink      * sink,
-          uint8_t       * message,
-          gssize          size,
-          gboolean        expect_input,
-          GError        * error)
-{
-  NdCCSink * self = ND_CC_SINK (sink);
-  GSocket * socket;
-  GInputStream * istream;
-  GOutputStream * ostream;
-  gssize io_bytes;
-  uint8_t buffer[MAX_MSG_SIZE];
-
-  if (!make_connection (self, &socket, &istream, &ostream, &error))
-  {
-    g_warning ("NdCCSink: Failed to make connection: %s", error->message);
-    g_error_free (error);
-    return FALSE;
-  }
-
-  g_assert (G_IS_TLS_CONNECTION (self->connection));
-
-  // start sending data
-  g_debug ("Writing data:");
-  dump_message (message, size);
-
-  while (size > 0)
-  {
-    g_socket_condition_check (socket, G_IO_OUT);
-    io_bytes = g_output_stream_write (ostream, message, size, NULL, &error);
-
-    if (io_bytes <= 0)
-    {
-      g_warning ("NdCCSink: Failed to write: %s", error->message);
-      g_error_free (error);
-      return FALSE;
-    }
-
-    g_debug ("NdCCSink: Sent %" G_GSSIZE_FORMAT " bytes", io_bytes);
-
-    size -= io_bytes;
-  }
-
-  if (!expect_input) return TRUE;
-
-  g_socket_condition_check (socket, G_IO_IN);
-  io_bytes = g_input_stream_read (istream, buffer, MAX_MSG_SIZE, NULL, &error);
-
-  if (io_bytes <= 0)
-  {
-    g_warning ("NdCCSink: Failed to read: %s", error->message);
-    g_error_free (error);
-    return FALSE;
-  }
-
-  g_debug ("NdCCSink: Received %" G_GSSIZE_FORMAT " bytes", io_bytes);
-  g_debug ("Received data:");
-  dump_message (buffer, io_bytes);
-
-  parse_received_data (buffer, io_bytes);
-
-  return TRUE;
-}
-
-// builds message based on available types
-Castchannel__CastMessage
-build_message (
-  gchar *namespace_,
-  Castchannel__CastMessage__PayloadType payload_type,
-  ProtobufCBinaryData * binary_payload,
-  gchar *utf8_payload)
-{
-  Castchannel__CastMessage message;
-  castchannel__cast_message__init(&message);
-
-  message.protocol_version = CASTCHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
-  message.source_id = "sender-0";
-  message.destination_id = "receiver-0";
-  message.namespace_ = namespace_;
-  message.payload_type = payload_type;
-
-  switch (payload_type)
-  {
-  case CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY:
-    message.payload_binary = *binary_payload;
-    message.has_payload_binary = 1;
-    break;
-  case CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING:
-  default:
-    message.payload_utf8 = utf8_payload;
-    message.has_payload_binary = 0;
-    break;
-  }
-
-  return message;
-}
-
-void
-send_request (NdCCSink *sink, enum MessageType message_type, char * utf8_payload)
-{
-  NdCCSink *self = ND_CC_SINK (sink);
-  g_autoptr(GError) error = NULL;
-  gboolean send_ok;
-  Castchannel__CastMessage message;
-  guint32 packed_size = 0;
-  gboolean expect_input = TRUE;
-  g_autofree uint8_t *sock_buffer = NULL;
-
-  g_debug("Send request: %d", message_type);
-
-  switch (message_type)
-  {
-  case MESSAGE_TYPE_CONNECT:
-    message = build_message(
-      "urn:x-cast:com.google.cast.tp.connection",
-      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-      NULL,
-      "{\"type\":\"CONNECT\"}");
-    expect_input = FALSE;
-    break;
-
-  case MESSAGE_TYPE_DISCONNECT:
-    message = build_message(
-      "urn:x-cast:com.google.cast.tp.connection",
-      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-      NULL,
-      "{ \"type\": \"CLOSE\" }");
-    expect_input = FALSE;
-    break;
-
-  case MESSAGE_TYPE_PING:
-    message = build_message(
-      "urn:x-cast:com.google.cast.tp.heartbeat",
-      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-      NULL,
-      "{ \"type\": \"PING\" }");
-    break;
-
-  case MESSAGE_TYPE_PONG:
-    message = build_message(
-      "urn:x-cast:com.google.cast.tp.heartbeat",
-      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-      NULL,
-      "{ \"type\": \"PONG\" }");
-    break;
-
-  case MESSAGE_TYPE_RECEIVER:
-    message = build_message(
-      "urn:x-cast:com.google.cast.receiver",
-      CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-      NULL,
-      utf8_payload);
-    break;
-
-  default:
-    break;
-  }
-
-  packed_size = castchannel__cast_message__get_packed_size(&message);
-  sock_buffer = malloc(4 + packed_size);
-
-  guint32 packed_size_be = GUINT32_TO_BE(packed_size);
-  memcpy(sock_buffer, &packed_size_be, 4);
-  castchannel__cast_message__pack(&message, 4 + sock_buffer);
-
-  g_debug("Sending message to %s:%s", self->remote_address, self->remote_name);
-  send_ok = tls_send (self,
-                      sock_buffer,
-                      packed_size+4,
-                      expect_input,
-                      error);
-
-  if (!send_ok || error != NULL)
-    {
-      if (error != NULL)
-        g_warning ("NdCCSink: Failed to connect to Chromecast: %s", error->message);
-      else
-        g_warning ("NdCCSink: Failed to connect to Chromecast");
-
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
-      g_clear_object (&self->server);
-    }
-}
-
 static void
 closed_cb (NdCCSink *sink, CCClient *client)
 {
@@ -658,6 +315,7 @@ static NdSink *
 nd_cc_sink_sink_start_stream (NdSink *sink)
 {
   NdCCSink *self = ND_CC_SINK (sink);
+  g_autoptr(GError) error = NULL;
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
@@ -671,19 +329,23 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
-  // send connection request to client
-  // send_request(self, MESSAGE_TYPE_DISCONNECT, NULL);
+  // open a TLS connection to the CC device
+  if (!cc_comm_ensure_connection(self))
+    return NULL;
 
-  send_request(self, MESSAGE_TYPE_CONNECT, NULL);
+  // TODO: listen to all incoming messages
 
-  // send ping to client
-  send_request(self, MESSAGE_TYPE_PING, NULL);
+  // open up a virtual connection to the device
+  cc_comm_send_request(self, MESSAGE_TYPE_CONNECT, NULL);
+
+  // send pings to device every 5 seconds
+  self->ping_timeout_handle = g_timeout_add_seconds(5, cc_comm_send_ping, self);
 
   // send req to get status
-  send_request(self, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}");
+  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}");
 
   // send req to open youtube
-  send_request(self, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }");
+  cc_comm_send_request(self, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }");
 
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);

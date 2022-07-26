@@ -1,6 +1,6 @@
-/* nd-cc-sink.h
+/* cc-comm.h
  *
- * Copyright 2022 Christian Glombek <lorbus@fedoraproject.org>
+ * Copyright 2022 Anupam Kumar <kyteinsky@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,27 +19,12 @@
 #pragma once
 
 #include <gio/gio.h>
-#include <gtk/gtk.h>
-#include "nd-sink.h"
+#include "../nd-cc-sink.h"
 
 G_BEGIN_DECLS
 
-#define ND_TYPE_CC_SINK (nd_cc_sink_get_type ())
-G_DECLARE_FINAL_TYPE (NdCCSink, nd_cc_sink, ND, CC_SINK, GObject)
-
-NdCCSink * nd_cc_sink_new (GSocketClient *client,
-                           gchar         *name,
-                           gchar         *remote_address);
-
-NdSinkState nd_cc_sink_get_state (NdCCSink *sink);
-
-#define MAX_MSG_SIZE 64 * 1024
-enum MessageType {
-    MESSAGE_TYPE_CONNECT,
-    MESSAGE_TYPE_DISCONNECT,
-    MESSAGE_TYPE_PING,
-    MESSAGE_TYPE_PONG,
-    MESSAGE_TYPE_RECEIVER,
-};
+gboolean cc_comm_ensure_connection (NdCCSink * sink, GError ** error);
+gboolean cc_comm_send_request (NdCCSink *sink, enum MessageType message_type, char *utf8_payload);
+gboolean cc_comm_send_ping (gpointer userdata);
 
 G_END_DECLS
