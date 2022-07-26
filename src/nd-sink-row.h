@@ -18,15 +18,15 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <adwaita.h>
 #include "nd-sink.h"
 
 G_BEGIN_DECLS
 
 #define ND_TYPE_SINK_ROW (nd_sink_row_get_type ())
-G_DECLARE_FINAL_TYPE (NdSinkRow, nd_sink_row, ND, SINK_ROW, GtkListBoxRow)
+G_DECLARE_FINAL_TYPE (NdSinkRow, nd_sink_row, ND, SINK_ROW, AdwActionRow)
 
-NdSinkRow * nd_sink_row_new (NdSink * sink);
+GtkWidget * nd_sink_row_new (NdSink * sink);
 
 NdSink * nd_sink_row_get_sink (NdSinkRow *sink_row);
 

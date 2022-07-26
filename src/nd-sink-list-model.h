@@ -1,4 +1,4 @@
-/* nd-sink-list.h
+/* nd-sink-list-model.h
  *
  * Copyright 2018 Benjamin Berg <bberg@redhat.com>
  *
@@ -23,13 +23,13 @@
 
 G_BEGIN_DECLS
 
-#define ND_TYPE_SINK_LIST (nd_sink_list_get_type ())
-G_DECLARE_FINAL_TYPE (NdSinkList, nd_sink_list, ND, SINK_LIST, GtkListBox)
+#define ND_TYPE_SINK_LIST_MODEL (nd_sink_list_model_get_type ())
+G_DECLARE_FINAL_TYPE (NdSinkListModel, nd_sink_list_model, ND, SINK_LIST_MODEL, GObject)
 
-NdSinkList * nd_sink_list_new (NdProvider * provider);
+NdSinkListModel * nd_sink_list_model_new (NdProvider * provider);
 
-void nd_sink_list_set_provider (NdSinkList *sink_list,
-                                NdProvider *provider);
-NdProvider *nd_sink_list_get_provider (NdSinkList *sink_list);
+void nd_sink_list_model_set_provider (NdSinkListModel *sink_list,
+                                      NdProvider      *provider);
+NdProvider *nd_sink_list_model_get_provider (NdSinkListModel *sink_list);
 
 G_END_DECLS

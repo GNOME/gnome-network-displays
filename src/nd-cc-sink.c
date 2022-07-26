@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gnome-network-displays-config.h"
-#include "nd-cc-sink.h"
+#include "cc/cc-common.h"
+#include "cc/cc-ctrl.h"
 #include "wfd/wfd-client.h"
 #include "wfd/wfd-media-factory.h"
-#include "cc/cc-ctrl.h"
-#include "cc/cc-common.h"
+#include "gnome-network-displays-config.h"
+#include "nd-cc-sink.h"
 
 struct _NdCCSink
 {
@@ -32,8 +32,8 @@ struct _NdCCSink
 
   GCancellable  *cancellable;
 
-  GStrv          missing_video_codec;
-  GStrv          missing_audio_codec;
+  GtkStringList *missing_video_codec;
+  GtkStringList *missing_audio_codec;
   char          *missing_firewall_zone;
 
   gchar         *remote_address;
@@ -122,11 +122,11 @@ nd_cc_sink_get_property (GObject    * object,
       break;
 
     case PROP_MISSING_VIDEO_CODEC:
-      g_value_set_boxed (value, self->missing_video_codec);
+      g_value_set_object (value, self->missing_video_codec);
       break;
 
     case PROP_MISSING_AUDIO_CODEC:
-      g_value_set_boxed (value, self->missing_audio_codec);
+      g_value_set_object (value, self->missing_audio_codec);
       break;
 
     case PROP_MISSING_FIREWALL_ZONE:
@@ -179,8 +179,8 @@ nd_cc_sink_finalize (GObject *object)
 
   nd_cc_sink_sink_stop_stream_int (self);
 
-  g_clear_pointer (&self->missing_video_codec, g_strfreev);
-  g_clear_pointer (&self->missing_audio_codec, g_strfreev);
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
   g_clear_pointer (&self->missing_firewall_zone, g_free);
 
   g_clear_pointer (&self->remote_address, g_free);
@@ -331,21 +331,21 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
-  // TODO: use the cc version of this function
+  /* TODO: use a cc version of this function */
   have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
 
-  g_clear_pointer (&self->missing_video_codec, g_strfreev);
-  g_clear_pointer (&self->missing_audio_codec, g_strfreev);
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
 
-  self->missing_video_codec = g_strdupv (missing_video);
-  self->missing_audio_codec = g_strdupv (missing_audio);
+  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
+  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
 
   g_object_notify (G_OBJECT (self), "missing-video-codec");
   g_object_notify (G_OBJECT (self), "missing-audio-codec");
 
   if (!have_basic_codecs)
     {
-      g_warning ("NdCCSink: Basic codecs missing");
+      g_warning ("NdCCSink: Essential codecs are missing!");
       goto error;
     }
 
@@ -356,7 +356,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   self->ctrl.cancellable = self->cancellable;
   self->ctrl.comm.cancellable = self->cancellable;
 
-  g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
+  g_debug ("NdCCSink: Attempting connection to Chromecast: %s @ %s", self->remote_name, self->remote_address);
   if (!cc_ctrl_connection_init (&self->ctrl, self->remote_address))
     {
       g_warning ("NdCCSink: Failed to init cc-ctrl");
@@ -400,7 +400,7 @@ error:
   self->state = ND_SINK_STATE_ERROR;
   g_object_notify (G_OBJECT (self), "state");
 
-  return NULL;
+  return g_object_ref (sink);
 }
 
 /******************************************************************

@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <adwaita.h>
 
 G_BEGIN_DECLS
 
 #define ND_TYPE_WINDOW (gnome_nd_window_get_type ())
-G_DECLARE_FINAL_TYPE (NdWindow, gnome_nd_window, ND, WINDOW, GtkApplicationWindow)
+G_DECLARE_FINAL_TYPE (NdWindow, gnome_nd_window, ND, WINDOW, AdwApplicationWindow)
 
 G_END_DECLS

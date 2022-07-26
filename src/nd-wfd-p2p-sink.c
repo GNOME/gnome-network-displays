@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gnome-network-displays-config.h"
-#include "nd-wfd-p2p-sink.h"
-#include "wfd/wfd-server.h"
 #include "wfd/wfd-client.h"
 #include "wfd/wfd-media-factory.h"
+#include "wfd/wfd-server.h"
+#include "gnome-network-displays-config.h"
 #include "nd-firewalld.h"
+#include "nd-wfd-p2p-sink.h"
 
 struct _NdWFDP2PSink
 {
@@ -36,8 +36,8 @@ struct _NdWFDP2PSink
   NMWifiP2PPeer      *nm_peer;
   NMActiveConnection *nm_ac;
 
-  GStrv               missing_video_codec;
-  GStrv               missing_audio_codec;
+  GtkStringList      *missing_video_codec;
+  GtkStringList      *missing_audio_codec;
   char               *missing_firewall_zone;
 
   WfdServer          *server;
@@ -154,11 +154,11 @@ nd_wfd_p2p_sink_get_property (GObject    *object,
       break;
 
     case PROP_MISSING_VIDEO_CODEC:
-      g_value_set_boxed (value, sink->missing_video_codec);
+      g_value_set_object (value, sink->missing_video_codec);
       break;
 
     case PROP_MISSING_AUDIO_CODEC:
-      g_value_set_boxed (value, sink->missing_audio_codec);
+      g_value_set_object (value, sink->missing_audio_codec);
       break;
 
     case PROP_MISSING_FIREWALL_ZONE:
@@ -228,8 +228,8 @@ nd_wfd_p2p_sink_finalize (GObject *object)
   g_clear_object (&sink->nm_device);
   g_clear_object (&sink->nm_peer);
 
-  g_clear_pointer (&sink->missing_video_codec, g_strfreev);
-  g_clear_pointer (&sink->missing_audio_codec, g_strfreev);
+  g_clear_object (&sink->missing_video_codec);
+  g_clear_object (&sink->missing_audio_codec);
   g_clear_pointer (&sink->missing_firewall_zone, g_free);
 
   G_OBJECT_CLASS (nd_wfd_p2p_sink_parent_class)->finalize (object);
@@ -522,18 +522,18 @@ nd_wfd_p2p_sink_sink_start_stream (NdSink *sink)
 
   have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
 
-  g_clear_pointer (&self->missing_video_codec, g_strfreev);
-  g_clear_pointer (&self->missing_audio_codec, g_strfreev);
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
 
-  self->missing_video_codec = g_strdupv (missing_video);
-  self->missing_audio_codec = g_strdupv (missing_audio);
+  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
+  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
 
   g_object_notify (G_OBJECT (self), "missing-video-codec");
   g_object_notify (G_OBJECT (self), "missing-audio-codec");
 
   if (!have_basic_codecs)
     {
-      g_warning ("Essential codecs are missing!");
+      g_warning ("NdWFDP2PSinkEssential codecs are missing!");
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
 

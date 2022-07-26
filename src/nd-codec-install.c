@@ -1,18 +1,19 @@
-#include "nd-codec-install.h"
 #include <glib/gi18n.h>
 #include <gst/pbutils/pbutils.h>
+#include "nd-codec-install.h"
 
 struct _NdCodecInstall
 {
-  GtkRevealer parent_instance;
+  GtkWidget      parent_instance;
 
-  GStrv       codecs;
+  GtkStringList *codecs;
 
-  GtkListBox *listbox;
-  GtkLabel   *header;
+  GtkFrame      *frame;
+  GtkListBox    *listbox;
+  GtkLabel      *header;
 };
 
-G_DEFINE_TYPE (NdCodecInstall, nd_codec_install, GTK_TYPE_REVEALER)
+G_DEFINE_TYPE (NdCodecInstall, nd_codec_install, GTK_TYPE_WIDGET)
 
 enum {
   PROP_0,
@@ -30,21 +31,24 @@ nd_codec_install_new (void)
 }
 
 static void
+nd_codec_install_dispose (GObject *object)
+{
+  NdCodecInstall *self = (NdCodecInstall *) object;
+
+  gtk_widget_unparent (GTK_WIDGET (self->frame));
+  gtk_widget_unparent (GTK_WIDGET (self->header));
+
+  G_OBJECT_CLASS (nd_codec_install_parent_class)->dispose (object);
+}
+
+static void
 nd_codec_install_finalize (GObject *object)
 {
   NdCodecInstall *self = (NdCodecInstall *) object;
 
-  g_clear_pointer (&self->codecs, g_strfreev);
+  g_clear_object (&self->codecs);
 
   G_OBJECT_CLASS (nd_codec_install_parent_class)->finalize (object);
-}
-
-static void
-remove_widget (GtkWidget *widget, gpointer user_data)
-{
-  GtkContainer *container = GTK_CONTAINER (user_data);
-
-  gtk_container_remove (container, widget);
 }
 
 static gchar *
@@ -66,44 +70,46 @@ get_description (const gchar *codec)
   return g_strdup_printf (_("GStreamer Element “%s”"), codec);
 }
 
+static GtkWidget *
+create_listbox_row (gpointer item,
+                    gpointer user_data)
+{
+  GtkStringObject *object = item;
+  const char *str = gtk_string_object_get_string (object);
+  GtkWidget *row;
+  GtkWidget *label;
+  g_autofree gchar *description = NULL;
+
+  description = get_description (str);
+  label = gtk_label_new (description);
+
+  row = gtk_list_box_row_new ();
+  gtk_list_box_row_set_child (GTK_LIST_BOX_ROW (row), label);
+
+  g_object_set_data_full (G_OBJECT (row), "codec", g_strdup (str), g_free);
+  return row;
+}
+
 static void
 nd_codec_install_update (NdCodecInstall *self)
 {
-  gchar **codec;
+  guint codec_count;
 
-  gtk_container_foreach (GTK_CONTAINER (self->listbox), remove_widget, self->listbox);
-
-  if (self->codecs == NULL)
+  if (!self->codecs)
     {
-      gtk_revealer_set_reveal_child (GTK_REVEALER (self), FALSE);
+      g_warning ("codec list not initialized");
       return;
     }
 
-  gtk_revealer_set_reveal_child (GTK_REVEALER (self), self->codecs[0] != NULL);
+  codec_count = g_list_model_get_n_items (G_LIST_MODEL (self->codecs));
 
-  for (codec = self->codecs; *codec; codec += 1)
-    {
-      GtkWidget *row;
-      GtkWidget *label;
-      g_autofree gchar *description = NULL;
+  gtk_list_box_bind_model (self->listbox,
+                           G_LIST_MODEL (self->codecs),
+                           (GtkListBoxCreateWidgetFunc) create_listbox_row,
+                           NULL,
+                           NULL);
 
-      row = gtk_list_box_row_new ();
-
-      description = get_description (*codec);
-      label = gtk_label_new (description);
-      gtk_container_add (GTK_CONTAINER (row), label);
-      gtk_widget_show (label);
-      g_object_set (label,
-                    "margin", 6,
-                    "xalign", 0.0,
-                    NULL);
-
-      g_object_set_data_full (G_OBJECT (row), "codec", g_strdup (*codec), g_free);
-      g_object_set_data_full (G_OBJECT (row), "desc", g_steal_pointer (&description), g_free);
-
-      gtk_list_box_insert (self->listbox, row, -1);
-      gtk_widget_show (row);
-    }
+  gtk_widget_set_visible (GTK_WIDGET (self), codec_count > 0);
 }
 
 static void
@@ -117,11 +123,11 @@ nd_codec_install_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_TITLE:
-      g_value_set_boxed (value, self->codecs);
+      g_value_set_string (value, gtk_label_get_text (self->header));
       break;
 
     case PROP_CODECS:
-      g_value_set_string (value, gtk_label_get_text (self->header));
+      g_value_set_object (value, self->codecs);
       break;
 
     default:
@@ -144,8 +150,7 @@ nd_codec_install_set_property (GObject      *object,
       break;
 
     case PROP_CODECS:
-      g_clear_pointer (&self->codecs, g_strfreev);
-      self->codecs = g_value_dup_boxed (value);
+      self->codecs = g_value_dup_object (value);
 
       nd_codec_install_update (self);
       break;
@@ -160,6 +165,7 @@ nd_codec_install_class_init (NdCodecInstallClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = nd_codec_install_dispose;
   object_class->finalize = nd_codec_install_finalize;
   object_class->get_property = nd_codec_install_get_property;
   object_class->set_property = nd_codec_install_set_property;
@@ -171,13 +177,12 @@ nd_codec_install_class_init (NdCodecInstallClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   properties[PROP_CODECS] =
-    g_param_spec_boxed ("codecs", "Codecs",
-                        "List of required codecs",
-                        G_TYPE_STRV,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+    g_param_spec_object ("codecs", "Codecs",
+                         "List of required codecs",
+                         G_TYPE_LIST_MODEL,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
-
 }
 
 static void
@@ -246,17 +251,12 @@ on_row_activated_cb (NdCodecInstall *self, GtkListBoxRow *row)
 static void
 nd_codec_install_init (NdCodecInstall *self)
 {
-  GtkWidget *box;
-  GtkWidget *frame;
+  GtkBoxLayout *box_layout;
 
-  g_object_set (self,
-                "transition-type", GTK_REVEALER_TRANSITION_TYPE_SLIDE_DOWN,
-                NULL);
-
-  box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
-  g_object_set (box, "margin", 6, NULL);
-  gtk_container_add (GTK_CONTAINER (self), box);
-  gtk_widget_show (box);
+  box_layout = GTK_BOX_LAYOUT (gtk_box_layout_new (GTK_ORIENTATION_VERTICAL));
+  gtk_box_layout_set_spacing (box_layout, 6);
+  gtk_widget_set_layout_manager (GTK_WIDGET (self), GTK_LAYOUT_MANAGER (box_layout));
+  gtk_widget_set_visible (GTK_WIDGET (self), TRUE);
 
   self->header = GTK_LABEL (gtk_label_new (g_value_get_string (g_param_spec_get_default_value (properties[PROP_TITLE]))));
   g_object_set (self->header,
@@ -264,17 +264,19 @@ nd_codec_install_init (NdCodecInstall *self)
                 "wrap-mode", GTK_WRAP_WORD,
                 "xalign", 0.0,
                 NULL);
-  gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (self->header));
-  gtk_widget_show (GTK_WIDGET (self->header));
+  gtk_widget_set_parent (GTK_WIDGET (self->header), GTK_WIDGET (self));
+  gtk_widget_set_visible (GTK_WIDGET (self->header), TRUE);
 
-  frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
-  gtk_container_add (GTK_CONTAINER (box), frame);
-  gtk_widget_show (frame);
+  self->frame = GTK_FRAME (gtk_frame_new (NULL));
+  gtk_widget_set_parent (GTK_WIDGET (self->frame), GTK_WIDGET (self));
+  gtk_widget_set_visible (GTK_WIDGET (self->frame), TRUE);
 
   self->listbox = GTK_LIST_BOX (gtk_list_box_new ());
-  gtk_container_add (GTK_CONTAINER (frame), GTK_WIDGET (self->listbox));
-  gtk_widget_show (GTK_WIDGET (self->listbox));
+  gtk_frame_set_child (self->frame, GTK_WIDGET (self->listbox));
+
+  self->codecs = gtk_string_list_new (NULL);
+
+  gtk_widget_set_visible (GTK_WIDGET (self->listbox), TRUE);
 
   g_signal_connect_object (self->listbox,
                            "row-activated",

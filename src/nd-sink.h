@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <gtk/gtk.h>
 #include <glib-object.h>
 #include "nd-enum-types.h"
 
