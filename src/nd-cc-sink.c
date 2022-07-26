@@ -32,8 +32,8 @@ struct _NdCCSink
 
   GCancellable  *cancellable;
 
-  GStrv          missing_video_codec;
-  GStrv          missing_audio_codec;
+  GtkStringList *missing_video_codec;
+  GtkStringList *missing_audio_codec;
   char          *missing_firewall_zone;
 
   gchar         *remote_address;
@@ -122,11 +122,11 @@ nd_cc_sink_get_property (GObject    * object,
       break;
 
     case PROP_MISSING_VIDEO_CODEC:
-      g_value_set_boxed (value, self->missing_video_codec);
+      g_value_set_object (value, self->missing_video_codec);
       break;
 
     case PROP_MISSING_AUDIO_CODEC:
-      g_value_set_boxed (value, self->missing_audio_codec);
+      g_value_set_object (value, self->missing_audio_codec);
       break;
 
     case PROP_MISSING_FIREWALL_ZONE:
@@ -179,8 +179,8 @@ nd_cc_sink_finalize (GObject *object)
 
   nd_cc_sink_sink_stop_stream_int (self);
 
-  g_clear_pointer (&self->missing_video_codec, g_strfreev);
-  g_clear_pointer (&self->missing_audio_codec, g_strfreev);
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
   g_clear_pointer (&self->missing_firewall_zone, g_free);
 
   g_clear_pointer (&self->remote_address, g_free);

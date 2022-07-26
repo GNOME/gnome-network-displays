@@ -181,7 +181,7 @@ nd_meta_sink_get_property (GObject    *object,
       if (meta_sink->current_sink)
         g_object_get_property (G_OBJECT (meta_sink->current_sink), pspec->name, value);
       else
-        g_value_set_boxed (value, NULL);
+        g_value_set_object (value, NULL);
       break;
 
     case PROP_MISSING_FIREWALL_ZONE:

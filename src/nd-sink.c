@@ -19,6 +19,7 @@
 #include "gnome-network-displays-config.h"
 #include "nd-sink.h"
 #include <gst/gst.h>
+#include <gio/gio.h>
 
 typedef NdSinkIface NdSinkInterface;
 G_DEFINE_INTERFACE (NdSink, nd_sink, G_TYPE_OBJECT);
@@ -72,18 +73,18 @@ nd_sink_default_init (NdSinkIface *iface)
                                                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
-                                       g_param_spec_boxed ("missing-video-codec",
-                                                           "Missing Video Codec",
-                                                           "One of the video codecs elements in the list is required.",
-                                                           G_TYPE_STRV,
-                                                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                                       g_param_spec_object ("missing-video-codec",
+                                                            "Missing Video Codec",
+                                                            "One of the video codecs elements in the list is required.",
+                                                            G_TYPE_LIST_MODEL,
+                                                            G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
-                                       g_param_spec_boxed ("missing-audio-codec",
-                                                           "Missing Audio Codec",
-                                                           "One of the audio codec elements in the list is required.",
-                                                           G_TYPE_STRV,
-                                                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                                       g_param_spec_object ("missing-audio-codec",
+                                                            "Missing Audio Codec",
+                                                            "One of the audio codec elements in the list is required.",
+                                                            G_TYPE_LIST_MODEL,
+                                                            G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
                                        g_param_spec_string ("missing-firewall-zone",

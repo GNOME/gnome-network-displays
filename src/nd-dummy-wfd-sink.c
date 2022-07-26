@@ -21,18 +21,19 @@
 #include "wfd/wfd-server.h"
 #include "wfd/wfd-client.h"
 #include "wfd/wfd-media-factory.h"
+#include <gtk/gtk.h>
 
 struct _NdDummyWFDSink
 {
-  GObject     parent_instance;
+  GObject         parent_instance;
 
-  NdSinkState state;
+  NdSinkState     state;
 
-  GStrv       missing_video_codec;
-  GStrv       missing_audio_codec;
+  GtkStringList * missing_video_codec;
+  GtkStringList * missing_audio_codec;
 
-  WfdServer  *server;
-  guint       server_source_id;
+  WfdServer      *server;
+  guint           server_source_id;
 };
 
 enum {
@@ -95,11 +96,11 @@ nd_dummy_wfd_sink_get_property (GObject    *object,
       break;
 
     case PROP_MISSING_VIDEO_CODEC:
-      g_value_set_boxed (value, sink->missing_video_codec);
+      g_value_set_object (value, sink->missing_video_codec);
       break;
 
     case PROP_MISSING_AUDIO_CODEC:
-      g_value_set_boxed (value, sink->missing_audio_codec);
+      g_value_set_object (value, sink->missing_audio_codec);
       break;
 
     case PROP_MISSING_FIREWALL_ZONE:
@@ -119,8 +120,8 @@ nd_dummy_wfd_sink_finalize (GObject *object)
 
   nd_dummy_wfd_sink_sink_stop_stream (ND_SINK (object));
 
-  g_clear_pointer (&sink->missing_video_codec, g_strfreev);
-  g_clear_pointer (&sink->missing_audio_codec, g_strfreev);
+  g_clear_object (&sink->missing_video_codec);
+  g_clear_object (&sink->missing_audio_codec);
 
   G_OBJECT_CLASS (nd_dummy_wfd_sink_parent_class)->finalize (object);
 }
@@ -231,11 +232,11 @@ nd_dummy_wfd_sink_sink_start_stream (NdSink *sink)
 
   have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
 
-  g_clear_pointer (&self->missing_video_codec, g_strfreev);
-  g_clear_pointer (&self->missing_audio_codec, g_strfreev);
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
 
-  self->missing_video_codec = g_strdupv (missing_video);
-  self->missing_audio_codec = g_strdupv (missing_audio);
+  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
+  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
 
   g_object_notify (G_OBJECT (self), "missing-video-codec");
   g_object_notify (G_OBJECT (self), "missing-audio-codec");

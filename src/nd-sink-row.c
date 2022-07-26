@@ -21,12 +21,9 @@
 
 struct _NdSinkRow
 {
-  GtkListBoxRow parent_instance;
+  AdwActionRow parent_instance;
 
-  NdSink       *sink;
-
-  /* Template widgets */
-  GtkLabel *name_label;
+  NdSink      *sink;
 };
 
 enum {
@@ -34,19 +31,15 @@ enum {
   PROP_LAST,
 };
 
-G_DEFINE_TYPE (NdSinkRow, nd_sink_row, GTK_TYPE_LIST_BOX_ROW)
+G_DEFINE_TYPE (NdSinkRow, nd_sink_row, ADW_TYPE_ACTION_ROW)
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
 
 static void
-nd_sink_row_sync (NdSinkRow *sink_row)
+nd_sink_row_sync (NdSinkRow *self)
 {
-  g_autofree gchar *display_name = NULL;
-
-  g_object_get (sink_row->sink, "display-name", &display_name, NULL);
-
-  gtk_label_set_text (sink_row->name_label, display_name);
+  g_object_bind_property (self->sink, "display-name", self, "title", G_BINDING_SYNC_CREATE);
 }
 
 static void
@@ -114,11 +107,7 @@ nd_sink_row_finalize (GObject *object)
 static void
 nd_sink_row_class_init (NdSinkRowClass *klass)
 {
-  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/screencast/nd-sink-row.ui");
-  gtk_widget_class_bind_template_child (widget_class, NdSinkRow, name_label);
 
   object_class->get_property = nd_sink_row_get_property;
   object_class->set_property = nd_sink_row_set_property;
@@ -136,7 +125,7 @@ nd_sink_row_class_init (NdSinkRowClass *klass)
 static void
 nd_sink_row_init (NdSinkRow *self)
 {
-  gtk_widget_init_template (GTK_WIDGET (self));
+  gtk_list_box_row_set_activatable (GTK_LIST_BOX_ROW (self), TRUE);
 }
 
 /**
@@ -148,7 +137,7 @@ nd_sink_row_init (NdSinkRow *self)
  * Returns:
  *   a newly created #NdSinkRow
  */
-NdSinkRow *
+GtkWidget *
 nd_sink_row_new (NdSink *sink)
 {
   return g_object_new (ND_TYPE_SINK_ROW,

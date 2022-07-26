@@ -7,7 +7,7 @@ gnome_nd_sources = [
   'nd-window.c',
   'nd-codec-install.c',
   'nd-firewalld.c',
-  'nd-sink-list.c',
+  'nd-sink-list-model.c',
   'nd-sink-row.c',
   'nd-sink.c',
   'nd-provider.c',
@@ -42,9 +42,10 @@ gnome_nd_deps = [
   dependency('gstreamer-pbutils-1.0', version: '>= 1.14'),
   dependency('gstreamer-plugins-base-1.0'),
   dependency('gstreamer-rtsp-server-1.0'),
-  dependency('gtk+-3.0', version: '>= 3.22'),
+  dependency('gtk4'),
   dependency('libnm', version: '>= 1.15'),
   dependency('libpulse-mainloop-glib'),
+  dependency('libadwaita-1', version: '>= 1.0.0'),
 ]
 
 gnome_nd_deps += wfd_server_deps

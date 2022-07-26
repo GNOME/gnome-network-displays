@@ -16,13 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <adwaita.h>
 #include <glib/gi18n.h>
 #include <gst/gst.h>
 #include "gnome-network-displays-config.h"
 #include "nd-window.h"
 
 static void
-on_activate (GtkApplication *app)
+on_activate (AdwApplication *app)
 {
   GtkWindow *window;
 
@@ -32,16 +33,9 @@ on_activate (GtkApplication *app)
    */
   g_assert (GTK_IS_APPLICATION (app));
 
-  /* Get the current window or create one if necessary. */
-  window = gtk_application_get_active_window (app);
-  if (window == NULL)
-    {
-      window = g_object_new (ND_TYPE_WINDOW,
-                             "application", app,
-                             "default-width", 600,
-                             "default-height", 300,
-                             NULL);
-    }
+  window = g_object_new (ND_TYPE_WINDOW,
+                         "application", app,
+                         NULL);
 
   /* Ask the window manager/compositor to present the window. */
   gtk_window_present (window);
@@ -51,8 +45,7 @@ int
 main (int   argc,
       char *argv[])
 {
-  g_autoptr(GtkApplication) app = NULL;
-  int ret;
+  g_autoptr(AdwApplication) app = NULL;
 
   /* Set up gettext translations */
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
@@ -67,10 +60,12 @@ main (int   argc,
    * desktop features such as file opening and single-instance applications.
    */
 #if GLIB_CHECK_VERSION (2, 74, 0)
-  app = gtk_application_new ("org.gnome.NetworkDisplays", G_APPLICATION_DEFAULT_FLAGS);
+  app = adw_application_new ("org.gnome.NetworkDisplays", G_APPLICATION_DEFAULT_FLAGS);
 #else
-  app = gtk_application_new ("org.gnome.NetworkDisplays", G_APPLICATION_FLAGS_NONE);
+  app = adw_application_new ("org.gnome.NetworkDisplays", G_APPLICATION_FLAGS_NONE);
 #endif
+
+  g_set_application_name (_("GNOME Network Displays"));
 
   /*
    * We connect to the activate signal to create a window when the application
@@ -93,7 +88,5 @@ main (int   argc,
    * method "run". But we need to cast, which is what the "G_APPLICATION()"
    * macro does.
    */
-  ret = g_application_run (G_APPLICATION (app), argc, argv);
-
-  return ret;
+  return g_application_run (G_APPLICATION (app), argc, argv);
 }
