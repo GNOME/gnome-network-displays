@@ -338,8 +338,6 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
       return NULL;
     }
 
-  // TODO: listen to all incoming messages
-
   // open up a virtual connection to the device
   cc_comm_send_request(&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL);
 
@@ -350,7 +348,14 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
 
   // send req to open youtube
+  g_debug("NdCCSink: Launching YouTube");
   cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }", NULL);
+
+  g_debug("NdCCSink: Get Status Again");
+  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
+
+  g_debug ("NdCCSink: Mute the TV");
+  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"SET_VOLUME\", \"volume\": { \"muted\": true } }", NULL);
 
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
@@ -404,6 +409,7 @@ nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
   self->cancellable = g_cancellable_new ();
 
   /* Close the client connection
+   * FIX: this does not close the connection
    * TODO: This should be moved into cc-comm.c */
   if (self->comm.con != NULL)
     {

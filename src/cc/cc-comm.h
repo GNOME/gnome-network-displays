@@ -22,22 +22,25 @@
 
 G_BEGIN_DECLS
 
+#define MAX_MSG_SIZE (64 * 1024)
+
 struct _CcComm
 {
   /*< public >*/
   GIOStream *con;
+
+  guint8    *header_buffer;
+  guint8    *message_buffer;
 };
 
 typedef struct _CcComm CcComm;
 
-#define MAX_MSG_SIZE 64 * 1024
-
 enum MessageType {
-    MESSAGE_TYPE_CONNECT,
-    MESSAGE_TYPE_DISCONNECT,
-    MESSAGE_TYPE_PING,
-    MESSAGE_TYPE_PONG,
-    MESSAGE_TYPE_RECEIVER,
+  MESSAGE_TYPE_CONNECT,
+  MESSAGE_TYPE_DISCONNECT,
+  MESSAGE_TYPE_PING,
+  MESSAGE_TYPE_PONG,
+  MESSAGE_TYPE_RECEIVER,
 };
 
 gboolean cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error);
