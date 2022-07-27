@@ -329,7 +329,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
   // open a TLS connection to the CC device
-  if (!cc_comm_make_connection(&self->comm, &error))
+  if (!cc_comm_make_connection(&self->comm, self->remote_address, &error))
     {
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");

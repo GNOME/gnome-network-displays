@@ -134,8 +134,9 @@ cc_comm_header_read_cb (GObject *source_object,
     return;
   }
 
+  // TODO
   // if everything is well, read all `io_bytes`
-  cc_comm_read (comm);
+  // cc_comm_read (comm);
 }
 
 void
@@ -150,7 +151,7 @@ cc_comm_read (CcComm *comm, uint8_t *buffer, gsize io_bytes)
                                  io_bytes,
                                  G_PRIORITY_DEFAULT,
                                  NULL,
-                                 (*GAsyncReadyCallback) cc_comm_header_read_cb,
+                                 cc_comm_header_read_cb,
                                  comm);
 }
 
@@ -158,9 +159,8 @@ cc_comm_read (CcComm *comm, uint8_t *buffer, gsize io_bytes)
 void
 cc_comm_listen (CcComm *comm)
 {
-  GInputStream *istream;
-  gssize io_bytes;
-  g_autofree uint8_t buffer[MAX_MSG_SIZE];
+  // gssize io_bytes;
+  // g_autofree uint8_t buffer[MAX_MSG_SIZE];
   g_autofree uint8_t header_buffer[4];
 
   cc_comm_read (comm, header_buffer, 4);
@@ -168,25 +168,25 @@ cc_comm_listen (CcComm *comm)
 
 
 
-  if (io_bytes <= 0)
-  {
-    g_warning ("CCComm: Failed to read: %s", error->message);
-    g_error_free (error);
-    return FALSE;
-  }
+  // if (io_bytes <= 0)
+  // {
+  //   g_warning ("CCComm: Failed to read: %s", error->message);
+  //   g_clear_error (error);
+  //   return FALSE;
+  // }
 
-  g_debug ("CCComm: Received %" G_GSSIZE_FORMAT " bytes", io_bytes);
-  g_debug ("CCComm: Received data:");
-  cc_comm_dump_message (buffer, io_bytes);
+  // g_debug ("CCComm: Received %" G_GSSIZE_FORMAT " bytes", io_bytes);
+  // g_debug ("CCComm: Received data:");
+  // cc_comm_dump_message (buffer, io_bytes);
 
-  cc_comm_parse_received_data (buffer, io_bytes);
+  // cc_comm_parse_received_data (buffer, io_bytes);
 
 }
 
-static gboolean
+gboolean
 cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 {
-  g_autopr(GSocket) socket = NULL;
+  g_autoptr(GSocket) socket = NULL;
   GSocketType socket_type;
   GSocketFamily socket_family;
   GSocketConnectable * connectable;
@@ -239,8 +239,6 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   }
   g_object_unref (enumerator);
 
-  g_debug ("CCComm: Connected to %s", remote_address);
-
   comm->con = G_IO_STREAM (g_socket_connection_factory_create_connection (socket));
 
   tls_conn = g_tls_client_connection_new (comm->con, connectable, error);
@@ -264,8 +262,9 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
   g_debug ("CCComm: Connected to %s", remote_address);
 
+  // TODO
   // start listening to all incoming messages
-  cc_comm_listen_all (comm);
+  // cc_comm_listen (comm);
 
   return TRUE;
 }
@@ -284,23 +283,23 @@ cc_comm_tls_send (CcComm        * comm,
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_CONNECTED,
                            "Connection has not been established");
-      return FALSE:
+      return FALSE;
     }
 
   g_debug ("Writing data to Chromecast command channel:");
   cc_comm_dump_message (message, size);
 
-  ostream = g_io_stream_get_output_stream (G_IO_STREAM (comm->con))
+  ostream = g_io_stream_get_output_stream (G_IO_STREAM (comm->con));
 
   // start sending data synchronously
   while (size > 0)
   {
-    io_bytes = g_output_stream_write (ostream, message, size, NULL, &error);
+    io_bytes = g_output_stream_write (ostream, message, size, NULL, error);
 
     if (io_bytes <= 0)
     {
-      g_warning ("CCComm: Failed to write: %s", error->message);
-      g_error_free (error);
+      g_warning ("CCComm: Failed to write: %s", (*error)->message);
+      g_clear_error (error);
       return FALSE;
     }
 
@@ -350,7 +349,6 @@ cc_comm_build_message (gchar *namespace_,
 gboolean
 cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_payload, GError **error)
 {
-  gboolean send_ok;
   Castchannel__CastMessage message;
   guint32 packed_size = 0;
   gboolean expect_input = TRUE;
@@ -423,7 +421,19 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
 gboolean
 cc_comm_send_ping (CcComm * comm)
 {
-  cc_comm_send_request(comm, MESSAGE_TYPE_PING, NULL);
+  g_autoptr(GError) error = NULL;
+
+  // if this errors out, we cancel the periodic ping by returning FALSE
+  if (!cc_comm_send_request(comm, MESSAGE_TYPE_PING, NULL, &error))
+    {
+      if (error != NULL)
+        {
+          g_warning ("CcComm: Failed to send ping message: %s", error->message);
+          return FALSE;
+        }
+        g_warning ("CcComm: Failed to send ping message");
+        return FALSE;
+    }
 
   return TRUE;
 }
