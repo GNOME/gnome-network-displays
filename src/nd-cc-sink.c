@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// #include <time.h>
+
 #include "gnome-network-displays-config.h"
 #include "nd-cc-sink.h"
 #include "cc/cc-client.h"
@@ -315,6 +317,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 {
   NdCCSink *self = ND_CC_SINK (sink);
   g_autoptr(GError) error = NULL;
+  // gchar six_digits[6];
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
@@ -339,23 +342,39 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
     }
 
   // open up a virtual connection to the device
-  cc_comm_send_request(&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL);
+  if (!cc_comm_send_request(&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL))
+    {
+      self->state = ND_SINK_STATE_ERROR;
+      g_object_notify (G_OBJECT (self), "state");
+      g_clear_object (&self->server);
+
+      return NULL;
+    }
+
+  // sprintf (six_digits, "%ld", time (NULL) % 1000000);
+  // self->comm.sender_id = "sender-";
+  // strncat (self->comm.sender_id, six_digits, 6);
+
+  // set sender_id after connection (sender-xxxxxx)
+  self->comm.sender_id = "sender-547784";
 
   // send pings to device every 5 seconds
   self->ping_timeout_handle = g_timeout_add_seconds(5, G_SOURCE_FUNC (cc_comm_send_ping), &self->comm);
+  cc_comm_send_ping (&self->comm);
 
   // send req to get status
+  g_debug("NdCCSink: Get Status");
   cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
 
   // send req to open youtube
-  g_debug("NdCCSink: Launching YouTube");
-  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }", NULL);
+  // g_debug("NdCCSink: Launching YouTube");
+  // cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }", NULL);
 
-  g_debug("NdCCSink: Get Status Again");
-  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
+  // g_debug("NdCCSink: Get Status Again");
+  // cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
 
-  g_debug ("NdCCSink: Mute the TV");
-  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"SET_VOLUME\", \"volume\": { \"muted\": true } }", NULL);
+  // g_debug ("NdCCSink: Mute the Chromecast");
+  // cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"SET_VOLUME\", \"volume\": { \"muted\": true } }", NULL);
 
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);

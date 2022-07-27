@@ -29,6 +29,8 @@ struct _CcComm
   /*< public >*/
   GIOStream *con;
 
+  gchar     *sender_id;
+
   guint8    *header_buffer;
   guint8    *message_buffer;
 };

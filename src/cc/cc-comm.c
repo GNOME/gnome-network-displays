@@ -48,6 +48,17 @@ cc_comm_dump_message (guint8 *msg, gsize length)
 }
 
 static void
+cc_comm_dump_json_message (Castchannel__CastMessage *message)
+{
+  g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_type: %d, payload_utf8: %s }",
+           message->source_id,
+           message->destination_id,
+           message->namespace_,
+           message->payload_type,
+           message->payload_utf8);
+}
+
+static void
 cc_comm_parse_received_data(uint8_t * input_buffer, gssize input_size)
 {
   Castchannel__CastMessage *message;
@@ -59,12 +70,8 @@ cc_comm_parse_received_data(uint8_t * input_buffer, gssize input_size)
     return;
   }
 
-  g_debug("CcComm: Received data: { source_id: %s, destination_id: %s, namespace_: %s, payload_type: %d, payload_utf8: %s }",
-           message->source_id,
-           message->destination_id,
-           message->namespace_,
-           message->payload_type,
-           message->payload_utf8);
+  g_debug("CcComm: Received data:");
+  cc_comm_dump_json_message (message);
 
   castchannel__cast_message__free_unpacked(message, NULL);
 }
@@ -148,7 +155,7 @@ cc_comm_message_read_cb (GObject *source_object,
   }
 
   // dump the received message and try to parse it
-  cc_comm_dump_message (comm->message_buffer, io_bytes);
+  // cc_comm_dump_message (comm->message_buffer, io_bytes);
   cc_comm_parse_received_data (comm->message_buffer, io_bytes);
 
   // go for another round
@@ -334,7 +341,6 @@ static gboolean
 cc_comm_tls_send (CcComm        * comm,
                   uint8_t       * message,
                   gssize          size,
-                  gboolean        expect_input,
                   GError        **error)
 {
   GOutputStream *ostream;
@@ -347,8 +353,8 @@ cc_comm_tls_send (CcComm        * comm,
       return FALSE;
     }
 
-  g_debug ("Writing data to Chromecast command channel:");
-  cc_comm_dump_message (message, size);
+  // g_debug ("Writing data to Chromecast command channel:");
+  // cc_comm_dump_message (message, size);
 
   ostream = g_io_stream_get_output_stream (G_IO_STREAM (comm->con));
 
@@ -371,9 +377,6 @@ cc_comm_tls_send (CcComm        * comm,
 
   return TRUE;
 }
-
-// TODO: build strong connect messaage
-
 
 // builds message based on available types
 static Castchannel__CastMessage
@@ -412,10 +415,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
 {
   Castchannel__CastMessage message;
   guint32 packed_size = 0;
-  gboolean expect_input = TRUE;
   g_autofree uint8_t *sock_buffer = NULL;
-
-  g_debug("CcComm: Send request: %d", message_type);
 
   switch (message_type)
   {
@@ -424,8 +424,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
       "urn:x-cast:com.google.cast.tp.connection",
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
       NULL,
-      "{\"type\":\"CONNECT\"}");
-    expect_input = FALSE;
+      "{ \"type\": \"CONNECT\", \"userAgent\": \"GND/0.90.5  (X11; Linux x86_64)\", \"connType\": 0, \"origin\": {}, \"senderInfo\": { \"sdkType\": 2, \"version\": \"X11; Linux x86_64\", \"browserVersion\": \"X11; Linux x86_64\", \"platform\": 6, \"connectionType\": 1 } }");
     break;
 
   case MESSAGE_TYPE_DISCONNECT:
@@ -434,7 +433,6 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
       NULL,
       "{ \"type\": \"CLOSE\" }");
-    expect_input = FALSE;
     break;
 
   case MESSAGE_TYPE_PING:
@@ -472,10 +470,12 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
   memcpy(sock_buffer, &packed_size_be, 4);
   castchannel__cast_message__pack(&message, 4 + sock_buffer);
 
+  g_debug ("CcComm: Sending message:");
+  cc_comm_dump_json_message (&message);
+
   return cc_comm_tls_send (comm,
                            sock_buffer,
                            packed_size+4,
-                           expect_input,
                            error);
 }
 
