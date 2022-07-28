@@ -312,6 +312,36 @@ server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
   return res;
 }
 
+static gboolean
+nd_cc_sink_close_conn_cb (NdCCSink *sink)
+{
+  if (!cc_comm_send_request(&sink->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL))
+  {
+    g_warning ("NdCCSink: something went wrong with closing connection");
+  }
+  return FALSE;
+}
+
+static gboolean
+nd_cc_sink_launch_default_app_cb (NdCCSink *sink)
+{
+  if (!cc_comm_send_request(&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"CC1AD845\", \"requestId\": 3 }", NULL))
+  {
+    g_warning ("NdCCSink: something went wrong with default app launch");
+  }
+  return FALSE;
+}
+
+static gboolean
+nd_cc_sink_get_status_cb (NdCCSink *sink)
+{
+  if (!cc_comm_send_request(&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"GET_STATUS\", \"requestId\": 2 }", NULL))
+  {
+    g_warning ("NdCCSink: something went wrong with get status");
+  }
+  return FALSE;
+}
+
 static NdSink *
 nd_cc_sink_sink_start_stream (NdSink *sink)
 {
@@ -341,6 +371,16 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
       return NULL;
     }
 
+  // authenticate with the CC device
+  if (!cc_comm_send_request(&self->comm, MESSAGE_TYPE_AUTH, NULL, NULL))
+    {
+      self->state = ND_SINK_STATE_ERROR;
+      g_object_notify (G_OBJECT (self), "state");
+      g_clear_object (&self->server);
+
+      return NULL;
+    }
+
   // open up a virtual connection to the device
   if (!cc_comm_send_request(&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL))
     {
@@ -356,22 +396,20 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   // strncat (self->comm.sender_id, six_digits, 6);
 
   // set sender_id after connection (sender-xxxxxx)
-  self->comm.sender_id = "sender-547784";
+  self->comm.sender_id = "sender-0";
 
   // send pings to device every 5 seconds
   self->ping_timeout_handle = g_timeout_add_seconds(5, G_SOURCE_FUNC (cc_comm_send_ping), &self->comm);
-  cc_comm_send_ping (&self->comm);
 
   // send req to get status
   g_debug("NdCCSink: Get Status");
-  cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
+  g_timeout_add_seconds (2, G_SOURCE_FUNC (nd_cc_sink_get_status_cb), self);
 
-  // send req to open youtube
-  // g_debug("NdCCSink: Launching YouTube");
-  // cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"YouTube\", \"requestId\": 1 }", NULL);
+  g_debug("NdCCSink: Launching Default Media App");
+  g_timeout_add_seconds (6, G_SOURCE_FUNC (nd_cc_sink_launch_default_app_cb), self);
 
-  // g_debug("NdCCSink: Get Status Again");
-  // cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{\"type\": \"GET_STATUS\"}", NULL);
+  g_debug("NdCCSink: Closing Connection");
+  g_timeout_add_seconds (60, G_SOURCE_FUNC (nd_cc_sink_close_conn_cb), self);
 
   // g_debug ("NdCCSink: Mute the Chromecast");
   // cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"SET_VOLUME\", \"volume\": { \"muted\": true } }", NULL);

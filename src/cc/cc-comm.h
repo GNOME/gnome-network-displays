@@ -19,6 +19,7 @@
 #pragma once
 
 #include <gio/gio.h>
+#include <json-glib-1.0/json-glib/json-glib.h>
 
 G_BEGIN_DECLS
 
@@ -30,6 +31,7 @@ struct _CcComm
   GIOStream *con;
 
   gchar     *sender_id;
+  gchar     *destination_id;
 
   guint8    *header_buffer;
   guint8    *message_buffer;
@@ -38,11 +40,13 @@ struct _CcComm
 typedef struct _CcComm CcComm;
 
 enum MessageType {
+  MESSAGE_TYPE_AUTH,
   MESSAGE_TYPE_CONNECT,
   MESSAGE_TYPE_DISCONNECT,
   MESSAGE_TYPE_PING,
   MESSAGE_TYPE_PONG,
   MESSAGE_TYPE_RECEIVER,
+  MESSAGE_TYPE_MEDIA,
 };
 
 gboolean cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error);
