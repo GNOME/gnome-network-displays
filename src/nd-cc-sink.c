@@ -361,6 +361,9 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
+  self->comm.sender_id = g_strdup ("sender-gnd");
+  self->comm.destination_id = g_strdup ("receiver-0");
+
   // open a TLS connection to the CC device
   if (!cc_comm_make_connection(&self->comm, self->remote_address, &error))
     {
@@ -396,7 +399,6 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   // strncat (self->comm.sender_id, six_digits, 6);
 
   // set sender_id after connection (sender-xxxxxx)
-  self->comm.sender_id = "sender-0";
 
   // send pings to device every 5 seconds
   self->ping_timeout_handle = g_timeout_add_seconds(5, G_SOURCE_FUNC (cc_comm_send_ping), &self->comm);

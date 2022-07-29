@@ -26,17 +26,15 @@ static void cc_comm_listen (CcComm *comm);
 static void cc_comm_read (CcComm *comm, gsize io_bytes, gboolean read_header);
 
 
-static void
-cc_comm_load_media (CcComm *comm)
+static gboolean
+cc_comm_load_media_cb (CcComm *comm)
 {
-  gboolean send_ok = cc_comm_send_request (comm, MESSAGE_TYPE_MEDIA, "{ \"type\": \"LOAD\", \"media\": { \"contentId\": \"https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/mp4/BigBuckBunny.mp4\", \"streamType\": \"BUFFERED\", \"contentType\": \"video/mp4\" }, \"requestId\": 4 }", NULL);
-
-  if (!send_ok)
+  if (!cc_comm_send_request (comm, MESSAGE_TYPE_MEDIA, "{ \"type\": \"LOAD\", \"media\": { \"contentId\": \"https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/mp4/BigBuckBunny.mp4\", \"streamType\": \"BUFFERED\", \"contentType\": \"video/mp4\" }, \"requestId\": 4 }", NULL))
   {
     g_warning ("NdCCSink: something went wrong with load media");
   }
 
-  g_clear_pointer (&comm->destination_id, g_free);
+  return FALSE;
 }
 
 static void
@@ -111,8 +109,19 @@ cc_comm_parse_json_data (CcComm *comm, char *payload)
               json_reader_read_member (reader, "transportId");
               const char *transport_id = json_reader_get_string_value (reader);
               g_debug ("CcComm: Transport Id: %s!", transport_id);
+
+              // start a new virtual connection
               comm->destination_id = g_strdup (transport_id);
-              cc_comm_load_media (comm);
+              // g_clear_pointer (&comm->sender_id, g_free);
+              // comm->sender_id = g_strdup ("sender-gnd");
+              g_debug ("CcComm: Sending second connect request");
+              if (!cc_comm_send_request(comm, MESSAGE_TYPE_CONNECT, NULL, NULL))
+              {
+                g_warning ("CcComm: Something went wrong with VC request for media");
+                return TRUE;
+              }
+              // call the LOAD media request after 4 seconds
+              g_timeout_add_seconds (4, G_SOURCE_FUNC (cc_comm_load_media_cb), comm);
             }
           json_reader_end_member (reader);
         json_reader_end_element (reader);
@@ -499,7 +508,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
     binary_payload.len = 0;
 
     message = cc_comm_build_message(
-      "sender-0",
+      comm->sender_id,
       "urn:x-cast:com.google.cast.tp.deviceauth",
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
       &binary_payload,
@@ -508,17 +517,18 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
 
   case MESSAGE_TYPE_CONNECT:
     message = cc_comm_build_message(
-      "sender-0",
+      comm->sender_id,
       "urn:x-cast:com.google.cast.tp.connection",
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
       NULL,
-      "{ \"type\": \"CONNECT\" }");
-      // "{ \"type\": \"CONNECT\", \"userAgent\": \"GND/0.90.5  (X11; Linux x86_64)\", \"connType\": 0, \"origin\": {}, \"senderInfo\": { \"sdkType\": 2, \"version\": \"X11; Linux x86_64\", \"browserVersion\": \"X11; Linux x86_64\", \"platform\": 6, \"connectionType\": 1 } }");
+      // "{ \"type\": \"CONNECT\" }");
+      "{ \"type\": \"CONNECT\", \"userAgent\": \"GND/0.90.5  (X11; Linux x86_64)\", \"connType\": 0, \"origin\": {}, \"senderInfo\": { \"sdkType\": 2, \"version\": \"X11; Linux x86_64\", \"browserVersion\": \"X11; Linux x86_64\", \"platform\": 6, \"connectionType\": 1 } }");
+      message.destination_id = comm->destination_id;
     break;
 
   case MESSAGE_TYPE_DISCONNECT:
     message = cc_comm_build_message(
-      "sender-0",
+      comm->sender_id,
       "urn:x-cast:com.google.cast.tp.connection",
       CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
       NULL,
