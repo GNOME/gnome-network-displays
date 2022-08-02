@@ -19,6 +19,7 @@ configure_file(
 )
 add_project_arguments([
   '-I' + meson.build_root(),
+  '-DG_LOG_DOMAIN="Gnd"',
 ], language: 'c')
 
 enable_firewalld_zone = get_option('firewalld_zone')
