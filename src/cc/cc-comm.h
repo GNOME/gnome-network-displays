@@ -28,13 +28,13 @@ G_BEGIN_DECLS
 struct _CcComm
 {
   /*< public >*/
-  GIOStream *con;
+  GIOStream    *con;
 
-  gchar     *sender_id;
-  gchar     *destination_id;
+  gchar        *destination_id;
+  guint8       *header_buffer;
+  guint8       *message_buffer;
 
-  guint8    *header_buffer;
-  guint8    *message_buffer;
+  GCancellable *cancellable;
 };
 
 typedef struct _CcComm CcComm;
@@ -49,8 +49,13 @@ enum MessageType {
   MESSAGE_TYPE_MEDIA,
 };
 
-gboolean cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error);
-gboolean cc_comm_send_request (CcComm *sink, enum MessageType message_type, char *utf8_payload, GError **error);
+gboolean cc_comm_make_connection (CcComm  *comm,
+                                  gchar   *remote_address,
+                                  GError **error);
+gboolean cc_comm_send_request (CcComm          *sink,
+                               enum MessageType message_type,
+                               char            *utf8_payload,
+                               GError         **error);
 gboolean cc_comm_send_ping (CcComm *sink);
 
 G_END_DECLS

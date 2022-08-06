@@ -29,25 +29,25 @@
 
 struct _NdCCSink
 {
-  GObject            parent_instance;
+  GObject        parent_instance;
 
-  NdSinkState        state;
+  NdSinkState    state;
 
-  GCancellable      *cancellable;
+  GCancellable  *cancellable;
 
-  GStrv              missing_video_codec;
-  GStrv              missing_audio_codec;
-  char              *missing_firewall_zone;
+  GStrv          missing_video_codec;
+  GStrv          missing_audio_codec;
+  char          *missing_firewall_zone;
 
-  gchar             *remote_address;
-  gchar             *remote_name;
+  gchar         *remote_address;
+  gchar         *remote_name;
 
-  GSocketClient     *comm_client;
-  CcComm             comm;
-  guint              ping_timeout_handle;
+  GSocketClient *comm_client;
+  CcComm         comm;
+  guint          ping_timeout_handle;
 
-  WfdServer         *server;
-  guint              server_source_id;
+  WfdServer     *server;
+  guint          server_source_id;
 };
 
 enum {
@@ -81,9 +81,9 @@ G_DEFINE_TYPE_EXTENDED (NdCCSink, nd_cc_sink, G_TYPE_OBJECT, 0,
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
 static void
-nd_cc_sink_get_property (GObject *    object,
+nd_cc_sink_get_property (GObject    * object,
                          guint        prop_id,
-                         GValue *     value,
+                         GValue     * value,
                          GParamSpec * pspec)
 {
   NdCCSink *sink = ND_CC_SINK (object);
@@ -263,7 +263,7 @@ static void
 closed_cb (NdCCSink *sink, CCClient *client)
 {
   /* Connection was closed, do a clean shutdown */
-  cc_comm_send_request(&sink->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL);
+  cc_comm_send_request (&sink->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL);
 
   nd_cc_sink_sink_stop_stream (ND_SINK (sink));
 }
@@ -313,32 +313,18 @@ server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
 }
 
 static gboolean
-nd_cc_sink_close_conn_cb (NdCCSink *sink)
-{
-  if (!cc_comm_send_request(&sink->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL))
-  {
-    g_warning ("NdCCSink: something went wrong with closing connection");
-  }
-  return FALSE;
-}
-
-static gboolean
 nd_cc_sink_launch_default_app_cb (NdCCSink *sink)
 {
-  if (!cc_comm_send_request(&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"CC1AD845\", \"requestId\": 3 }", NULL))
-  {
+  if (!cc_comm_send_request (&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"CC1AD845\", \"requestId\": 3 }", NULL))
     g_warning ("NdCCSink: something went wrong with default app launch");
-  }
   return FALSE;
 }
 
 static gboolean
 nd_cc_sink_get_status_cb (NdCCSink *sink)
 {
-  if (!cc_comm_send_request(&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"GET_STATUS\", \"requestId\": 2 }", NULL))
-  {
+  if (!cc_comm_send_request (&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"GET_STATUS\", \"requestId\": 2 }", NULL))
     g_warning ("NdCCSink: something went wrong with get status");
-  }
   return FALSE;
 }
 
@@ -346,6 +332,7 @@ static NdSink *
 nd_cc_sink_sink_start_stream (NdSink *sink)
 {
   NdCCSink *self = ND_CC_SINK (sink);
+
   g_autoptr(GError) error = NULL;
   // gchar six_digits[6];
 
@@ -361,11 +348,11 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
 
-  self->comm.sender_id = g_strdup ("sender-gnd");
-  self->comm.destination_id = g_strdup ("receiver-0");
+  self->comm.destination_id = "receiver-0";
+  self->comm.cancellable = self->cancellable;
 
   // open a TLS connection to the CC device
-  if (!cc_comm_make_connection(&self->comm, self->remote_address, &error))
+  if (!cc_comm_make_connection (&self->comm, self->remote_address, &error))
     {
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
@@ -375,7 +362,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
     }
 
   // authenticate with the CC device
-  if (!cc_comm_send_request(&self->comm, MESSAGE_TYPE_AUTH, NULL, NULL))
+  if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_AUTH, NULL, NULL))
     {
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
@@ -385,7 +372,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
     }
 
   // open up a virtual connection to the device
-  if (!cc_comm_send_request(&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL))
+  if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL))
     {
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
@@ -394,27 +381,18 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
       return NULL;
     }
 
-  // sprintf (six_digits, "%ld", time (NULL) % 1000000);
-  // self->comm.sender_id = "sender-";
-  // strncat (self->comm.sender_id, six_digits, 6);
-
-  // set sender_id after connection (sender-xxxxxx)
-
   // send pings to device every 5 seconds
-  self->ping_timeout_handle = g_timeout_add_seconds(5, G_SOURCE_FUNC (cc_comm_send_ping), &self->comm);
+  self->ping_timeout_handle = g_timeout_add_seconds (5, G_SOURCE_FUNC (cc_comm_send_ping), &self->comm);
 
   // send req to get status
-  g_debug("NdCCSink: Get Status");
+  g_debug ("NdCCSink: Get Status");
   g_timeout_add_seconds (2, G_SOURCE_FUNC (nd_cc_sink_get_status_cb), self);
 
-  g_debug("NdCCSink: Launching Default Media App");
+  g_debug ("NdCCSink: Launching Default Media App");
   g_timeout_add_seconds (6, G_SOURCE_FUNC (nd_cc_sink_launch_default_app_cb), self);
 
-  g_debug("NdCCSink: Closing Connection");
-  g_timeout_add_seconds (60, G_SOURCE_FUNC (nd_cc_sink_close_conn_cb), self);
-
-  // g_debug ("NdCCSink: Mute the Chromecast");
-  // cc_comm_send_request(&self->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"SET_VOLUME\", \"volume\": { \"muted\": true } }", NULL);
+  self->state = ND_SINK_STATE_STREAMING;
+  g_object_notify (G_OBJECT (self), "state");
 
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
@@ -446,8 +424,8 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
                            self,
                            G_CONNECT_SWAPPED);
 
-  self->state = ND_SINK_STATE_WAIT_SOCKET;
-  g_object_notify (G_OBJECT (self), "state");
+  // self->state = ND_SINK_STATE_WAIT_SOCKET;
+  // g_object_notify (G_OBJECT (self), "state");
 
   // these were originally here
   // 1. send connect request
@@ -459,27 +437,53 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
-  g_autoptr(GError) error;
+  g_autoptr(GError) error = NULL;
   gboolean close_ok;
+
+  // Close the app before closing the connection
+  // hack to know if the app is already up
+  if (g_strcmp0 (self->comm.destination_id, "receiver-0") != 0)
+    {
+      g_autoptr(GString) close_app_message = NULL;
+      close_app_message = g_string_new ("{ \"type\": \"STOP\", \"requestId\": 5, \"sessionId\": \"");
+      g_string_append (close_app_message, self->comm.destination_id);
+      g_string_append (close_app_message, "\" }");
+
+      if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_RECEIVER, close_app_message->str, &error))
+        {
+          if (error != NULL)
+            g_warning ("NdCCSink: Error closing the cast app: %s", error->message);
+          else
+            g_warning ("NdCCSink: Error closing the cast app");
+        }
+
+      g_clear_error (&error);
+      g_clear_pointer (&self->comm.destination_id, g_free);
+      self->comm.destination_id = g_strdup ("receiver-0");
+    }
+
+  if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL))
+    g_warning ("NdCCSink: Error closing virtual connection");
 
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
 
   self->cancellable = g_cancellable_new ();
 
+  // cancel ping timeout
+  g_clear_handle_id (&self->ping_timeout_handle, g_source_remove);
+
   /* Close the client connection
-   * FIX: this does not close the connection
    * TODO: This should be moved into cc-comm.c */
   if (self->comm.con != NULL)
     {
       close_ok = g_io_stream_close (G_IO_STREAM (self->comm.con), NULL, &error);
-      if (error != NULL)
-        {
-          g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
-        }
       if (!close_ok)
         {
-          g_warning ("NdCCSink: Communication client connection not closed");
+          if (error != NULL)
+            g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
+          else
+            g_warning ("NdCCSink: Communication client connection not closed");
         }
 
       g_clear_object (&self->comm.con);
