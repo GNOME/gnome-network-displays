@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <gio/gio.h>
 #include <json-glib-1.0/json-glib/json-glib.h>
 
 G_BEGIN_DECLS
