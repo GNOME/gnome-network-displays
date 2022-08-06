@@ -533,8 +533,8 @@ nd_wfd_mice_sink_sink_stop_stream (NdSink *sink)
 ******************************************************************/
 
 NdWFDMiceSink *
-nd_wfd_mice_sink_new (gchar         *name,
-                      gchar         *remote_address)
+nd_wfd_mice_sink_new (gchar *name,
+                      gchar *remote_address)
 {
   return g_object_new (ND_TYPE_WFD_MICE_SINK,
                        "name", name,

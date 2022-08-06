@@ -104,9 +104,7 @@ nd_meta_sink_update (NdMetaSink *meta_sink)
       g_debug ("MetaSink: Priority sink updated. Priority: %i", best_priority);
     }
   else
-    {
-      g_debug ("MetaSink: No usable sink is left, object has become invalid.");
-    }
+    g_debug ("MetaSink: No usable sink is left, object has become invalid.");
 
   /* Notify the pass-through properties */
   g_object_notify (G_OBJECT (meta_sink), "display-name");

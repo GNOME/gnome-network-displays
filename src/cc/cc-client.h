@@ -14,8 +14,8 @@ G_DECLARE_FINAL_TYPE (CCClient, cc_client, CC, CLIENT, GstRTSPClient)
 
 CCClient * cc_client_new (void);
 void cc_client_query_support (CCClient *self);
-void cc_client_trigger_method (CCClient   *self,
-                                const gchar *method);
+void cc_client_trigger_method (CCClient    *self,
+                               const gchar *method);
 
 
 G_END_DECLS

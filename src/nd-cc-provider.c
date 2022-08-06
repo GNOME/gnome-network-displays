@@ -26,10 +26,10 @@
 
 struct _NdCCProvider
 {
-  GObject parent_instance;
+  GObject        parent_instance;
 
-  GPtrArray *sinks;
-  GaClient *avahi_client;
+  GPtrArray     *sinks;
+  GaClient      *avahi_client;
 
   GSocketClient *signalling_client;
   // GSocketService *signalling_server;
@@ -37,8 +37,7 @@ struct _NdCCProvider
   gboolean discover;
 };
 
-enum
-{
+enum {
   PROP_CLIENT = 1,
 
   PROP_DISCOVER,
@@ -46,81 +45,82 @@ enum
   PROP_LAST = PROP_DISCOVER,
 };
 
-static void nd_cc_provider_provider_iface_init(NdProviderIface *iface);
-static GList *nd_cc_provider_provider_get_sinks(NdProvider *provider);
+static void nd_cc_provider_provider_iface_init (NdProviderIface *iface);
+static GList *nd_cc_provider_provider_get_sinks (NdProvider *provider);
 
-G_DEFINE_TYPE_EXTENDED(NdCCProvider, nd_cc_provider, G_TYPE_OBJECT, 0,
-                       G_IMPLEMENT_INTERFACE(ND_TYPE_PROVIDER,
-                                             nd_cc_provider_provider_iface_init);)
+G_DEFINE_TYPE_EXTENDED (NdCCProvider, nd_cc_provider, G_TYPE_OBJECT, 0,
+                        G_IMPLEMENT_INTERFACE (ND_TYPE_PROVIDER,
+                                               nd_cc_provider_provider_iface_init);
+                       )
 
 static GParamSpec *props[PROP_LAST] = {
-    NULL,
+  NULL,
 };
 
 static void
-nd_cc_provider_get_property(GObject *object,
-                            guint prop_id,
-                            GValue *value,
-                            GParamSpec *pspec)
+nd_cc_provider_get_property (GObject    *object,
+                             guint       prop_id,
+                             GValue     *value,
+                             GParamSpec *pspec)
 {
-  NdCCProvider *provider = ND_CC_PROVIDER(object);
+  NdCCProvider *provider = ND_CC_PROVIDER (object);
 
   switch (prop_id)
-  {
-  case PROP_CLIENT:
-    g_assert(provider->avahi_client == NULL);
-    g_value_set_object(value, provider->avahi_client);
-    break;
+    {
+    case PROP_CLIENT:
+      g_assert (provider->avahi_client == NULL);
+      g_value_set_object (value, provider->avahi_client);
+      break;
 
-  case PROP_DISCOVER:
-    g_value_set_boolean(value, provider->discover);
-    break;
+    case PROP_DISCOVER:
+      g_value_set_boolean (value, provider->discover);
+      break;
 
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
-    break;
-  }
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
 }
 
 static void
-nd_cc_provider_set_property(GObject *object,
-                            guint prop_id,
-                            const GValue *value,
-                            GParamSpec *pspec)
+nd_cc_provider_set_property (GObject      *object,
+                             guint         prop_id,
+                             const GValue *value,
+                             GParamSpec   *pspec)
 {
-  NdCCProvider *provider = ND_CC_PROVIDER(object);
+  NdCCProvider *provider = ND_CC_PROVIDER (object);
 
   switch (prop_id)
-  {
-  case PROP_CLIENT:
-    /* Construct only */
-    provider->avahi_client = g_value_dup_object(value);
-    break;
+    {
+    case PROP_CLIENT:
+      /* Construct only */
+      provider->avahi_client = g_value_dup_object (value);
+      break;
 
-  case PROP_DISCOVER:
-    provider->discover = g_value_get_boolean(value);
-    break;
+    case PROP_DISCOVER:
+      provider->discover = g_value_get_boolean (value);
+      break;
 
-  default:
-    G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
-    break;
-  }
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
 }
 
 static void
-nd_cc_provider_finalize(GObject *object)
+nd_cc_provider_finalize (GObject *object)
 {
-  NdCCProvider *provider = ND_CC_PROVIDER(object);
+  NdCCProvider *provider = ND_CC_PROVIDER (object);
   GError *error;
 
-  g_clear_pointer(&provider->sinks, g_ptr_array_unref);
+  g_clear_pointer (&provider->sinks, g_ptr_array_unref);
 
   if (provider->signalling_client)
-  {
-    if (!g_socket_close((GSocket *)provider->signalling_client, &error))
-      g_warning("NdCCProvider: Error closing signalling client socket: %s", error->message);
-    g_object_unref(provider->signalling_client);
-  }
+    {
+      if (!g_socket_close ((GSocket *) provider->signalling_client, &error))
+        g_warning ("NdCCProvider: Error closing signalling client socket: %s", error->message);
+      g_object_unref (provider->signalling_client);
+    }
 
   // if (provider->signalling_server)
   // {
@@ -129,141 +129,141 @@ nd_cc_provider_finalize(GObject *object)
   //   g_object_unref(provider->signalling_server);
   // }
 
-  G_OBJECT_CLASS(nd_cc_provider_parent_class)->finalize(object);
+  G_OBJECT_CLASS (nd_cc_provider_parent_class)->finalize (object);
 }
 
 static void
-nd_cc_provider_class_init(NdCCProviderClass *klass)
+nd_cc_provider_class_init (NdCCProviderClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS(klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = nd_cc_provider_get_property;
   object_class->set_property = nd_cc_provider_set_property;
   object_class->finalize = nd_cc_provider_finalize;
 
   props[PROP_CLIENT] =
-      g_param_spec_object("client", "Client",
-                          "The AvahiClient used to find sinks.",
-                          GA_TYPE_CLIENT,
-                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+    g_param_spec_object ("client", "Client",
+                         "The AvahiClient used to find sinks.",
+                         GA_TYPE_CLIENT,
+                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
 
-  g_object_class_install_properties(object_class, PROP_LAST, props);
+  g_object_class_install_properties (object_class, PROP_LAST, props);
 
-  g_object_class_override_property(object_class, PROP_DISCOVER, "discover");
+  g_object_class_override_property (object_class, PROP_DISCOVER, "discover");
 }
 
 static void
-resolver_found_cb(GaServiceResolver *resolver,
-                  AvahiIfIndex iface,
-                  GaProtocol proto,
-                  gchar *name,
-                  gchar *type,
-                  gchar *domain,
-                  gchar *hostname,
-                  AvahiAddress *addr,
-                  gint port,
-                  AvahiStringList *txt,
-                  GaLookupResultFlags flags,
-                  NdCCProvider *provider)
+resolver_found_cb (GaServiceResolver  *resolver,
+                   AvahiIfIndex        iface,
+                   GaProtocol          proto,
+                   gchar              *name,
+                   gchar              *type,
+                   gchar              *domain,
+                   gchar              *hostname,
+                   AvahiAddress       *addr,
+                   gint                port,
+                   AvahiStringList    *txt,
+                   GaLookupResultFlags flags,
+                   NdCCProvider       *provider)
 {
   NdCCSink *sink = NULL;
   gchar address[AVAHI_ADDRESS_STR_MAX];
 
-  g_debug("NdCCProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
+  g_debug ("NdCCProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
 
-  if (avahi_address_snprint(address, sizeof(address), addr) == NULL)
-    g_warning("NdCCProvider: Failed to convert AvahiAddress to string");
+  if (avahi_address_snprint (address, sizeof (address), addr) == NULL)
+    g_warning ("NdCCProvider: Failed to convert AvahiAddress to string");
 
-  g_debug("NdCCProvider: Resolved %s to %s", hostname, address);
+  g_debug ("NdCCProvider: Resolved %s to %s", hostname, address);
 
-  sink = nd_cc_sink_new(provider->signalling_client, name, address);
+  sink = nd_cc_sink_new (provider->signalling_client, name, address);
 
-  g_object_unref(resolver);
+  g_object_unref (resolver);
 
-  g_ptr_array_add(provider->sinks, sink);
-  g_signal_emit_by_name(provider, "sink-added", sink);
+  g_ptr_array_add (provider->sinks, sink);
+  g_signal_emit_by_name (provider, "sink-added", sink);
 }
 
 static void
-resolver_failure_cb(GaServiceResolver *resolver,
-                    GError *error,
-                    NdCCProvider *provider)
+resolver_failure_cb (GaServiceResolver *resolver,
+                     GError            *error,
+                     NdCCProvider      *provider)
 {
-  g_warning("NdCCProvider: Failed to resolve Avahi service: %s", error->message);
-  g_object_unref(resolver);
+  g_warning ("NdCCProvider: Failed to resolve Avahi service: %s", error->message);
+  g_object_unref (resolver);
 }
 
 static void
-service_added_cb(GaServiceBrowser *browser,
-                 AvahiIfIndex iface,
-                 GaProtocol proto,
-                 gchar *name,
-                 gchar *type,
-                 gchar *domain,
-                 GaLookupResultFlags flags,
-                 NdCCProvider *provider)
+service_added_cb (GaServiceBrowser   *browser,
+                  AvahiIfIndex        iface,
+                  GaProtocol          proto,
+                  gchar              *name,
+                  gchar              *type,
+                  gchar              *domain,
+                  GaLookupResultFlags flags,
+                  NdCCProvider       *provider)
 {
   GaServiceResolver *resolver;
   GError *error = NULL;
 
-  resolver = ga_service_resolver_new(iface,
-                                     proto,
-                                     name,
-                                     type,
-                                     domain,
-                                     GA_PROTOCOL_INET,
-                                     GA_LOOKUP_NO_FLAGS);
+  resolver = ga_service_resolver_new (iface,
+                                      proto,
+                                      name,
+                                      type,
+                                      domain,
+                                      GA_PROTOCOL_INET,
+                                      GA_LOOKUP_NO_FLAGS);
 
-  g_signal_connect(resolver,
-                   "found",
-                   (GCallback)resolver_found_cb,
-                   provider);
+  g_signal_connect (resolver,
+                    "found",
+                    (GCallback) resolver_found_cb,
+                    provider);
 
-  g_signal_connect(resolver,
-                   "failure",
-                   (GCallback)resolver_failure_cb,
-                   provider);
+  g_signal_connect (resolver,
+                    "failure",
+                    (GCallback) resolver_failure_cb,
+                    provider);
 
-  if (!ga_service_resolver_attach(resolver,
-                                  provider->avahi_client,
-                                  &error))
-  {
-    g_warning("NdCCProvider: Failed to attach Avahi resolver: %s", error->message);
-    g_error_free(error);
-  }
+  if (!ga_service_resolver_attach (resolver,
+                                   provider->avahi_client,
+                                   &error))
+    {
+      g_warning ("NdCCProvider: Failed to attach Avahi resolver: %s", error->message);
+      g_error_free (error);
+    }
 }
 
 static void
-service_removed_cb(GaServiceBrowser *browser,
-                   AvahiIfIndex iface,
-                   GaProtocol proto,
-                   gchar *name,
-                   gchar *type,
-                   gchar *domain,
-                   GaLookupResultFlags flags,
-                   NdCCProvider *provider)
+service_removed_cb (GaServiceBrowser   *browser,
+                    AvahiIfIndex        iface,
+                    GaProtocol          proto,
+                    gchar              *name,
+                    gchar              *type,
+                    gchar              *domain,
+                    GaLookupResultFlags flags,
+                    NdCCProvider       *provider)
 {
-  g_debug("NdCCProvider: mDNS service \"%s\" removed from interface %i", name, iface);
+  g_debug ("NdCCProvider: mDNS service \"%s\" removed from interface %i", name, iface);
 
   for (gint i = 0; i < provider->sinks->len; i++)
-  {
-    g_autoptr(NdCCSink) sink = g_object_ref(g_ptr_array_index(provider->sinks, i));
-
-    NdSinkState state = nd_cc_sink_get_state(sink);
-    if (state == ND_SINK_STATE_WAIT_STREAMING ||
-        state == ND_SINK_STATE_STREAMING)
-      continue;
-
-    gchar *remote_name = NULL;
-    g_object_get(sink, "name", &remote_name, NULL);
-    if (remote_name == name)
     {
-      g_debug("NdCCProvider: Removing sink");
-      g_ptr_array_remove_index(provider->sinks, i);
-      g_signal_emit_by_name(provider, "sink-removed", sink);
-      break;
+      g_autoptr(NdCCSink) sink = g_object_ref (g_ptr_array_index (provider->sinks, i));
+
+      NdSinkState state = nd_cc_sink_get_state (sink);
+      if (state == ND_SINK_STATE_WAIT_STREAMING ||
+          state == ND_SINK_STATE_STREAMING)
+        continue;
+
+      gchar *remote_name = NULL;
+      g_object_get (sink, "name", &remote_name, NULL);
+      if (remote_name == name)
+        {
+          g_debug ("NdCCProvider: Removing sink");
+          g_ptr_array_remove_index (provider->sinks, i);
+          g_signal_emit_by_name (provider, "sink-removed", sink);
+          break;
+        }
     }
-  }
 }
 
 // // TODO: msg receiving callback
@@ -295,14 +295,14 @@ service_removed_cb(GaServiceBrowser *browser,
 
 // TODO: is GThreadedSocketService required?
 static void
-nd_cc_provider_init(NdCCProvider *provider)
+nd_cc_provider_init (NdCCProvider *provider)
 {
   // g_autoptr(GError) error = NULL;
   // GSocketService *server;
 
   provider->discover = TRUE;
-  provider->sinks = g_ptr_array_new_with_free_func(g_object_unref);
-  provider->signalling_client = g_socket_client_new();
+  provider->sinks = g_ptr_array_new_with_free_func (g_object_unref);
+  provider->signalling_client = g_socket_client_new ();
   // server = g_socket_service_new();
 
   // g_socket_listener_add_inet_port((GSocketListener *)server,
@@ -328,39 +328,39 @@ nd_cc_provider_init(NdCCProvider *provider)
 }
 
 /******************************************************************
- * NdProvider interface implementation
- ******************************************************************/
+* NdProvider interface implementation
+******************************************************************/
 
 static void
-nd_cc_provider_provider_iface_init(NdProviderIface *iface)
+nd_cc_provider_provider_iface_init (NdProviderIface *iface)
 {
   iface->get_sinks = nd_cc_provider_provider_get_sinks;
 }
 
 static GList *
-nd_cc_provider_provider_get_sinks(NdProvider *provider)
+nd_cc_provider_provider_get_sinks (NdProvider *provider)
 {
-  NdCCProvider *cc_provider = ND_CC_PROVIDER(provider);
+  NdCCProvider *cc_provider = ND_CC_PROVIDER (provider);
   GList *res = NULL;
 
   for (gint i = 0; i < cc_provider->sinks->len; i++)
-    res = g_list_prepend(res, g_ptr_array_index(cc_provider->sinks, i));
+    res = g_list_prepend (res, g_ptr_array_index (cc_provider->sinks, i));
 
   return res;
 }
 
 /******************************************************************
- * NdCCProvider public functions
- ******************************************************************/
+* NdCCProvider public functions
+******************************************************************/
 
 GaClient *
-nd_cc_provider_get_client(NdCCProvider *provider)
+nd_cc_provider_get_client (NdCCProvider *provider)
 {
   return provider->avahi_client;
 }
 
 GSocketClient *
-nd_cc_provider_get_signalling_client(NdCCProvider *provider)
+nd_cc_provider_get_signalling_client (NdCCProvider *provider)
 {
   return provider->signalling_client;
 }
@@ -372,43 +372,43 @@ nd_cc_provider_get_signalling_client(NdCCProvider *provider)
 // }
 
 NdCCProvider *
-nd_cc_provider_new(GaClient *client)
+nd_cc_provider_new (GaClient *client)
 {
-  return g_object_new(ND_TYPE_CC_PROVIDER,
-                      "client", client,
-                      NULL);
+  return g_object_new (ND_TYPE_CC_PROVIDER,
+                       "client", client,
+                       NULL);
 }
 
 gboolean
-nd_cc_provider_browse(NdCCProvider *provider, GError *error)
+nd_cc_provider_browse (NdCCProvider *provider, GError *error)
 {
   GaServiceBrowser *avahi_browser;
 
-  avahi_browser = ga_service_browser_new("_googlecast._tcp");
+  avahi_browser = ga_service_browser_new ("_googlecast._tcp");
 
   if (provider->avahi_client == NULL)
-  {
-    g_warning("NdCCProvider: No Avahi client found");
-    return FALSE;
-  }
+    {
+      g_warning ("NdCCProvider: No Avahi client found");
+      return FALSE;
+    }
 
-  g_signal_connect(avahi_browser,
-                   "new-service",
-                   (GCallback)service_added_cb,
-                   provider);
+  g_signal_connect (avahi_browser,
+                    "new-service",
+                    (GCallback) service_added_cb,
+                    provider);
 
-  g_signal_connect(avahi_browser,
-                   "removed-service",
-                   (GCallback)service_removed_cb,
-                   provider);
+  g_signal_connect (avahi_browser,
+                    "removed-service",
+                    (GCallback) service_removed_cb,
+                    provider);
 
-  if (!ga_service_browser_attach(avahi_browser,
-                                 provider->avahi_client,
-                                 &error))
-  {
-    g_warning("NdCCProvider: Failed to attach Avahi Service Browser: %s", error->message);
-    return FALSE;
-  }
+  if (!ga_service_browser_attach (avahi_browser,
+                                  provider->avahi_client,
+                                  &error))
+    {
+      g_warning ("NdCCProvider: Failed to attach Avahi Service Browser: %s", error->message);
+      return FALSE;
+    }
 
   return TRUE;
 }

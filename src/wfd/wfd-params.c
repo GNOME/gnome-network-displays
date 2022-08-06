@@ -267,9 +267,7 @@ wfd_params_from_sink (WfdParams *self, const guint8 *body, gsize body_size)
                   g_ptr_array_add (self->video_codecs, g_steal_pointer (&codec));
                 }
               else
-                {
-                  g_warning ("WfdParams: Could not parse codec descriptor: %s", *codec_descriptor);
-                }
+                g_warning ("WfdParams: Could not parse codec descriptor: %s", *codec_descriptor);
             }
         }
       else if (g_str_equal (option, "wfd_audio_codecs"))
@@ -299,9 +297,7 @@ wfd_params_from_sink (WfdParams *self, const guint8 *body, gsize body_size)
                   g_ptr_array_add (self->audio_codecs, g_steal_pointer (&codec));
                 }
               else
-                {
-                  g_warning ("WfdParams: Could not parse codec descriptor: %s", *codec_descriptor);
-                }
+                g_warning ("WfdParams: Could not parse codec descriptor: %s", *codec_descriptor);
             }
         }
       else if (g_str_equal (option, "wfd_display_edid"))
@@ -342,10 +338,8 @@ wfd_params_from_sink (WfdParams *self, const guint8 *body, gsize body_size)
             }
         }
       else if (g_str_equal (option, "wfd_idr_request_capability"))
-        {
-          /* Assume IDR request capable if it is the string one */
-          self->idr_request_capability = g_str_equal (value, "1");
-        }
+        /* Assume IDR request capable if it is the string one */
+        self->idr_request_capability = g_str_equal (value, "1");
       else if (g_str_equal (option, "microsoft_cursor"))
         {
           g_auto(GStrv) split_value = NULL;
@@ -375,8 +369,6 @@ wfd_params_from_sink (WfdParams *self, const guint8 *body, gsize body_size)
             g_warning ("WfdParams: microsoft_cursor extension has odd values: \"%s\"", value);
         }
       else
-        {
-          g_debug ("WfdParams: Not handling option %s", option);
-        }
+        g_debug ("WfdParams: Not handling option %s", option);
     }
 }

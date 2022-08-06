@@ -24,16 +24,16 @@ typedef enum {
 
 struct _CCClient
 {
-  GstRTSPClient      parent_instance;
+  GstRTSPClient     parent_instance;
 
   CCConnectionType  connection_type;
-  guint              keep_alive_source_id;
+  guint             keep_alive_source_id;
 
   CCClientInitState init_state;
-  WfdMedia          *media;
-  WfdParams         *params;
+  WfdMedia         *media;
+  WfdParams        *params;
 
-  WfdMediaQuirks     media_quirks;
+  WfdMediaQuirks    media_quirks;
 };
 
 G_DEFINE_TYPE (CCClient, cc_client, GST_TYPE_RTSP_CLIENT)
@@ -142,9 +142,7 @@ cc_client_select_codec_and_resolution (CCClient *self, WfdH264ProfileFlags profi
 #if 0
   /* The native resolution reported by some devices is just useless */
   if (codec->native)
-    {
-      self->params->selected_resolution = wfd_resolution_copy (codec->native);
-    }
+    self->params->selected_resolution = wfd_resolution_copy (codec->native);
   else
     {
       /* Find a good resolution. */
@@ -155,9 +153,7 @@ cc_client_select_codec_and_resolution (CCClient *self, WfdH264ProfileFlags profi
       resolutions = g_list_sort (resolutions, compare_resolutions);
       last = g_list_last (resolutions);
       if (last)
-        {
-          self->params->selected_resolution = wfd_resolution_copy ((WfdResolution *) last->data);
-        }
+        self->params->selected_resolution = wfd_resolution_copy ((WfdResolution *) last->data);
       else
         {
 #endif
@@ -191,8 +187,8 @@ cc_client_select_codec_and_resolution (CCClient *self, WfdH264ProfileFlags profi
 
 gboolean
 cc_client_configure_client_media (GstRTSPClient * client,
-                                   GstRTSPMedia * media, GstRTSPStream * stream,
-                                   GstRTSPContext * ctx)
+                                  GstRTSPMedia * media, GstRTSPStream * stream,
+                                  GstRTSPContext * ctx)
 {
   CCClient *self = CC_CLIENT (client);
 
@@ -289,8 +285,8 @@ cc_client_idle_set_params (gpointer user_data)
 
 GstRTSPFilterResult
 cc_client_touch_session_filter_func (GstRTSPClient  *client,
-                                      GstRTSPSession *sess,
-                                      gpointer        user_data)
+                                     GstRTSPSession *sess,
+                                     gpointer        user_data)
 {
   gst_rtsp_session_touch (sess);
 
@@ -366,15 +362,13 @@ cc_client_make_path_from_uri (GstRTSPClient * client, const GstRTSPUrl * uri)
         return g_strdup (uri->abspath);
     }
   else
-    {
-      return GST_RTSP_CLIENT_CLASS (cc_client_parent_class)->make_path_from_uri (client, uri);
-    }
+    return GST_RTSP_CLIENT_CLASS (cc_client_parent_class)->make_path_from_uri (client, uri);
 }
 
 GstRTSPFilterResult
 cc_client_timeout_session_filter_func (GstRTSPClient  *client,
-                                        GstRTSPSession *sess,
-                                        gpointer        user_data)
+                                       GstRTSPSession *sess,
+                                       gpointer        user_data)
 {
   GstRTSPMessage msg = { 0 };
 
@@ -456,9 +450,7 @@ cc_client_params_set (GstRTSPClient *client, GstRTSPContext *ctx)
         {
           /* Force a key unit event. */
           if (self->media_quirks & WFD_QUIRK_NO_IDR)
-            {
-              g_debug ("Cannot force key frame as the pipeline doesn't support it!");
-            }
+            g_debug ("Cannot force key frame as the pipeline doesn't support it!");
           else if (self->media)
             {
               GstRTSPStream *stream;
@@ -476,14 +468,10 @@ cc_client_params_set (GstRTSPClient *client, GstRTSPContext *ctx)
               gst_pad_send_event (srcpad, g_steal_pointer (&event));
             }
           else
-            {
-              g_debug ("Cannot force key frame currently, no media!");
-            }
+            g_debug ("Cannot force key frame currently, no media!");
         }
       else
-        {
-          g_debug ("Ignoring unknown parameter %s", option);
-        }
+        g_debug ("Ignoring unknown parameter %s", option);
     }
 
   return GST_RTSP_OK;
@@ -539,9 +527,7 @@ cc_client_pre_options_request (GstRTSPClient *client, GstRTSPContext *ctx)
           self->init_state = INIT_STATE_DONE;
         }
       else
-        {
-          g_idle_add (cc_client_idle_cc_query_params, g_object_ref (client));
-        }
+        g_idle_add (cc_client_idle_cc_query_params, g_object_ref (client));
     }
 
   return GST_RTSP_STS_OK;

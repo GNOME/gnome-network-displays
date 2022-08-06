@@ -578,9 +578,7 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
     }
 
   if (profile == WFD_H264_PROFILE_HIGH)
-    {
-      caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=high");
-    }
+    caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=high");
   else
     {
       /* Permit both constrained-baseline and baseline. Would constrained-baseline be sufficient? */

@@ -109,6 +109,7 @@ static void
 nd_wfd_mice_provider_finalize (GObject *object)
 {
   NdWFDMiceProvider *provider = ND_WFD_MICE_PROVIDER (object);
+
   g_clear_pointer (&provider->sinks, g_ptr_array_unref);
   g_clear_object (&provider->avahi_client);
   g_clear_object (&provider->signalling_server);
