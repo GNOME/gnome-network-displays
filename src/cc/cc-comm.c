@@ -57,7 +57,7 @@ cc_comm_dump_message (guint8 *msg, gsize length)
 }
 
 static void
-cc_comm_dump_json_message (Castchannel__CastMessage *message)
+cc_comm_dump_json_message (Cast__Channel__CastMessage *message)
 {
   g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_type: %d, payload_utf8: %s }",
            message->source_id,
@@ -137,9 +137,9 @@ cc_comm_parse_json_data (CcComm *comm, char *payload)
 static void
 cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_size)
 {
-  Castchannel__CastMessage *message;
+  Cast__Channel__CastMessage *message;
 
-  message = castchannel__cast_message__unpack (NULL, input_size, input_buffer);
+  message = cast__channel__cast_message__unpack (NULL, input_size, input_buffer);
   if (message == NULL)
     {
       g_warning ("CcComm: Failed to unpack received data");
@@ -152,7 +152,7 @@ cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_
       cc_comm_dump_json_message (message);
     }
 
-  castchannel__cast_message__free_unpacked (message, NULL);
+  cast__channel__cast_message__free_unpacked (message, NULL);
 }
 
 static gboolean
@@ -461,17 +461,17 @@ cc_comm_tls_send (CcComm  * comm,
 }
 
 // builds message based on available types
-static Castchannel__CastMessage
-cc_comm_build_message (gchar                                *namespace_,
-                       Castchannel__CastMessage__PayloadType payload_type,
-                       ProtobufCBinaryData                 * binary_payload,
-                       gchar                                *utf8_payload)
+static Cast__Channel__CastMessage
+cc_comm_build_message (gchar                                  *namespace_,
+                       Cast__Channel__CastMessage__PayloadType payload_type,
+                       ProtobufCBinaryData                   * binary_payload,
+                       gchar                                  *utf8_payload)
 {
-  Castchannel__CastMessage message;
+  Cast__Channel__CastMessage message;
 
-  castchannel__cast_message__init (&message);
+  cast__channel__cast_message__init (&message);
 
-  message.protocol_version = CASTCHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
+  message.protocol_version = CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
   message.source_id = "sender-gnd";
   message.destination_id = "receiver-0";
   message.namespace_ = namespace_;
@@ -479,12 +479,12 @@ cc_comm_build_message (gchar                                *namespace_,
 
   switch (payload_type)
     {
-    case CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY:
+    case CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY:
       message.payload_binary = *binary_payload;
       message.has_payload_binary = 1;
       break;
 
-    case CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING:
+    case CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING:
     default:
       message.payload_utf8 = utf8_payload;
       message.has_payload_binary = 0;
@@ -497,7 +497,7 @@ cc_comm_build_message (gchar                                *namespace_,
 gboolean
 cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_payload, GError **error)
 {
-  Castchannel__CastMessage message;
+  Cast__Channel__CastMessage message;
   guint32 packed_size = 0;
   g_autofree uint8_t *sock_buffer = NULL;
 
@@ -510,7 +510,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
 
       message = cc_comm_build_message (
         "urn:x-cast:com.google.cast.tp.deviceauth",
-        CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
+        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
         &binary_payload,
         NULL);
       break;
@@ -518,7 +518,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
     case MESSAGE_TYPE_CONNECT:
       message = cc_comm_build_message (
         "urn:x-cast:com.google.cast.tp.connection",
-        CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
         NULL,
         // "{ \"type\": \"CONNECT\" }");
         "{ \"type\": \"CONNECT\", \"userAgent\": \"GND/0.90.5  (X11; Linux x86_64)\", \"connType\": 0, \"origin\": {}, \"senderInfo\": { \"sdkType\": 2, \"version\": \"X11; Linux x86_64\", \"browserVersion\": \"X11; Linux x86_64\", \"platform\": 6, \"connectionType\": 1 } }");
@@ -528,7 +528,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
     case MESSAGE_TYPE_DISCONNECT:
       message = cc_comm_build_message (
         "urn:x-cast:com.google.cast.tp.connection",
-        CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
         NULL,
         "{ \"type\": \"CLOSE\" }");
       break;
@@ -536,7 +536,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
     case MESSAGE_TYPE_PING:
       message = cc_comm_build_message (
         "urn:x-cast:com.google.cast.tp.heartbeat",
-        CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
         NULL,
         "{ \"type\": \"PING\" }");
       break;
@@ -544,7 +544,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
     case MESSAGE_TYPE_PONG:
       message = cc_comm_build_message (
         "urn:x-cast:com.google.cast.tp.heartbeat",
-        CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
         NULL,
         "{ \"type\": \"PONG\" }");
       break;
@@ -552,7 +552,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
     case MESSAGE_TYPE_RECEIVER:
       message = cc_comm_build_message (
         "urn:x-cast:com.google.cast.receiver",
-        CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
         NULL,
         utf8_payload);
       break;
@@ -560,7 +560,7 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
     case MESSAGE_TYPE_MEDIA:
       message = cc_comm_build_message (
         "urn:x-cast:com.google.cast.media",
-        CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
         NULL,
         utf8_payload);
       message.destination_id = comm->destination_id;
@@ -570,13 +570,13 @@ cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_p
       return FALSE;
     }
 
-  packed_size = castchannel__cast_message__get_packed_size (&message);
+  packed_size = cast__channel__cast_message__get_packed_size (&message);
   sock_buffer = malloc (4 + packed_size);
 
   guint32 packed_size_be = GUINT32_TO_BE (packed_size);
 
   memcpy (sock_buffer, &packed_size_be, 4);
-  castchannel__cast_message__pack (&message, 4 + sock_buffer);
+  cast__channel__cast_message__pack (&message, 4 + sock_buffer);
 
   if (message_type != MESSAGE_TYPE_PING && message_type != MESSAGE_TYPE_PONG)
     {

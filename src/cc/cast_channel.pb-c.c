@@ -8,317 +8,323 @@
 
 #include "cast_channel.pb-c.h"
 void
-castchannel__cast_message__init
-  (Castchannel__CastMessage *message)
+cast__channel__cast_message__init
+  (Cast__Channel__CastMessage *message)
 {
-  static const Castchannel__CastMessage init_value = CASTCHANNEL__CAST_MESSAGE__INIT;
+  static const Cast__Channel__CastMessage init_value = CAST__CHANNEL__CAST_MESSAGE__INIT;
 
   *message = init_value;
 }
 size_t
-castchannel__cast_message__get_packed_size
-  (const Castchannel__CastMessage *message)
+cast__channel__cast_message__get_packed_size
+  (const Cast__Channel__CastMessage *message)
 {
-  assert (message->base.descriptor == &castchannel__cast_message__descriptor);
+  assert (message->base.descriptor == &cast__channel__cast_message__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage *) (message));
 }
 size_t
-castchannel__cast_message__pack
-  (const Castchannel__CastMessage *message,
-  uint8_t                         *out)
-{
-  assert (message->base.descriptor == &castchannel__cast_message__descriptor);
-  return protobuf_c_message_pack ((const ProtobufCMessage *) message, out);
-}
-size_t
-castchannel__cast_message__pack_to_buffer
-  (const Castchannel__CastMessage *message,
-  ProtobufCBuffer                 *buffer)
-{
-  assert (message->base.descriptor == &castchannel__cast_message__descriptor);
-  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage *) message, buffer);
-}
-Castchannel__CastMessage *
-castchannel__cast_message__unpack
-  (ProtobufCAllocator *allocator,
-  size_t               len,
-  const uint8_t       *data)
-{
-  return (Castchannel__CastMessage *)
-         protobuf_c_message_unpack (&castchannel__cast_message__descriptor,
-                                    allocator, len, data);
-}
-void
-castchannel__cast_message__free_unpacked
-  (Castchannel__CastMessage *message,
-  ProtobufCAllocator        *allocator)
-{
-  if(!message)
-    return;
-  assert (message->base.descriptor == &castchannel__cast_message__descriptor);
-  protobuf_c_message_free_unpacked ((ProtobufCMessage *) message, allocator);
-}
-void
-castchannel__auth_challenge__init
-  (Castchannel__AuthChallenge *message)
-{
-  static const Castchannel__AuthChallenge init_value = CASTCHANNEL__AUTH_CHALLENGE__INIT;
-
-  *message = init_value;
-}
-size_t
-castchannel__auth_challenge__get_packed_size
-  (const Castchannel__AuthChallenge *message)
-{
-  assert (message->base.descriptor == &castchannel__auth_challenge__descriptor);
-  return protobuf_c_message_get_packed_size ((const ProtobufCMessage *) (message));
-}
-size_t
-castchannel__auth_challenge__pack
-  (const Castchannel__AuthChallenge *message,
+cast__channel__cast_message__pack
+  (const Cast__Channel__CastMessage *message,
   uint8_t                           *out)
 {
-  assert (message->base.descriptor == &castchannel__auth_challenge__descriptor);
+  assert (message->base.descriptor == &cast__channel__cast_message__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage *) message, out);
 }
 size_t
-castchannel__auth_challenge__pack_to_buffer
-  (const Castchannel__AuthChallenge *message,
+cast__channel__cast_message__pack_to_buffer
+  (const Cast__Channel__CastMessage *message,
   ProtobufCBuffer                   *buffer)
 {
-  assert (message->base.descriptor == &castchannel__auth_challenge__descriptor);
+  assert (message->base.descriptor == &cast__channel__cast_message__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage *) message, buffer);
 }
-Castchannel__AuthChallenge *
-castchannel__auth_challenge__unpack
+Cast__Channel__CastMessage *
+cast__channel__cast_message__unpack
   (ProtobufCAllocator *allocator,
   size_t               len,
   const uint8_t       *data)
 {
-  return (Castchannel__AuthChallenge *)
-         protobuf_c_message_unpack (&castchannel__auth_challenge__descriptor,
+  return (Cast__Channel__CastMessage *)
+         protobuf_c_message_unpack (&cast__channel__cast_message__descriptor,
                                     allocator, len, data);
 }
 void
-castchannel__auth_challenge__free_unpacked
-  (Castchannel__AuthChallenge *message,
+cast__channel__cast_message__free_unpacked
+  (Cast__Channel__CastMessage *message,
   ProtobufCAllocator          *allocator)
 {
   if(!message)
     return;
-  assert (message->base.descriptor == &castchannel__auth_challenge__descriptor);
+  assert (message->base.descriptor == &cast__channel__cast_message__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage *) message, allocator);
 }
 void
-castchannel__auth_response__init
-  (Castchannel__AuthResponse *message)
+cast__channel__auth_challenge__init
+  (Cast__Channel__AuthChallenge *message)
 {
-  static const Castchannel__AuthResponse init_value = CASTCHANNEL__AUTH_RESPONSE__INIT;
+  static const Cast__Channel__AuthChallenge init_value = CAST__CHANNEL__AUTH_CHALLENGE__INIT;
 
   *message = init_value;
 }
 size_t
-castchannel__auth_response__get_packed_size
-  (const Castchannel__AuthResponse *message)
+cast__channel__auth_challenge__get_packed_size
+  (const Cast__Channel__AuthChallenge *message)
 {
-  assert (message->base.descriptor == &castchannel__auth_response__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_challenge__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage *) (message));
 }
 size_t
-castchannel__auth_response__pack
-  (const Castchannel__AuthResponse *message,
-  uint8_t                          *out)
+cast__channel__auth_challenge__pack
+  (const Cast__Channel__AuthChallenge *message,
+  uint8_t                             *out)
 {
-  assert (message->base.descriptor == &castchannel__auth_response__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_challenge__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage *) message, out);
 }
 size_t
-castchannel__auth_response__pack_to_buffer
-  (const Castchannel__AuthResponse *message,
-  ProtobufCBuffer                  *buffer)
+cast__channel__auth_challenge__pack_to_buffer
+  (const Cast__Channel__AuthChallenge *message,
+  ProtobufCBuffer                     *buffer)
 {
-  assert (message->base.descriptor == &castchannel__auth_response__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_challenge__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage *) message, buffer);
 }
-Castchannel__AuthResponse *
-castchannel__auth_response__unpack
+Cast__Channel__AuthChallenge *
+cast__channel__auth_challenge__unpack
   (ProtobufCAllocator *allocator,
   size_t               len,
   const uint8_t       *data)
 {
-  return (Castchannel__AuthResponse *)
-         protobuf_c_message_unpack (&castchannel__auth_response__descriptor,
+  return (Cast__Channel__AuthChallenge *)
+         protobuf_c_message_unpack (&cast__channel__auth_challenge__descriptor,
                                     allocator, len, data);
 }
 void
-castchannel__auth_response__free_unpacked
-  (Castchannel__AuthResponse *message,
-  ProtobufCAllocator         *allocator)
+cast__channel__auth_challenge__free_unpacked
+  (Cast__Channel__AuthChallenge *message,
+  ProtobufCAllocator            *allocator)
 {
   if(!message)
     return;
-  assert (message->base.descriptor == &castchannel__auth_response__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_challenge__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage *) message, allocator);
 }
 void
-castchannel__auth_error__init
-  (Castchannel__AuthError *message)
+cast__channel__auth_response__init
+  (Cast__Channel__AuthResponse *message)
 {
-  static const Castchannel__AuthError init_value = CASTCHANNEL__AUTH_ERROR__INIT;
+  static const Cast__Channel__AuthResponse init_value = CAST__CHANNEL__AUTH_RESPONSE__INIT;
 
   *message = init_value;
 }
 size_t
-castchannel__auth_error__get_packed_size
-  (const Castchannel__AuthError *message)
+cast__channel__auth_response__get_packed_size
+  (const Cast__Channel__AuthResponse *message)
 {
-  assert (message->base.descriptor == &castchannel__auth_error__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_response__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage *) (message));
 }
 size_t
-castchannel__auth_error__pack
-  (const Castchannel__AuthError *message,
-  uint8_t                       *out)
+cast__channel__auth_response__pack
+  (const Cast__Channel__AuthResponse *message,
+  uint8_t                            *out)
 {
-  assert (message->base.descriptor == &castchannel__auth_error__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_response__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage *) message, out);
 }
 size_t
-castchannel__auth_error__pack_to_buffer
-  (const Castchannel__AuthError *message,
-  ProtobufCBuffer               *buffer)
+cast__channel__auth_response__pack_to_buffer
+  (const Cast__Channel__AuthResponse *message,
+  ProtobufCBuffer                    *buffer)
 {
-  assert (message->base.descriptor == &castchannel__auth_error__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_response__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage *) message, buffer);
 }
-Castchannel__AuthError *
-castchannel__auth_error__unpack
+Cast__Channel__AuthResponse *
+cast__channel__auth_response__unpack
   (ProtobufCAllocator *allocator,
   size_t               len,
   const uint8_t       *data)
 {
-  return (Castchannel__AuthError *)
-         protobuf_c_message_unpack (&castchannel__auth_error__descriptor,
+  return (Cast__Channel__AuthResponse *)
+         protobuf_c_message_unpack (&cast__channel__auth_response__descriptor,
                                     allocator, len, data);
 }
 void
-castchannel__auth_error__free_unpacked
-  (Castchannel__AuthError *message,
-  ProtobufCAllocator      *allocator)
+cast__channel__auth_response__free_unpacked
+  (Cast__Channel__AuthResponse *message,
+  ProtobufCAllocator           *allocator)
 {
   if(!message)
     return;
-  assert (message->base.descriptor == &castchannel__auth_error__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_response__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage *) message, allocator);
 }
 void
-castchannel__device_auth_message__init
-  (Castchannel__DeviceAuthMessage *message)
+cast__channel__auth_error__init
+  (Cast__Channel__AuthError *message)
 {
-  static const Castchannel__DeviceAuthMessage init_value = CASTCHANNEL__DEVICE_AUTH_MESSAGE__INIT;
+  static const Cast__Channel__AuthError init_value = CAST__CHANNEL__AUTH_ERROR__INIT;
 
   *message = init_value;
 }
 size_t
-castchannel__device_auth_message__get_packed_size
-  (const Castchannel__DeviceAuthMessage *message)
+cast__channel__auth_error__get_packed_size
+  (const Cast__Channel__AuthError *message)
 {
-  assert (message->base.descriptor == &castchannel__device_auth_message__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_error__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage *) (message));
 }
 size_t
-castchannel__device_auth_message__pack
-  (const Castchannel__DeviceAuthMessage *message,
-  uint8_t                               *out)
+cast__channel__auth_error__pack
+  (const Cast__Channel__AuthError *message,
+  uint8_t                         *out)
 {
-  assert (message->base.descriptor == &castchannel__device_auth_message__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_error__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage *) message, out);
 }
 size_t
-castchannel__device_auth_message__pack_to_buffer
-  (const Castchannel__DeviceAuthMessage *message,
-  ProtobufCBuffer                       *buffer)
+cast__channel__auth_error__pack_to_buffer
+  (const Cast__Channel__AuthError *message,
+  ProtobufCBuffer                 *buffer)
 {
-  assert (message->base.descriptor == &castchannel__device_auth_message__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_error__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage *) message, buffer);
 }
-Castchannel__DeviceAuthMessage *
-castchannel__device_auth_message__unpack
+Cast__Channel__AuthError *
+cast__channel__auth_error__unpack
   (ProtobufCAllocator *allocator,
   size_t               len,
   const uint8_t       *data)
 {
-  return (Castchannel__DeviceAuthMessage *)
-         protobuf_c_message_unpack (&castchannel__device_auth_message__descriptor,
+  return (Cast__Channel__AuthError *)
+         protobuf_c_message_unpack (&cast__channel__auth_error__descriptor,
                                     allocator, len, data);
 }
 void
-castchannel__device_auth_message__free_unpacked
-  (Castchannel__DeviceAuthMessage *message,
-  ProtobufCAllocator              *allocator)
+cast__channel__auth_error__free_unpacked
+  (Cast__Channel__AuthError *message,
+  ProtobufCAllocator        *allocator)
 {
   if(!message)
     return;
-  assert (message->base.descriptor == &castchannel__device_auth_message__descriptor);
+  assert (message->base.descriptor == &cast__channel__auth_error__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage *) message, allocator);
 }
-static const ProtobufCEnumValue castchannel__cast_message__protocol_version__enum_values_by_number[1] = {
-  { "CASTV2_1_0", "CASTCHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0", 0 },
+void
+cast__channel__device_auth_message__init
+  (Cast__Channel__DeviceAuthMessage *message)
+{
+  static const Cast__Channel__DeviceAuthMessage init_value = CAST__CHANNEL__DEVICE_AUTH_MESSAGE__INIT;
+
+  *message = init_value;
+}
+size_t
+cast__channel__device_auth_message__get_packed_size
+  (const Cast__Channel__DeviceAuthMessage *message)
+{
+  assert (message->base.descriptor == &cast__channel__device_auth_message__descriptor);
+  return protobuf_c_message_get_packed_size ((const ProtobufCMessage *) (message));
+}
+size_t
+cast__channel__device_auth_message__pack
+  (const Cast__Channel__DeviceAuthMessage *message,
+  uint8_t                                 *out)
+{
+  assert (message->base.descriptor == &cast__channel__device_auth_message__descriptor);
+  return protobuf_c_message_pack ((const ProtobufCMessage *) message, out);
+}
+size_t
+cast__channel__device_auth_message__pack_to_buffer
+  (const Cast__Channel__DeviceAuthMessage *message,
+  ProtobufCBuffer                         *buffer)
+{
+  assert (message->base.descriptor == &cast__channel__device_auth_message__descriptor);
+  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage *) message, buffer);
+}
+Cast__Channel__DeviceAuthMessage *
+cast__channel__device_auth_message__unpack
+  (ProtobufCAllocator *allocator,
+  size_t               len,
+  const uint8_t       *data)
+{
+  return (Cast__Channel__DeviceAuthMessage *)
+         protobuf_c_message_unpack (&cast__channel__device_auth_message__descriptor,
+                                    allocator, len, data);
+}
+void
+cast__channel__device_auth_message__free_unpacked
+  (Cast__Channel__DeviceAuthMessage *message,
+  ProtobufCAllocator                *allocator)
+{
+  if(!message)
+    return;
+  assert (message->base.descriptor == &cast__channel__device_auth_message__descriptor);
+  protobuf_c_message_free_unpacked ((ProtobufCMessage *) message, allocator);
+}
+static const ProtobufCEnumValue cast__channel__cast_message__protocol_version__enum_values_by_number[4] = {
+  { "CASTV2_1_0", "CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0", 0 },
+  { "CASTV2_1_1", "CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_1", 1 },
+  { "CASTV2_1_2", "CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_2", 2 },
+  { "CASTV2_1_3", "CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_3", 3 },
 };
-static const ProtobufCIntRange castchannel__cast_message__protocol_version__value_ranges[] = {
-  {0, 0}, {0, 1}
+static const ProtobufCIntRange cast__channel__cast_message__protocol_version__value_ranges[] = {
+  {0, 0}, {0, 4}
 };
-static const ProtobufCEnumValueIndex castchannel__cast_message__protocol_version__enum_values_by_name[1] = {
+static const ProtobufCEnumValueIndex cast__channel__cast_message__protocol_version__enum_values_by_name[4] = {
   { "CASTV2_1_0", 0 },
+  { "CASTV2_1_1", 1 },
+  { "CASTV2_1_2", 2 },
+  { "CASTV2_1_3", 3 },
 };
-const ProtobufCEnumDescriptor castchannel__cast_message__protocol_version__descriptor = {
+const ProtobufCEnumDescriptor cast__channel__cast_message__protocol_version__descriptor = {
   PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
-  "castchannel.CastMessage.ProtocolVersion",
+  "cast.channel.CastMessage.ProtocolVersion",
   "ProtocolVersion",
-  "Castchannel__CastMessage__ProtocolVersion",
-  "castchannel",
+  "Cast__Channel__CastMessage__ProtocolVersion",
+  "cast.channel",
+  4,
+  cast__channel__cast_message__protocol_version__enum_values_by_number,
+  4,
+  cast__channel__cast_message__protocol_version__enum_values_by_name,
   1,
-  castchannel__cast_message__protocol_version__enum_values_by_number,
-  1,
-  castchannel__cast_message__protocol_version__enum_values_by_name,
-  1,
-  castchannel__cast_message__protocol_version__value_ranges,
+  cast__channel__cast_message__protocol_version__value_ranges,
   NULL, NULL, NULL, NULL   /* reserved[1234] */
 };
-static const ProtobufCEnumValue castchannel__cast_message__payload_type__enum_values_by_number[2] = {
-  { "STRING", "CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING", 0 },
-  { "BINARY", "CASTCHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY", 1 },
+static const ProtobufCEnumValue cast__channel__cast_message__payload_type__enum_values_by_number[2] = {
+  { "STRING", "CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING", 0 },
+  { "BINARY", "CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY", 1 },
 };
-static const ProtobufCIntRange castchannel__cast_message__payload_type__value_ranges[] = {
+static const ProtobufCIntRange cast__channel__cast_message__payload_type__value_ranges[] = {
   {0, 0}, {0, 2}
 };
-static const ProtobufCEnumValueIndex castchannel__cast_message__payload_type__enum_values_by_name[2] = {
+static const ProtobufCEnumValueIndex cast__channel__cast_message__payload_type__enum_values_by_name[2] = {
   { "BINARY", 1 },
   { "STRING", 0 },
 };
-const ProtobufCEnumDescriptor castchannel__cast_message__payload_type__descriptor = {
+const ProtobufCEnumDescriptor cast__channel__cast_message__payload_type__descriptor = {
   PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
-  "castchannel.CastMessage.PayloadType",
+  "cast.channel.CastMessage.PayloadType",
   "PayloadType",
-  "Castchannel__CastMessage__PayloadType",
-  "castchannel",
+  "Cast__Channel__CastMessage__PayloadType",
+  "cast.channel",
   2,
-  castchannel__cast_message__payload_type__enum_values_by_number,
+  cast__channel__cast_message__payload_type__enum_values_by_number,
   2,
-  castchannel__cast_message__payload_type__enum_values_by_name,
+  cast__channel__cast_message__payload_type__enum_values_by_name,
   1,
-  castchannel__cast_message__payload_type__value_ranges,
+  cast__channel__cast_message__payload_type__value_ranges,
   NULL, NULL, NULL, NULL   /* reserved[1234] */
 };
-static const ProtobufCFieldDescriptor castchannel__cast_message__field_descriptors[7] = {
+static const ProtobufCFieldDescriptor cast__channel__cast_message__field_descriptors[9] = {
   {
     "protocol_version",
     1,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_ENUM,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__CastMessage, protocol_version),
-    &castchannel__cast_message__protocol_version__descriptor,
+    offsetof (Cast__Channel__CastMessage, protocol_version),
+    &cast__channel__cast_message__protocol_version__descriptor,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
@@ -329,7 +335,7 @@ static const ProtobufCFieldDescriptor castchannel__cast_message__field_descripto
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__CastMessage, source_id),
+    offsetof (Cast__Channel__CastMessage, source_id),
     NULL,
     NULL,
     0,             /* flags */
@@ -341,7 +347,7 @@ static const ProtobufCFieldDescriptor castchannel__cast_message__field_descripto
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__CastMessage, destination_id),
+    offsetof (Cast__Channel__CastMessage, destination_id),
     NULL,
     NULL,
     0,             /* flags */
@@ -353,7 +359,7 @@ static const ProtobufCFieldDescriptor castchannel__cast_message__field_descripto
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__CastMessage, namespace_),
+    offsetof (Cast__Channel__CastMessage, namespace_),
     NULL,
     NULL,
     0,             /* flags */
@@ -365,8 +371,8 @@ static const ProtobufCFieldDescriptor castchannel__cast_message__field_descripto
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_ENUM,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__CastMessage, payload_type),
-    &castchannel__cast_message__payload_type__descriptor,
+    offsetof (Cast__Channel__CastMessage, payload_type),
+    &cast__channel__cast_message__payload_type__descriptor,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
@@ -377,7 +383,7 @@ static const ProtobufCFieldDescriptor castchannel__cast_message__field_descripto
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__CastMessage, payload_utf8),
+    offsetof (Cast__Channel__CastMessage, payload_utf8),
     NULL,
     NULL,
     0,             /* flags */
@@ -388,66 +394,140 @@ static const ProtobufCFieldDescriptor castchannel__cast_message__field_descripto
     7,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_BYTES,
-    offsetof (Castchannel__CastMessage, has_payload_binary),
-    offsetof (Castchannel__CastMessage, payload_binary),
+    offsetof (Cast__Channel__CastMessage, has_payload_binary),
+    offsetof (Cast__Channel__CastMessage, payload_binary),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "continued",
+    8,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BOOL,
+    offsetof (Cast__Channel__CastMessage, has_continued),
+    offsetof (Cast__Channel__CastMessage, continued),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "remaining_length",
+    9,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_UINT32,
+    offsetof (Cast__Channel__CastMessage, has_remaining_length),
+    offsetof (Cast__Channel__CastMessage, remaining_length),
     NULL,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned castchannel__cast_message__field_indices_by_name[] = {
+static const unsigned cast__channel__cast_message__field_indices_by_name[] = {
+  7,   /* field[7] = continued */
   2,   /* field[2] = destination_id */
   3,   /* field[3] = namespace */
   6,   /* field[6] = payload_binary */
   4,   /* field[4] = payload_type */
   5,   /* field[5] = payload_utf8 */
   0,   /* field[0] = protocol_version */
+  8,   /* field[8] = remaining_length */
   1,   /* field[1] = source_id */
 };
-static const ProtobufCIntRange castchannel__cast_message__number_ranges[1 + 1] = {
+static const ProtobufCIntRange cast__channel__cast_message__number_ranges[1 + 1] = {
   { 1, 0 },
-  { 0, 7 }
+  { 0, 9 }
 };
-const ProtobufCMessageDescriptor castchannel__cast_message__descriptor = {
+const ProtobufCMessageDescriptor cast__channel__cast_message__descriptor = {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "castchannel.CastMessage",
+  "cast.channel.CastMessage",
   "CastMessage",
-  "Castchannel__CastMessage",
-  "castchannel",
-  sizeof (Castchannel__CastMessage),
-  7,
-  castchannel__cast_message__field_descriptors,
-  castchannel__cast_message__field_indices_by_name,
-  1,  castchannel__cast_message__number_ranges,
-  (ProtobufCMessageInit) castchannel__cast_message__init,
+  "Cast__Channel__CastMessage",
+  "cast.channel",
+  sizeof (Cast__Channel__CastMessage),
+  9,
+  cast__channel__cast_message__field_descriptors,
+  cast__channel__cast_message__field_indices_by_name,
+  1,  cast__channel__cast_message__number_ranges,
+  (ProtobufCMessageInit) cast__channel__cast_message__init,
   NULL, NULL, NULL    /* reserved[123] */
 };
-#define castchannel__auth_challenge__field_descriptors NULL
-#define castchannel__auth_challenge__field_indices_by_name NULL
-#define castchannel__auth_challenge__number_ranges NULL
-const ProtobufCMessageDescriptor castchannel__auth_challenge__descriptor = {
+static const Cast__Channel__SignatureAlgorithm cast__channel__auth_challenge__signature_algorithm__default_value = CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PKCS1v15;
+static const Cast__Channel__HashAlgorithm cast__channel__auth_challenge__hash_algorithm__default_value = CAST__CHANNEL__HASH_ALGORITHM__SHA1;
+static const ProtobufCFieldDescriptor cast__channel__auth_challenge__field_descriptors[3] = {
+  {
+    "signature_algorithm",
+    1,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_ENUM,
+    offsetof (Cast__Channel__AuthChallenge, has_signature_algorithm),
+    offsetof (Cast__Channel__AuthChallenge, signature_algorithm),
+    &cast__channel__signature_algorithm__descriptor,
+    &cast__channel__auth_challenge__signature_algorithm__default_value,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "sender_nonce",
+    2,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BYTES,
+    offsetof (Cast__Channel__AuthChallenge, has_sender_nonce),
+    offsetof (Cast__Channel__AuthChallenge, sender_nonce),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "hash_algorithm",
+    3,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_ENUM,
+    offsetof (Cast__Channel__AuthChallenge, has_hash_algorithm),
+    offsetof (Cast__Channel__AuthChallenge, hash_algorithm),
+    &cast__channel__hash_algorithm__descriptor,
+    &cast__channel__auth_challenge__hash_algorithm__default_value,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+};
+static const unsigned cast__channel__auth_challenge__field_indices_by_name[] = {
+  2,   /* field[2] = hash_algorithm */
+  1,   /* field[1] = sender_nonce */
+  0,   /* field[0] = signature_algorithm */
+};
+static const ProtobufCIntRange cast__channel__auth_challenge__number_ranges[1 + 1] = {
+  { 1, 0 },
+  { 0, 3 }
+};
+const ProtobufCMessageDescriptor cast__channel__auth_challenge__descriptor = {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "castchannel.AuthChallenge",
+  "cast.channel.AuthChallenge",
   "AuthChallenge",
-  "Castchannel__AuthChallenge",
-  "castchannel",
-  sizeof (Castchannel__AuthChallenge),
-  0,
-  castchannel__auth_challenge__field_descriptors,
-  castchannel__auth_challenge__field_indices_by_name,
-  0,  castchannel__auth_challenge__number_ranges,
-  (ProtobufCMessageInit) castchannel__auth_challenge__init,
+  "Cast__Channel__AuthChallenge",
+  "cast.channel",
+  sizeof (Cast__Channel__AuthChallenge),
+  3,
+  cast__channel__auth_challenge__field_descriptors,
+  cast__channel__auth_challenge__field_indices_by_name,
+  1,  cast__channel__auth_challenge__number_ranges,
+  (ProtobufCMessageInit) cast__channel__auth_challenge__init,
   NULL, NULL, NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor castchannel__auth_response__field_descriptors[2] = {
+static const Cast__Channel__SignatureAlgorithm cast__channel__auth_response__signature_algorithm__default_value = CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PKCS1v15;
+static const Cast__Channel__HashAlgorithm cast__channel__auth_response__hash_algorithm__default_value = CAST__CHANNEL__HASH_ALGORITHM__SHA1;
+static const ProtobufCFieldDescriptor cast__channel__auth_response__field_descriptors[7] = {
   {
     "signature",
     1,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__AuthResponse, signature),
+    offsetof (Cast__Channel__AuthResponse, signature),
     NULL,
     NULL,
     0,             /* flags */
@@ -459,104 +539,171 @@ static const ProtobufCFieldDescriptor castchannel__auth_response__field_descript
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__AuthResponse, client_auth_certificate),
+    offsetof (Cast__Channel__AuthResponse, client_auth_certificate),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "intermediate_certificate",
+    3,
+    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_TYPE_BYTES,
+    offsetof (Cast__Channel__AuthResponse, n_intermediate_certificate),
+    offsetof (Cast__Channel__AuthResponse, intermediate_certificate),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "signature_algorithm",
+    4,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_ENUM,
+    offsetof (Cast__Channel__AuthResponse, has_signature_algorithm),
+    offsetof (Cast__Channel__AuthResponse, signature_algorithm),
+    &cast__channel__signature_algorithm__descriptor,
+    &cast__channel__auth_response__signature_algorithm__default_value,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "sender_nonce",
+    5,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BYTES,
+    offsetof (Cast__Channel__AuthResponse, has_sender_nonce),
+    offsetof (Cast__Channel__AuthResponse, sender_nonce),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "hash_algorithm",
+    6,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_ENUM,
+    offsetof (Cast__Channel__AuthResponse, has_hash_algorithm),
+    offsetof (Cast__Channel__AuthResponse, hash_algorithm),
+    &cast__channel__hash_algorithm__descriptor,
+    &cast__channel__auth_response__hash_algorithm__default_value,
+    0,             /* flags */
+    0, NULL, NULL    /* reserved1,reserved2, etc */
+  },
+  {
+    "crl",
+    7,
+    PROTOBUF_C_LABEL_OPTIONAL,
+    PROTOBUF_C_TYPE_BYTES,
+    offsetof (Cast__Channel__AuthResponse, has_crl),
+    offsetof (Cast__Channel__AuthResponse, crl),
     NULL,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned castchannel__auth_response__field_indices_by_name[] = {
+static const unsigned cast__channel__auth_response__field_indices_by_name[] = {
   1,   /* field[1] = client_auth_certificate */
+  6,   /* field[6] = crl */
+  5,   /* field[5] = hash_algorithm */
+  2,   /* field[2] = intermediate_certificate */
+  4,   /* field[4] = sender_nonce */
   0,   /* field[0] = signature */
+  3,   /* field[3] = signature_algorithm */
 };
-static const ProtobufCIntRange castchannel__auth_response__number_ranges[1 + 1] = {
+static const ProtobufCIntRange cast__channel__auth_response__number_ranges[1 + 1] = {
   { 1, 0 },
-  { 0, 2 }
+  { 0, 7 }
 };
-const ProtobufCMessageDescriptor castchannel__auth_response__descriptor = {
+const ProtobufCMessageDescriptor cast__channel__auth_response__descriptor = {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "castchannel.AuthResponse",
+  "cast.channel.AuthResponse",
   "AuthResponse",
-  "Castchannel__AuthResponse",
-  "castchannel",
-  sizeof (Castchannel__AuthResponse),
-  2,
-  castchannel__auth_response__field_descriptors,
-  castchannel__auth_response__field_indices_by_name,
-  1,  castchannel__auth_response__number_ranges,
-  (ProtobufCMessageInit) castchannel__auth_response__init,
+  "Cast__Channel__AuthResponse",
+  "cast.channel",
+  sizeof (Cast__Channel__AuthResponse),
+  7,
+  cast__channel__auth_response__field_descriptors,
+  cast__channel__auth_response__field_indices_by_name,
+  1,  cast__channel__auth_response__number_ranges,
+  (ProtobufCMessageInit) cast__channel__auth_response__init,
   NULL, NULL, NULL    /* reserved[123] */
 };
-static const ProtobufCEnumValue castchannel__auth_error__error_type__enum_values_by_number[2] = {
-  { "INTERNAL_ERROR", "CASTCHANNEL__AUTH_ERROR__ERROR_TYPE__INTERNAL_ERROR", 0 },
-  { "NO_TLS", "CASTCHANNEL__AUTH_ERROR__ERROR_TYPE__NO_TLS", 1 },
+static const ProtobufCEnumValue cast__channel__auth_error__error_type__enum_values_by_number[3] = {
+  { "INTERNAL_ERROR", "CAST__CHANNEL__AUTH_ERROR__ERROR_TYPE__INTERNAL_ERROR", 0 },
+  { "NO_TLS", "CAST__CHANNEL__AUTH_ERROR__ERROR_TYPE__NO_TLS", 1 },
+  { "SIGNATURE_ALGORITHM_UNAVAILABLE", "CAST__CHANNEL__AUTH_ERROR__ERROR_TYPE__SIGNATURE_ALGORITHM_UNAVAILABLE", 2 },
 };
-static const ProtobufCIntRange castchannel__auth_error__error_type__value_ranges[] = {
-  {0, 0}, {0, 2}
+static const ProtobufCIntRange cast__channel__auth_error__error_type__value_ranges[] = {
+  {0, 0}, {0, 3}
 };
-static const ProtobufCEnumValueIndex castchannel__auth_error__error_type__enum_values_by_name[2] = {
+static const ProtobufCEnumValueIndex cast__channel__auth_error__error_type__enum_values_by_name[3] = {
   { "INTERNAL_ERROR", 0 },
   { "NO_TLS", 1 },
+  { "SIGNATURE_ALGORITHM_UNAVAILABLE", 2 },
 };
-const ProtobufCEnumDescriptor castchannel__auth_error__error_type__descriptor = {
+const ProtobufCEnumDescriptor cast__channel__auth_error__error_type__descriptor = {
   PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
-  "castchannel.AuthError.ErrorType",
+  "cast.channel.AuthError.ErrorType",
   "ErrorType",
-  "Castchannel__AuthError__ErrorType",
-  "castchannel",
-  2,
-  castchannel__auth_error__error_type__enum_values_by_number,
-  2,
-  castchannel__auth_error__error_type__enum_values_by_name,
+  "Cast__Channel__AuthError__ErrorType",
+  "cast.channel",
+  3,
+  cast__channel__auth_error__error_type__enum_values_by_number,
+  3,
+  cast__channel__auth_error__error_type__enum_values_by_name,
   1,
-  castchannel__auth_error__error_type__value_ranges,
+  cast__channel__auth_error__error_type__value_ranges,
   NULL, NULL, NULL, NULL   /* reserved[1234] */
 };
-static const ProtobufCFieldDescriptor castchannel__auth_error__field_descriptors[1] = {
+static const ProtobufCFieldDescriptor cast__channel__auth_error__field_descriptors[1] = {
   {
     "error_type",
     1,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_ENUM,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__AuthError, error_type),
-    &castchannel__auth_error__error_type__descriptor,
+    offsetof (Cast__Channel__AuthError, error_type),
+    &cast__channel__auth_error__error_type__descriptor,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned castchannel__auth_error__field_indices_by_name[] = {
+static const unsigned cast__channel__auth_error__field_indices_by_name[] = {
   0,   /* field[0] = error_type */
 };
-static const ProtobufCIntRange castchannel__auth_error__number_ranges[1 + 1] = {
+static const ProtobufCIntRange cast__channel__auth_error__number_ranges[1 + 1] = {
   { 1, 0 },
   { 0, 1 }
 };
-const ProtobufCMessageDescriptor castchannel__auth_error__descriptor = {
+const ProtobufCMessageDescriptor cast__channel__auth_error__descriptor = {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "castchannel.AuthError",
+  "cast.channel.AuthError",
   "AuthError",
-  "Castchannel__AuthError",
-  "castchannel",
-  sizeof (Castchannel__AuthError),
+  "Cast__Channel__AuthError",
+  "cast.channel",
+  sizeof (Cast__Channel__AuthError),
   1,
-  castchannel__auth_error__field_descriptors,
-  castchannel__auth_error__field_indices_by_name,
-  1,  castchannel__auth_error__number_ranges,
-  (ProtobufCMessageInit) castchannel__auth_error__init,
+  cast__channel__auth_error__field_descriptors,
+  cast__channel__auth_error__field_indices_by_name,
+  1,  cast__channel__auth_error__number_ranges,
+  (ProtobufCMessageInit) cast__channel__auth_error__init,
   NULL, NULL, NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor castchannel__device_auth_message__field_descriptors[3] = {
+static const ProtobufCFieldDescriptor cast__channel__device_auth_message__field_descriptors[3] = {
   {
     "challenge",
     1,
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__DeviceAuthMessage, challenge),
-    &castchannel__auth_challenge__descriptor,
+    offsetof (Cast__Channel__DeviceAuthMessage, challenge),
+    &cast__channel__auth_challenge__descriptor,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
@@ -567,8 +714,8 @@ static const ProtobufCFieldDescriptor castchannel__device_auth_message__field_de
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__DeviceAuthMessage, response),
-    &castchannel__auth_response__descriptor,
+    offsetof (Cast__Channel__DeviceAuthMessage, response),
+    &cast__channel__auth_response__descriptor,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
@@ -579,33 +726,85 @@ static const ProtobufCFieldDescriptor castchannel__device_auth_message__field_de
     PROTOBUF_C_LABEL_OPTIONAL,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
-    offsetof (Castchannel__DeviceAuthMessage, error),
-    &castchannel__auth_error__descriptor,
+    offsetof (Cast__Channel__DeviceAuthMessage, error),
+    &cast__channel__auth_error__descriptor,
     NULL,
     0,             /* flags */
     0, NULL, NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned castchannel__device_auth_message__field_indices_by_name[] = {
+static const unsigned cast__channel__device_auth_message__field_indices_by_name[] = {
   0,   /* field[0] = challenge */
   2,   /* field[2] = error */
   1,   /* field[1] = response */
 };
-static const ProtobufCIntRange castchannel__device_auth_message__number_ranges[1 + 1] = {
+static const ProtobufCIntRange cast__channel__device_auth_message__number_ranges[1 + 1] = {
   { 1, 0 },
   { 0, 3 }
 };
-const ProtobufCMessageDescriptor castchannel__device_auth_message__descriptor = {
+const ProtobufCMessageDescriptor cast__channel__device_auth_message__descriptor = {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "castchannel.DeviceAuthMessage",
+  "cast.channel.DeviceAuthMessage",
   "DeviceAuthMessage",
-  "Castchannel__DeviceAuthMessage",
-  "castchannel",
-  sizeof (Castchannel__DeviceAuthMessage),
+  "Cast__Channel__DeviceAuthMessage",
+  "cast.channel",
+  sizeof (Cast__Channel__DeviceAuthMessage),
   3,
-  castchannel__device_auth_message__field_descriptors,
-  castchannel__device_auth_message__field_indices_by_name,
-  1,  castchannel__device_auth_message__number_ranges,
-  (ProtobufCMessageInit) castchannel__device_auth_message__init,
+  cast__channel__device_auth_message__field_descriptors,
+  cast__channel__device_auth_message__field_indices_by_name,
+  1,  cast__channel__device_auth_message__number_ranges,
+  (ProtobufCMessageInit) cast__channel__device_auth_message__init,
   NULL, NULL, NULL    /* reserved[123] */
+};
+static const ProtobufCEnumValue cast__channel__signature_algorithm__enum_values_by_number[3] = {
+  { "UNSPECIFIED", "CAST__CHANNEL__SIGNATURE_ALGORITHM__UNSPECIFIED", 0 },
+  { "RSASSA_PKCS1v15", "CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PKCS1v15", 1 },
+  { "RSASSA_PSS", "CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PSS", 2 },
+};
+static const ProtobufCIntRange cast__channel__signature_algorithm__value_ranges[] = {
+  {0, 0}, {0, 3}
+};
+static const ProtobufCEnumValueIndex cast__channel__signature_algorithm__enum_values_by_name[3] = {
+  { "RSASSA_PKCS1v15", 1 },
+  { "RSASSA_PSS", 2 },
+  { "UNSPECIFIED", 0 },
+};
+const ProtobufCEnumDescriptor cast__channel__signature_algorithm__descriptor = {
+  PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
+  "cast.channel.SignatureAlgorithm",
+  "SignatureAlgorithm",
+  "Cast__Channel__SignatureAlgorithm",
+  "cast.channel",
+  3,
+  cast__channel__signature_algorithm__enum_values_by_number,
+  3,
+  cast__channel__signature_algorithm__enum_values_by_name,
+  1,
+  cast__channel__signature_algorithm__value_ranges,
+  NULL, NULL, NULL, NULL   /* reserved[1234] */
+};
+static const ProtobufCEnumValue cast__channel__hash_algorithm__enum_values_by_number[2] = {
+  { "SHA1", "CAST__CHANNEL__HASH_ALGORITHM__SHA1", 0 },
+  { "SHA256", "CAST__CHANNEL__HASH_ALGORITHM__SHA256", 1 },
+};
+static const ProtobufCIntRange cast__channel__hash_algorithm__value_ranges[] = {
+  {0, 0}, {0, 2}
+};
+static const ProtobufCEnumValueIndex cast__channel__hash_algorithm__enum_values_by_name[2] = {
+  { "SHA1", 0 },
+  { "SHA256", 1 },
+};
+const ProtobufCEnumDescriptor cast__channel__hash_algorithm__descriptor = {
+  PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
+  "cast.channel.HashAlgorithm",
+  "HashAlgorithm",
+  "Cast__Channel__HashAlgorithm",
+  "cast.channel",
+  2,
+  cast__channel__hash_algorithm__enum_values_by_number,
+  2,
+  cast__channel__hash_algorithm__enum_values_by_name,
+  1,
+  cast__channel__hash_algorithm__value_ranges,
+  NULL, NULL, NULL, NULL   /* reserved[1234] */
 };
