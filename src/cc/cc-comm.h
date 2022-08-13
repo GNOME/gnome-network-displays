@@ -38,7 +38,7 @@ struct _CcComm
 
 typedef struct _CcComm CcComm;
 
-enum MessageType {
+typedef enum {
   MESSAGE_TYPE_AUTH,
   MESSAGE_TYPE_CONNECT,
   MESSAGE_TYPE_DISCONNECT,
@@ -46,15 +46,15 @@ enum MessageType {
   MESSAGE_TYPE_PONG,
   MESSAGE_TYPE_RECEIVER,
   MESSAGE_TYPE_MEDIA,
-};
+} MessageType;
 
 gboolean cc_comm_make_connection (CcComm  *comm,
                                   gchar   *remote_address,
                                   GError **error);
-gboolean cc_comm_send_request (CcComm          *sink,
-                               enum MessageType message_type,
-                               char            *utf8_payload,
-                               GError         **error);
+gboolean cc_comm_send_request (CcComm      *sink,
+                               MessageType message_type,
+                               char        *utf8_payload,
+                               GError      **error);
 gboolean cc_comm_send_ping (CcComm *sink);
 
 G_END_DECLS

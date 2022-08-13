@@ -495,7 +495,7 @@ cc_comm_build_message (gchar                                  *namespace_,
 }
 
 gboolean
-cc_comm_send_request (CcComm * comm, enum MessageType message_type, char *utf8_payload, GError **error)
+cc_comm_send_request (CcComm * comm, MessageType message_type, char *utf8_payload, GError **error)
 {
   Cast__Channel__CastMessage message;
   guint32 packed_size = 0;
