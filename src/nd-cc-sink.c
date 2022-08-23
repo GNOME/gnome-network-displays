@@ -23,7 +23,7 @@
 #include "cc/cc-client.h"
 #include "wfd/wfd-media-factory.h"
 #include "wfd/wfd-server.h"
-#include "cc/cc-comm.h"
+#include "cc/cc-ctrl.h"
 
 // TODO: add cancellable everywhere
 
@@ -43,8 +43,7 @@ struct _NdCCSink
   gchar         *remote_name;
 
   GSocketClient *comm_client;
-  CcComm         comm;
-  guint          ping_timeout_handle;
+  CcCtrl         ctrl;
 
   WfdServer     *server;
   guint          server_source_id;
@@ -263,8 +262,6 @@ static void
 closed_cb (NdCCSink *sink, CCClient *client)
 {
   /* Connection was closed, do a clean shutdown */
-  cc_comm_send_request (&sink->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL);
-
   nd_cc_sink_sink_stop_stream (ND_SINK (sink));
 }
 
@@ -312,20 +309,27 @@ server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
   return res;
 }
 
-static gboolean
-nd_cc_sink_launch_default_app_cb (NdCCSink *sink)
+static void
+nd_cc_sink_start_webrtc_stream (CcCtrlClosure *closure)
 {
-  if (!cc_comm_send_request (&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"LAUNCH\", \"appId\": \"CC1AD845\", \"requestId\": 3 }", NULL))
-    g_warning ("NdCCSink: something went wrong with default app launch");
-  return FALSE;
+  // TODO
+  g_debug ("Received webrtc stream signal from ctrl");
 }
 
-static gboolean
-nd_cc_sink_get_status_cb (NdCCSink *sink)
+static void
+nd_cc_sink_error_in_ctrl (CcCtrlClosure *closure)
 {
-  if (!cc_comm_send_request (&sink->comm, MESSAGE_TYPE_RECEIVER, "{ \"type\": \"GET_STATUS\", \"requestId\": 2 }", NULL))
-    g_warning ("NdCCSink: something went wrong with get status");
-  return FALSE;
+  nd_cc_sink_sink_stop_stream (ND_SINK (closure->userdata));
+}
+
+CcCtrlClosure *
+nd_cc_sink_get_callback_closure (NdCCSink *sink)
+{
+  CcCtrlClosure *closure = (CcCtrlClosure *) g_malloc (sizeof (CcCtrlClosure));
+  closure->userdata = sink;
+  closure->end_stream = nd_cc_sink_error_in_ctrl;
+  closure->start_stream = nd_cc_sink_start_webrtc_stream;
+  return closure;
 }
 
 static NdSink *
@@ -346,54 +350,24 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
 
+  self->ctrl.cancellable = self->cancellable;
+  self->ctrl.closure = nd_cc_sink_get_callback_closure (self);
+
   g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
-
-  self->comm.destination_id = "receiver-0";
-  self->comm.cancellable = self->cancellable;
-
-  // open a TLS connection to the CC device
-  if (!cc_comm_make_connection (&self->comm, self->remote_address, &error))
+  if (!cc_ctrl_connection_init (&self->ctrl, self->remote_address))
     {
+      g_warning ("NdCCSink: Failed to init cc-ctrl");
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
       g_clear_object (&self->server);
 
       return NULL;
     }
-
-  // authenticate with the CC device
-  if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_AUTH, NULL, NULL))
-    {
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
-      g_clear_object (&self->server);
-
-      return NULL;
-    }
-
-  // open up a virtual connection to the device
-  if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_CONNECT, NULL, NULL))
-    {
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
-      g_clear_object (&self->server);
-
-      return NULL;
-    }
-
-  // send pings to device every 5 seconds
-  self->ping_timeout_handle = g_timeout_add_seconds (5, G_SOURCE_FUNC (cc_comm_send_ping), &self->comm);
-
-  // send req to get status
-  g_debug ("NdCCSink: Get Status");
-  g_timeout_add_seconds (2, G_SOURCE_FUNC (nd_cc_sink_get_status_cb), self);
-
-  g_debug ("NdCCSink: Launching Default Media App");
-  g_timeout_add_seconds (6, G_SOURCE_FUNC (nd_cc_sink_launch_default_app_cb), self);
 
   self->state = ND_SINK_STATE_STREAMING;
   g_object_notify (G_OBJECT (self), "state");
 
+  // TODO: maybe we don't need this part
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
 
@@ -437,58 +411,12 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
-  g_autoptr(GError) error = NULL;
-  gboolean close_ok;
-
-  // Close the app before closing the connection
-  // hack to know if the app is already up
-  if (g_strcmp0 (self->comm.destination_id, "receiver-0") != 0)
-    {
-      g_autoptr(GString) close_app_message = NULL;
-      close_app_message = g_string_new ("{ \"type\": \"STOP\", \"requestId\": 5, \"sessionId\": \"");
-      g_string_append (close_app_message, self->comm.destination_id);
-      g_string_append (close_app_message, "\" }");
-
-      if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_RECEIVER, close_app_message->str, &error))
-        {
-          if (error != NULL)
-            g_warning ("NdCCSink: Error closing the cast app: %s", error->message);
-          else
-            g_warning ("NdCCSink: Error closing the cast app");
-        }
-
-      g_clear_error (&error);
-      g_clear_pointer (&self->comm.destination_id, g_free);
-      self->comm.destination_id = g_strdup ("receiver-0");
-    }
-
-  if (!cc_comm_send_request (&self->comm, MESSAGE_TYPE_DISCONNECT, NULL, NULL))
-    g_warning ("NdCCSink: Error closing virtual connection");
+  cc_ctrl_finish (&self->ctrl, NULL);
 
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
 
   self->cancellable = g_cancellable_new ();
-
-  // cancel ping timeout
-  g_clear_handle_id (&self->ping_timeout_handle, g_source_remove);
-
-  /* Close the client connection
-   * TODO: This should be moved into cc-comm.c */
-  if (self->comm.con != NULL)
-    {
-      close_ok = g_io_stream_close (G_IO_STREAM (self->comm.con), NULL, &error);
-      if (!close_ok)
-        {
-          if (error != NULL)
-            g_warning ("NdCCSink: Error closing communication client connection: %s", error->message);
-          else
-            g_warning ("NdCCSink: Communication client connection not closed");
-        }
-
-      g_clear_object (&self->comm.con);
-      g_debug ("NdCCSink: Client connection removed");
-    }
 
   /* Destroy the server that is streaming. */
   if (self->server_source_id)

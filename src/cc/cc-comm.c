@@ -17,7 +17,6 @@
  */
 
 #include "cc-comm.h"
-#include "cast_channel.pb-c.h"
 
 // function decl
 static void cc_comm_listen (CcComm *comm);
@@ -26,113 +25,107 @@ static void cc_comm_read (CcComm  *comm,
                           gboolean read_header);
 
 
-static gboolean
-cc_comm_load_media_cb (CcComm *comm)
-{
-  if (!cc_comm_send_request (comm, MESSAGE_TYPE_MEDIA, "{ \"type\": \"LOAD\", \"media\": { \"contentId\": \"https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/mp4/BigBuckBunny.mp4\", \"streamType\": \"BUFFERED\", \"contentType\": \"video/mp4\" }, \"requestId\": 4 }", NULL))
-    g_warning ("NdCCSink: something went wrong with load media");
+// DEBUG HEX DUMP
 
-  return FALSE;
-}
+// static void
+// cc_comm_dump_message (guint8 *msg, gsize length)
+// {
+//   g_autoptr(GString) line = NULL;
 
-static void
-cc_comm_dump_message (guint8 *msg, gsize length)
-{
-  g_autoptr(GString) line = NULL;
+//   line = g_string_new ("");
+//   /* Dump the buffer. */
+//   for (gint i = 0; i < length; i++)
+//     {
+//       g_string_append_printf (line, "%02x ", msg[i]);
+//       if ((i + 1) % 16 == 0)
+//         {
+//           g_debug ("%s", line->str);
+//           g_string_set_size (line, 0);
+//         }
+//     }
 
-  line = g_string_new ("");
-  /* Dump the buffer. */
-  for (gint i = 0; i < length; i++)
-    {
-      g_string_append_printf (line, "%02x ", msg[i]);
-      if ((i + 1) % 16 == 0)
-        {
-          g_debug ("%s", line->str);
-          g_string_set_size (line, 0);
-        }
-    }
+//   if (line->len)
+//     g_debug ("%s", line->str);
+// }
 
-  if (line->len)
-    g_debug ("%s", line->str);
-}
 
-static void
-cc_comm_dump_json_message (Cast__Channel__CastMessage *message)
-{
-  g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_type: %d, payload_utf8: %s }",
-           message->source_id,
-           message->destination_id,
-           message->namespace_,
-           message->payload_type,
-           message->payload_utf8);
-}
 
-// returns FALSE if message is PONG
-// returns TRUE if the message is to be logged
-static gboolean
-cc_comm_parse_json_data (CcComm *comm, char *payload)
-{
-  g_autoptr(GError) error = NULL;
-  g_autoptr(JsonParser) parser = NULL;
-  g_autoptr(JsonReader) reader = NULL;
 
-  parser = json_parser_new ();
-  if (!json_parser_load_from_data (parser, payload, -1, &error))
-    {
-      g_warning ("NdCCSink: Error parsing received messaage JSON: %s", error->message);
-      return TRUE;
-    }
+// static gboolean
+// cc_comm_load_media_cb (CcComm *comm)
+// {
+//   if (!cc_comm_send_request (comm, CC_MESSAGE_TYPE_MEDIA, "{ \"type\": \"LOAD\", \"media\": { \"contentId\": \"https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/mp4/BigBuckBunny.mp4\", \"streamType\": \"BUFFERED\", \"contentType\": \"video/mp4\" }, \"requestId\": 4 }", NULL))
+//     g_warning ("NdCCSink: something went wrong with load media");
 
-  reader = json_reader_new (json_parser_get_root (parser));
+//   return FALSE;
+// }
 
-  json_reader_read_member (reader, "type");
-  const char *message_type = json_reader_get_string_value (reader);
-  json_reader_end_member (reader);
+// // returns FALSE if message is PONG
+// // returns TRUE if the message is to be logged
+// static gboolean
+// cc_comm_parse_json_data (CcComm *comm, char *payload)
+// {
+//   g_autoptr(GError) error = NULL;
+//   g_autoptr(JsonParser) parser = NULL;
+//   g_autoptr(JsonReader) reader = NULL;
 
-  if (g_strcmp0 (message_type, "PONG") == 0)
-    return FALSE;
+//   parser = json_parser_new ();
+//   if (!json_parser_load_from_data (parser, payload, -1, &error))
+//     {
+//       g_warning ("NdCCSink: Error parsing received messaage JSON: %s", error->message);
+//       return TRUE;
+//     }
 
-  if (g_strcmp0 (message_type, "RECEIVER_STATUS") == 0)
-    {
-      if (json_reader_read_member (reader, "status"))
-        {
-          if (json_reader_read_member (reader, "applications"))
-            {
-              if (json_reader_read_element (reader, 0))
-                {
-                  if (json_reader_read_member (reader, "appId"))
-                    {
-                      const char *app_id = json_reader_get_string_value (reader);
-                      if (g_strcmp0 (app_id, "CC1AD845") == 0)
-                        {
-                          json_reader_end_member (reader);
-                          json_reader_read_member (reader, "transportId");
-                          const char *transport_id = json_reader_get_string_value (reader);
-                          g_debug ("CcComm: Transport Id: %s!", transport_id);
+//   reader = json_reader_new (json_parser_get_root (parser));
 
-                          // start a new virtual connection
-                          comm->destination_id = g_strdup (transport_id);
-                          g_debug ("CcComm: Sending second connect request");
-                          if (!cc_comm_send_request (comm, MESSAGE_TYPE_CONNECT, NULL, NULL))
-                            {
-                              g_warning ("CcComm: Something went wrong with VC request for media");
-                              return TRUE;
-                            }
-                          // call the LOAD media request after 2 seconds
-                          g_timeout_add_seconds (2, G_SOURCE_FUNC (cc_comm_load_media_cb), comm);
-                        }
-                      json_reader_end_member (reader);
-                    }
-                  json_reader_end_element (reader);
-                }
-              json_reader_end_member (reader);
-            }
-          json_reader_end_member (reader);
-        }
-    }
+//   json_reader_read_member (reader, "type");
+//   const char *message_type = json_reader_get_string_value (reader);
+//   json_reader_end_member (reader);
 
-  return TRUE;
-}
+//   if (g_strcmp0 (message_type, "PONG") == 0)
+//     return FALSE;
+
+//   if (g_strcmp0 (message_type, "RECEIVER_STATUS") == 0)
+//     {
+//       if (json_reader_read_member (reader, "status"))
+//         {
+//           if (json_reader_read_member (reader, "applications"))
+//             {
+//               if (json_reader_read_element (reader, 0))
+//                 {
+//                   if (json_reader_read_member (reader, "appId"))
+//                     {
+//                       const char *app_id = json_reader_get_string_value (reader);
+//                       if (g_strcmp0 (app_id, "CC1AD845") == 0)
+//                         {
+//                           json_reader_end_member (reader);
+//                           json_reader_read_member (reader, "transportId");
+//                           const char *transport_id = json_reader_get_string_value (reader);
+//                           g_debug ("CcComm: Transport Id: %s!", transport_id);
+
+//                           // start a new virtual connection
+//                           comm->destination_id = g_strdup (transport_id);
+//                           g_debug ("CcComm: Sending second connect request");
+//                           if (!cc_comm_send_request (comm, CC_MESSAGE_TYPE_CONNECT, NULL, NULL))
+//                             {
+//                               g_warning ("CcComm: Something went wrong with VC request for media");
+//                               return TRUE;
+//                             }
+//                           // call the LOAD media request after 2 seconds
+//                           g_timeout_add_seconds (2, G_SOURCE_FUNC (cc_comm_load_media_cb), comm);
+//                         }
+//                       json_reader_end_member (reader);
+//                     }
+//                   json_reader_end_element (reader);
+//                 }
+//               json_reader_end_member (reader);
+//             }
+//           json_reader_end_member (reader);
+//         }
+//     }
+
+//   return TRUE;
+// }
 
 static void
 cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_size)
@@ -146,11 +139,21 @@ cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_
       return;
     }
 
-  if (cc_comm_parse_json_data (comm, message->payload_utf8))
-    {
-      g_debug ("CcComm: Received message:");
-      cc_comm_dump_json_message (message);
-    }
+  g_clear_pointer (&comm->message_buffer, g_free);
+
+  // go for another round while we process this one
+  cc_comm_listen (comm);
+
+  CcReceivedMessageType type = cc_json_helper_get_message_type (message, NULL);
+
+  if (type == CC_RWAIT_TYPE_PING || type == CC_RWAIT_TYPE_PONG || type == -1)
+    return;
+
+  g_debug ("CcComm: Received message:");
+  cc_json_helper_dump_message (message);
+
+  // actual message handling
+  comm->closure->message_received_cb (comm->closure, message);
 
   cast__channel__cast_message__free_unpacked (message, NULL);
 }
@@ -180,12 +183,6 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
 }
 
 // LISTENER
-
-static guint32
-cc_comm_to_message_size (CcComm *comm)
-{
-  return GINT32_FROM_BE (*(guint32 *) comm->header_buffer);
-}
 
 // async callback for message read
 static void
@@ -235,10 +232,6 @@ cc_comm_message_read_cb (GObject      *source_object,
   // cc_comm_dump_message (comm->message_buffer, io_bytes);
   cc_comm_parse_received_data (comm, comm->message_buffer, io_bytes);
 
-  g_clear_pointer (&comm->message_buffer, g_free);
-
-  // go for another round
-  cc_comm_listen (comm);
 }
 
 // async callback for header read
@@ -287,10 +280,7 @@ cc_comm_header_read_cb (GObject      *source_object,
     }
 
   // if everything is well, read all `io_bytes`
-  g_debug ("CcComm: Raw header dump:");
-  cc_comm_dump_message (comm->header_buffer, 4);
-
-  message_size = cc_comm_to_message_size (comm);
+  message_size = GINT32_FROM_BE (*(guint32 *) comm->header_buffer);
   g_debug ("CcComm: Message size: %d", message_size);
 
   g_clear_pointer (&comm->header_buffer, g_free);
@@ -419,6 +409,28 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   return TRUE;
 }
 
+void
+cc_comm_close_connection (CcComm *comm)
+{
+  g_autoptr (GError) error = NULL;
+  gboolean close_ok;
+
+  if (comm->con != NULL)
+    {
+      close_ok = g_io_stream_close (G_IO_STREAM (comm->con), NULL, &error);
+      if (!close_ok)
+        {
+          if (error != NULL)
+            g_warning ("CcComm: Error closing communication client connection: %s", error->message);
+          else
+            g_warning ("CcComm: Error closing communication client connection");
+        }
+
+      g_clear_object (&comm->con);
+      g_debug ("CcComm: Client connection removed");
+    }
+}
+
 static gboolean
 cc_comm_tls_send (CcComm  * comm,
                   uint8_t * message,
@@ -448,11 +460,10 @@ cc_comm_tls_send (CcComm  * comm,
       if (io_bytes <= 0)
         {
           g_warning ("CcComm: Failed to write: %s", (*error)->message);
+          comm->closure->fatal_error_cb (comm->closure, error);
           g_clear_error (error);
           return FALSE;
         }
-
-      // g_debug ("CcComm: Sent %" G_GSSIZE_FORMAT " bytes", io_bytes);
 
       size -= io_bytes;
     }
@@ -461,41 +472,80 @@ cc_comm_tls_send (CcComm  * comm,
 }
 
 // builds message based on available types
-static Cast__Channel__CastMessage
-cc_comm_build_message (gchar                                  *namespace_,
+static gboolean
+cc_comm_build_message (Cast__Channel__CastMessage             *message,
+                       gchar                                  *sender_id,
+                       gchar                                  *destination_id,
+                       CcMessageType                           message_type,
                        Cast__Channel__CastMessage__PayloadType payload_type,
-                       ProtobufCBinaryData                   * binary_payload,
+                       ProtobufCBinaryData                    *binary_payload,
                        gchar                                  *utf8_payload)
 {
-  Cast__Channel__CastMessage message;
+  cast__channel__cast_message__init (message);
 
-  cast__channel__cast_message__init (&message);
+  message->protocol_version = CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
+  // pray we don't free these pointers before being used
+  message->source_id = sender_id;
+  message->destination_id = destination_id;
 
-  message.protocol_version = CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
-  message.source_id = "sender-gnd";
-  message.destination_id = "receiver-0";
-  message.namespace_ = namespace_;
-  message.payload_type = payload_type;
+  switch (message_type)
+    {
+    case CC_MESSAGE_TYPE_AUTH:
+      message->namespace_ = CC_NAMESPACE_AUTH;
+      break;
 
+    case CC_MESSAGE_TYPE_CONNECT:
+    case CC_MESSAGE_TYPE_DISCONNECT:
+      message->namespace_ = CC_NAMESPACE_CONNECTION;
+      break;
+
+    case CC_MESSAGE_TYPE_PING:
+    case CC_MESSAGE_TYPE_PONG:
+      message->namespace_ = CC_NAMESPACE_HEARTBEAT;
+      break;
+
+    case CC_MESSAGE_TYPE_RECEIVER:
+      message->namespace_ = CC_NAMESPACE_RECEIVER;
+      break;
+
+    case CC_MESSAGE_TYPE_MEDIA:
+      message->namespace_ = CC_NAMESPACE_MEDIA;
+      break;
+
+    case CC_MESSAGE_TYPE_WEBRTC:
+      message->namespace_ = CC_NAMESPACE_WEBRTC;
+      break;
+
+    default:
+      return FALSE;
+    }
+
+  message->payload_type = payload_type;
   switch (payload_type)
     {
     case CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY:
-      message.payload_binary = *binary_payload;
-      message.has_payload_binary = 1;
+      message->payload_binary = *binary_payload;
+      message->has_payload_binary = 1;
       break;
 
     case CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING:
-    default:
-      message.payload_utf8 = utf8_payload;
-      message.has_payload_binary = 0;
+      message->payload_utf8 = utf8_payload;
+      message->has_payload_binary = 0;
       break;
+
+    default:
+      return FALSE;
     }
 
-  return message;
+  return TRUE;
 }
 
 gboolean
-cc_comm_send_request (CcComm * comm, MessageType message_type, char *utf8_payload, GError **error)
+cc_comm_send_request (CcComm       *comm,
+                      gchar        *destination_id,
+                      CcMessageType message_type,
+                      gchar        *utf8_payload,
+                      GError      **error)
 {
   Cast__Channel__CastMessage message;
   guint32 packed_size = 0;
@@ -503,71 +553,38 @@ cc_comm_send_request (CcComm * comm, MessageType message_type, char *utf8_payloa
 
   switch (message_type)
     {
-    case MESSAGE_TYPE_AUTH:
+    // CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_3 allows for binary payloads over utf8
+    case CC_MESSAGE_TYPE_AUTH:
       ProtobufCBinaryData binary_payload;
       binary_payload.data = NULL;
       binary_payload.len = 0;
 
-      message = cc_comm_build_message (
-        "urn:x-cast:com.google.cast.tp.deviceauth",
-        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
-        &binary_payload,
-        NULL);
-      break;
-
-    case MESSAGE_TYPE_CONNECT:
-      message = cc_comm_build_message (
-        "urn:x-cast:com.google.cast.tp.connection",
-        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-        NULL,
-        // "{ \"type\": \"CONNECT\" }");
-        "{ \"type\": \"CONNECT\", \"userAgent\": \"GND/0.90.5  (X11; Linux x86_64)\", \"connType\": 0, \"origin\": {}, \"senderInfo\": { \"sdkType\": 2, \"version\": \"X11; Linux x86_64\", \"browserVersion\": \"X11; Linux x86_64\", \"platform\": 6, \"connectionType\": 1 } }");
-      message.destination_id = comm->destination_id;
-      break;
-
-    case MESSAGE_TYPE_DISCONNECT:
-      message = cc_comm_build_message (
-        "urn:x-cast:com.google.cast.tp.connection",
-        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-        NULL,
-        "{ \"type\": \"CLOSE\" }");
-      break;
-
-    case MESSAGE_TYPE_PING:
-      message = cc_comm_build_message (
-        "urn:x-cast:com.google.cast.tp.heartbeat",
-        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-        NULL,
-        "{ \"type\": \"PING\" }");
-      break;
-
-    case MESSAGE_TYPE_PONG:
-      message = cc_comm_build_message (
-        "urn:x-cast:com.google.cast.tp.heartbeat",
-        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-        NULL,
-        "{ \"type\": \"PONG\" }");
-      break;
-
-    case MESSAGE_TYPE_RECEIVER:
-      message = cc_comm_build_message (
-        "urn:x-cast:com.google.cast.receiver",
-        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-        NULL,
-        utf8_payload);
-      break;
-
-    case MESSAGE_TYPE_MEDIA:
-      message = cc_comm_build_message (
-        "urn:x-cast:com.google.cast.media",
-        CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-        NULL,
-        utf8_payload);
-      message.destination_id = comm->destination_id;
+      if (!cc_comm_build_message (&message,
+                                  CC_DEFAULT_SENDER_ID,
+                                  destination_id,
+                                  message_type,
+                                  CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
+                                  &binary_payload,
+                                  NULL))
+        {
+          *error = g_error_new (1, 1, "Auth message building failed!");
+          return FALSE;
+        }
       break;
 
     default:
-      return FALSE;
+      if (!cc_comm_build_message (&message,
+                                  CC_DEFAULT_SENDER_ID,
+                                  destination_id,
+                                  message_type,
+                                  CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+                                  NULL,
+                                  utf8_payload))
+        {
+          *error = g_error_new (1, 1, "Message building failed for message type: %d", message_type);
+          return FALSE;
+        }
+      break;
     }
 
   packed_size = cast__channel__cast_message__get_packed_size (&message);
@@ -578,34 +595,14 @@ cc_comm_send_request (CcComm * comm, MessageType message_type, char *utf8_payloa
   memcpy (sock_buffer, &packed_size_be, 4);
   cast__channel__cast_message__pack (&message, 4 + sock_buffer);
 
-  if (message_type != MESSAGE_TYPE_PING && message_type != MESSAGE_TYPE_PONG)
+  if (message_type != CC_MESSAGE_TYPE_PING && message_type != CC_MESSAGE_TYPE_PONG)
     {
       g_debug ("CcComm: Sending message:");
-      cc_comm_dump_json_message (&message);
+      cc_json_helper_dump_message (&message);
     }
 
   return cc_comm_tls_send (comm,
                            sock_buffer,
                            packed_size + 4,
                            error);
-}
-
-gboolean
-cc_comm_send_ping (CcComm * comm)
-{
-  g_autoptr(GError) error = NULL;
-
-  // if this errors out, we cancel the periodic ping by returning FALSE
-  if (!cc_comm_send_request (comm, MESSAGE_TYPE_PING, NULL, &error))
-    {
-      if (error != NULL)
-        {
-          g_warning ("CcComm: Failed to send ping message: %s", error->message);
-          return G_SOURCE_REMOVE;
-        }
-      g_warning ("CcComm: Failed to send ping message");
-      return G_SOURCE_REMOVE;
-    }
-
-  return G_SOURCE_CONTINUE;
 }
