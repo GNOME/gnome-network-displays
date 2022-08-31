@@ -18,149 +18,147 @@
 
 #include "cc-json-helper.h"
 
-// static void
-// cc_json_helper_add_type_value (JsonBuilder *builder,
-//                                CcJsonType   type,
-//                                gpointer     value)
-// {
-//   switch (type)
-//     {
-//     case CC_JSON_TYPE_STRING:
-//       json_builder_add_string_value (builder, (gchar *) *value);
-//       break;
-//     case CC_JSON_TYPE_INT:
-//       json_builder_add_int_value (builder, (gint) *value);
-//       break;
-//     case CC_JSON_TYPE_DOUBLE:
-//       json_builder_add_double_value (builder, (gdouble) *value);
-//       break;
-//     case CC_JSON_TYPE_BOOLEAN:
-//       json_builder_add_boolean_value (builder, (gboolean) *value);
-//       break;
-//     case CC_JSON_TYPE_NULL: /* no additional arg is required here */
-//       json_builder_add_null_value (builder);
-//       break;
-//     case CC_JSON_TYPE_OBJECT:
-//       json_builder_begin_object (builder);
-//       json_builder_add_value (builder, (JsonNode *) value);
-//       json_builder_end_object (builder);
-//       break;
-//     /* only 1D arrays supported */
-//     }
-// }
+static void
+cc_json_helper_build_internal (JsonBuilder *builder,
+                               gchar       *first_key,
+                               va_list	    var_args)
+{
+  gchar *key = first_key;
 
-// void
-// cc_json_helper_build_root (JsonBuilder *builder,
-//                            const gchar *first_key,
-//                            va_list	    var_args)
-// {
-//   gchar *key = first_key;
+  while (key)
+    {
+      json_builder_set_member_name (builder, key);
+      CcJsonType type = va_arg (var_args, CcJsonType);
 
-//   while (key)
-//     {
-//       json_builder_set_member_name (builder, key);
-//       CcJsonType type = va_arg (var_args, CcJsonType);
+      if (type < CC_JSON_TYPE_STRING || type > CC_JSON_TYPE_ARRAY_OBJECT)
+        {
+          g_warning ("CcJsonHelper: Incorrect type passed in json contructor: %d", type);
+          return;
+        }
 
-//       if (type == CC_JSON_TYPE_ARRAY)
-//         {
-//           json_builder_begin_array (builder);
-//           gint length = va_arg (var_args, gint);
-//           for (gint i = 0; i < length; i++)
-//             {
-//               cc_json_helper_add_type_value (builder, type, va_arg (var_args, gpointer));
-//             }
-//           json_builder_end_array (builder);
-//         }
-//       switch (type)
-//         {
-//         case CC_JSON_TYPE_STRING:
-//           json_builder_add_string_value (builder, va_arg (var_args, gchar *));
-//           break;
-//         case CC_JSON_TYPE_INT:
-//           json_builder_add_int_value (builder, va_arg (var_args, gint));
-//           break;
-//         case CC_JSON_TYPE_DOUBLE:
-//           json_builder_add_double_value (builder, va_arg (var_args, gdouble));
-//           break;
-//         case CC_JSON_TYPE_BOOLEAN:
-//           json_builder_add_boolean_value (builder, va_arg (var_args, gboolean));
-//           break;
-//         case CC_JSON_TYPE_NULL: /* no additional arg is required here */
-//           json_builder_add_null_value (builder);
-//           break;
-//         case CC_JSON_TYPE_OBJECT:
-//           json_builder_begin_object (builder);
-//           json_builder_add_value (builder, va_arg (var_args, JsonNode *));
-//           json_builder_end_object (builder);
-//           break;
-//         case CC_JSON_TYPE_ARRAY: /* type for array elements is also required here */
-//           json_builder_begin_array (builder);
-//           CcJsonType array_type = va_arg (var_args, CcJsonType);
-//           /* GArray */
-//           json_builder_end_array (builder);
-//           break;
-//         default:
-//           output = NULL;
-//           return;
-//         }
+      switch (type)
+        {
+        case CC_JSON_TYPE_STRING:
+          json_builder_add_string_value (builder, va_arg (var_args, gchar *));
+          break;
+        case CC_JSON_TYPE_INT:
+          json_builder_add_int_value (builder, va_arg (var_args, gint));
+          break;
+        case CC_JSON_TYPE_DOUBLE:
+          json_builder_add_double_value (builder, va_arg (var_args, gdouble));
+          break;
+        case CC_JSON_TYPE_BOOLEAN:
+          json_builder_add_boolean_value (builder, va_arg (var_args, gboolean));
+          break;
+        case CC_JSON_TYPE_NULL: /* no additional arg is required here */
+          json_builder_add_null_value (builder);
+          break;
+        case CC_JSON_TYPE_OBJECT:
+          json_builder_add_value (builder, va_arg (var_args, JsonNode *));
+          break;
+        default:
+          break;
+        }
 
-//       key = va_arg (var_args, gchar *);
-//     }
-// }
+      if (type < CC_JSON_TYPE_ARRAY_STRING)
+        {
+          key = va_arg (var_args, gchar *);
+          continue;
+        }
 
-// void
-// cc_json_helper_build_string (gchar       *output,
-//                              const gchar *first_key,
-//                              ...)
-// {
-//   va_list var_args;
-//   va_start (var_args, first_key);
+      json_builder_begin_array (builder);
+      GArray *arr = va_arg (var_args, GArray *);
+      guint i;
 
-//   JsonBuilder *builder = json_builder_new ();
+      for (i=0; i<arr->len; i++)
+        {
+          switch (type)
+          {
+            case CC_JSON_TYPE_ARRAY_STRING:
+              json_builder_add_string_value (builder, g_array_index (arr, gchar *, i));
+              break;
+            case CC_JSON_TYPE_ARRAY_INT:
+              json_builder_add_int_value (builder, g_array_index (arr, gint, i));
+              break;
+            case CC_JSON_TYPE_ARRAY_DOUBLE:
+              json_builder_add_double_value (builder, g_array_index (arr, gdouble, i));
+              break;
+            case CC_JSON_TYPE_ARRAY_BOOLEAN:
+              json_builder_add_boolean_value (builder, g_array_index (arr, gboolean, i));
+              break;
+            case CC_JSON_TYPE_ARRAY_NULL:
+              json_builder_add_null_value (builder);
+              break;
+            case CC_JSON_TYPE_ARRAY_OBJECT:
+              json_builder_add_value (builder, g_array_index (arr, JsonNode *, i));
+              break;
+            default:
+              break;
+          }
+        }
 
-//   json_builder_begin_object (builder);
-//   cc_json_helper_build_root (builder, first_key, var_args);
-//   json_builder_end_object (builder);
+      json_builder_end_array (builder);
 
-//   JsonGenerator *gen = json_generator_new ();
-//   JsonNode *root = json_builder_get_root (builder);
-//   json_generator_set_root (gen, root);
+      key = va_arg (var_args, gchar *);
+    }
+}
 
-//   output = json_generator_to_data (gen, NULL);
+void
+cc_json_helper_build_node (JsonNode **output,
+                           gchar     *first_key,
+                           ...)
+{
+  va_list var_args;
+  va_start (var_args, first_key);
 
-//   va_end (var_args);
-//   json_node_free (root);
-//   g_object_unref (gen);
-//   g_object_unref (builder);
-// }
+  JsonBuilder *builder = json_builder_new ();
 
-// void
-// cc_json_helper_build_string (gchar       *output,
-//                              const gchar *first_key,
-//                              ...)
-// {
-//   va_list var_args;
-//   va_start (var_args, first_key);
+  json_builder_begin_object (builder);
+  cc_json_helper_build_internal (builder, first_key, var_args);
+  json_builder_end_object (builder);
 
-//   JsonBuilder *builder = json_builder_new ();
+  *output = json_builder_get_root (builder);
 
-//   json_builder_begin_object (builder);
-//   cc_json_helper_build_root (builder, first_key, var_args);
-//   json_builder_end_object (builder);
+  va_end (var_args);
+  g_object_unref (builder);
+}
 
-//   JsonGenerator *gen = json_generator_new ();
-//   JsonNode *root = json_builder_get_root (builder);
-//   json_generator_set_root (gen, root);
+void
+cc_json_helper_build_string (gchar  **output,
+                            //  gboolean pretty_print,
+                             gchar   *first_key,
+                             ...)
+{
+  va_list var_args;
+  va_start (var_args, first_key);
 
-//   output = json_generator_to_data (gen, NULL);
+  JsonBuilder *builder = json_builder_new ();
 
-//   va_end (var_args);
-//   json_node_free (root);
-//   g_object_unref (gen);
-//   g_object_unref (builder);
-// }
+  json_builder_begin_object (builder);
+  cc_json_helper_build_internal (builder, first_key, var_args);
+  json_builder_end_object (builder);
 
+  JsonNode *root = json_builder_get_root (builder);
+  JsonGenerator *gen = json_generator_new ();
 
+  // json_generator_set_pretty (gen, pretty_print);
+  json_generator_set_root (gen, root);
+  *output = json_generator_to_data (gen, NULL);
+
+  va_end (var_args);
+  json_node_free (root);
+  g_object_unref (gen);
+  g_object_unref (builder);
+}
+
+void
+cc_json_helper_node_to_string (gchar **output, JsonNode *node)
+{
+  JsonGenerator *gen = json_generator_new ();
+  json_generator_set_root (gen, node);
+  *output = json_generator_to_data (gen, NULL);
+  g_object_unref (gen);
+}
 
 CcReceivedMessageType
 cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
@@ -169,20 +167,20 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
   const gchar *message_type;
   g_autoptr (GError) error = NULL;
 
-  if (reader == NULL)
-    {
-      g_autoptr(JsonParser) parser = NULL;
+  // if (reader == NULL)
+  //   {
+  //     g_autoptr(JsonParser) parser = NULL;
 
-      parser = json_parser_new ();
-      if (!json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
-        {
-          cc_json_helper_dump_message (message);
-          g_warning ("CcJsonHelper: Error parsing received message JSON: %s", error->message);
-          return -1;
-        }
+  //     parser = json_parser_new ();
+  //     if (!json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
+  //       {
+  //         cc_json_helper_dump_message (message);
+  //         g_warning ("CcJsonHelper: Error parsing received message JSON: %s", error->message);
+  //         return -1;
+  //       }
 
-      reader = json_reader_new (json_parser_get_root (parser));
-    }
+  //     reader = json_reader_new (json_parser_get_root (parser));
+  //   }
 
   gboolean typeExists = json_reader_read_member (reader, "type");
   if (typeExists)
@@ -194,8 +192,8 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
         message_type = json_reader_get_string_value (reader);
       else
         {
-          cc_json_helper_dump_message (message);
           g_warning ("CcJsonHelper: Error parsing received message JSON: no type or responseType keys");
+          cc_json_helper_dump_message (message, TRUE);
           return -1;
         }
     }
@@ -224,14 +222,34 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
     } cc_end
 }
 
+/* borked var reduces extra computation */
 void
-cc_json_helper_dump_message (Cast__Channel__CastMessage *message)
+cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borked)
 {
-  // TODO: pretty print json object
-  g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_type: %d, payload_utf8: %s }",
-    message->source_id,
-    message->destination_id,
-    message->namespace_,
-    message->payload_type,
-    message->payload_utf8);
+  JsonNode *payload_utf8_node;
+  JsonParser *parser = json_parser_new ();
+  g_autoptr (GError) error = NULL;
+
+  if (borked || !json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
+    {
+      g_warning ("CcJsonHelper: Error parsing received JSON payload: %s", error->message);
+      g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_utf8: %s }",
+        message->source_id,
+        message->destination_id,
+        message->namespace_,
+        message->payload_utf8);
+      return;
+    }
+
+  payload_utf8_node = json_parser_get_root (parser);
+
+  gchar *output;
+  cc_json_helper_build_string (&output, //TRUE,
+    "source_id", CC_JSON_TYPE_STRING, message->source_id,
+    "destination_id", CC_JSON_TYPE_STRING, message->destination_id,
+    "namespace", CC_JSON_TYPE_STRING, message->namespace_,
+    "payload_utf8", CC_JSON_TYPE_OBJECT, payload_utf8_node,
+    NULL);
+  
+  g_debug ("%s", output);
 }

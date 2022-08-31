@@ -61,4 +61,57 @@ typedef enum {
 
 typedef CcReceivedMessageType CcWaitingFor;
 
+typedef struct _Stream {
+  gint index;
+
+  // Default channel count is 1, e.g. for video.
+  gint channels;
+  gint rtp_payload_type;
+  gint ssrc;
+  gint target_delay;
+
+  // AES Key and IV mask format is very strict: a 32 digit hex string that
+  // must be converted to a 16 digit byte array.
+  // uint8_t aes_key[16];
+  // uint8_t aes_iv_mask[16];
+  gchar *aes_iv_mask;
+  gchar *aes_key;
+  gboolean receiver_rtcp_event_log;
+  gchar *receiver_rtcp_dscp;
+  // gint rtp_timebase;
+  gchar *rtp_timebase;
+
+  // The codec parameter field honors the format laid out in RFC 6381:
+  // https://datatracker.ietf.org/doc/html/rfc6381.
+  gchar *codec_parameter;
+} Stream;
+
+typedef struct _AudioStream {
+  Stream stream;
+  gchar *codec;
+  gint bit_rate;
+  gint sample_rate;
+  gchar *profile;
+} AudioStream;
+
+typedef struct _VideoStream {
+  Stream stream;
+  gchar *codec;
+  gchar *max_frame_rate;
+  gint max_bit_rate;
+  gchar *protection;
+  gchar *profile;
+  gchar *level;
+  gint **resolutions;
+  gchar *error_recovery_mode;
+} VideoStream;
+
+typedef struct _Offer {
+  gchar *cast_mode;
+  guint seq_num;
+  gboolean receiver_get_status;
+  AudioStream audio_stream;
+  VideoStream video_stream;
+} Offer;
+
 G_END_DECLS

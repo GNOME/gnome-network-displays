@@ -40,8 +40,9 @@ struct _CcCtrlClosure
 {
   gpointer userdata;
   // TODO
-  void (*end_stream) (struct _CcCtrlClosure *closure);
+  Offer * (*get_offer_message) (struct _CcCtrlClosure *closure);
   void (*start_stream) (struct _CcCtrlClosure *closure);
+  void (*end_stream) (struct _CcCtrlClosure *closure);
 };
 
 typedef struct _CcCtrlClosure CcCtrlClosure;

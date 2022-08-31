@@ -144,15 +144,6 @@ cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_
   // go for another round while we process this one
   cc_comm_listen (comm);
 
-  CcReceivedMessageType type = cc_json_helper_get_message_type (message, NULL);
-
-  if (type == CC_RWAIT_TYPE_PING || type == CC_RWAIT_TYPE_PONG || type == -1)
-    return;
-
-  g_debug ("CcComm: Received message:");
-  cc_json_helper_dump_message (message);
-
-  // actual message handling
   comm->closure->message_received_cb (comm->closure, message);
 
   cast__channel__cast_message__free_unpacked (message, NULL);
@@ -595,10 +586,12 @@ cc_comm_send_request (CcComm       *comm,
   memcpy (sock_buffer, &packed_size_be, 4);
   cast__channel__cast_message__pack (&message, 4 + sock_buffer);
 
-  if (message_type != CC_MESSAGE_TYPE_PING && message_type != CC_MESSAGE_TYPE_PONG)
+  if (message_type != CC_MESSAGE_TYPE_PING
+      && message_type != CC_MESSAGE_TYPE_PONG
+      && message_type != CC_MESSAGE_TYPE_AUTH)
     {
       g_debug ("CcComm: Sending message:");
-      cc_json_helper_dump_message (&message);
+      cc_json_helper_dump_message (&message, FALSE);
     }
 
   return cc_comm_tls_send (comm,

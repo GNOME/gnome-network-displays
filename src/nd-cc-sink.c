@@ -24,6 +24,7 @@
 #include "wfd/wfd-media-factory.h"
 #include "wfd/wfd-server.h"
 #include "cc/cc-ctrl.h"
+#include "cc/cc-common.h"
 
 // TODO: add cancellable everywhere
 
@@ -327,8 +328,8 @@ nd_cc_sink_get_callback_closure (NdCCSink *sink)
 {
   CcCtrlClosure *closure = (CcCtrlClosure *) g_malloc (sizeof (CcCtrlClosure));
   closure->userdata = sink;
-  closure->end_stream = nd_cc_sink_error_in_ctrl;
   closure->start_stream = nd_cc_sink_start_webrtc_stream;
+  closure->end_stream = nd_cc_sink_error_in_ctrl;
   return closure;
 }
 
@@ -413,8 +414,8 @@ nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
   cc_ctrl_finish (&self->ctrl, NULL);
 
-  g_cancellable_cancel (self->cancellable);
-  g_clear_object (&self->cancellable);
+  // g_cancellable_cancel (self->cancellable);
+  // g_clear_object (&self->cancellable);
 
   self->cancellable = g_cancellable_new ();
 
