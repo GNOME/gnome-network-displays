@@ -39,7 +39,6 @@ typedef enum {
 struct _CcCtrlClosure
 {
   gpointer userdata;
-  // TODO
   Offer * (*get_offer_message) (struct _CcCtrlClosure *closure);
   void (*start_stream) (struct _CcCtrlClosure *closure);
   void (*end_stream) (struct _CcCtrlClosure *closure);
@@ -65,7 +64,7 @@ struct _CcCtrl
 
 typedef struct _CcCtrl CcCtrl;
 
-// public functions
+/* public functions */
 gboolean cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address);
 void cc_ctrl_finish (CcCtrl *ctrl, GError **error);
 
