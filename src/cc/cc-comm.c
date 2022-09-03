@@ -157,18 +157,8 @@ cc_comm_header_read_cb (GObject      *source_object,
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
-  // XXX: should we give up or keep on retrying if errors pop up
-  /*
-   * If this error is for an old connection (that should be closed already),
-   * then just give up immediately with a CLOSED error.
-   */
-  if (comm->con &&
-      g_io_stream_get_input_stream (G_IO_STREAM (comm->con)) != G_INPUT_STREAM (source_object))
-    {
-      g_error ("CcComm: Error on old read connection, ignoring.");
-      cc_comm_listen (comm);
-      return;
-    }
+  g_assert (comm->con);
+  g_assert (G_INPUT_STREAM (source_object) == g_io_stream_get_input_stream (G_IO_STREAM (comm->con)));
 
   if (!success || io_bytes != 4)
     {
