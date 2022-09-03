@@ -104,6 +104,9 @@ cc_comm_message_read_cb (GObject      *source_object,
 {
   CcComm * comm = (CcComm *) user_data;
 
+  if (g_cancellable_is_cancelled (comm->cancellable))
+    return;
+
   g_autoptr(GError) error = NULL;
   gboolean success;
   gsize io_bytes;
@@ -153,6 +156,9 @@ cc_comm_header_read_cb (GObject      *source_object,
                         gpointer      user_data)
 {
   CcComm *comm = (CcComm *) user_data;
+
+  if (g_cancellable_is_cancelled (comm->cancellable))
+    return;
 
   g_autoptr (GError) error = NULL;
   g_autoptr (GInputStream) istream = NULL;
