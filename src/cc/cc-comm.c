@@ -25,107 +25,32 @@ static void cc_comm_read (CcComm  *comm,
                           gboolean read_header);
 
 
-// DEBUG HEX DUMP
+/* DEBUG HEX DUMP */
 
-// static void
-// cc_comm_dump_message (guint8 *msg, gsize length)
-// {
-//   g_autoptr(GString) line = NULL;
+static void
+cc_comm_dump_message (gchar *msg_head, guint8 *msg, gsize length)
+{
+#if 0
+  g_autoptr(GString) line = NULL;
 
-//   line = g_string_new ("");
-//   /* Dump the buffer. */
-//   for (gint i = 0; i < length; i++)
-//     {
-//       g_string_append_printf (line, "%02x ", msg[i]);
-//       if ((i + 1) % 16 == 0)
-//         {
-//           g_debug ("%s", line->str);
-//           g_string_set_size (line, 0);
-//         }
-//     }
+  g_debug ("CcComm: %s", msg_head);
 
-//   if (line->len)
-//     g_debug ("%s", line->str);
-// }
+  line = g_string_new ("");
+  /* Dump the buffer. */
+  for (gint i = 0; i < length; i++)
+    {
+      g_string_append_printf (line, "%02x ", msg[i]);
+      if ((i + 1) % 16 == 0)
+        {
+          g_debug ("%s", line->str);
+          g_string_set_size (line, 0);
+        }
+    }
 
-
-
-
-// static gboolean
-// cc_comm_load_media_cb (CcComm *comm)
-// {
-//   if (!cc_comm_send_request (comm, CC_MESSAGE_TYPE_MEDIA, "{ \"type\": \"LOAD\", \"media\": { \"contentId\": \"https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/mp4/BigBuckBunny.mp4\", \"streamType\": \"BUFFERED\", \"contentType\": \"video/mp4\" }, \"requestId\": 4 }", NULL))
-//     g_warning ("NdCCSink: something went wrong with load media");
-
-//   return FALSE;
-// }
-
-// // returns FALSE if message is PONG
-// // returns TRUE if the message is to be logged
-// static gboolean
-// cc_comm_parse_json_data (CcComm *comm, char *payload)
-// {
-//   g_autoptr(GError) error = NULL;
-//   g_autoptr(JsonParser) parser = NULL;
-//   g_autoptr(JsonReader) reader = NULL;
-
-//   parser = json_parser_new ();
-//   if (!json_parser_load_from_data (parser, payload, -1, &error))
-//     {
-//       g_warning ("NdCCSink: Error parsing received messaage JSON: %s", error->message);
-//       return TRUE;
-//     }
-
-//   reader = json_reader_new (json_parser_get_root (parser));
-
-//   json_reader_read_member (reader, "type");
-//   const char *message_type = json_reader_get_string_value (reader);
-//   json_reader_end_member (reader);
-
-//   if (g_strcmp0 (message_type, "PONG") == 0)
-//     return FALSE;
-
-//   if (g_strcmp0 (message_type, "RECEIVER_STATUS") == 0)
-//     {
-//       if (json_reader_read_member (reader, "status"))
-//         {
-//           if (json_reader_read_member (reader, "applications"))
-//             {
-//               if (json_reader_read_element (reader, 0))
-//                 {
-//                   if (json_reader_read_member (reader, "appId"))
-//                     {
-//                       const char *app_id = json_reader_get_string_value (reader);
-//                       if (g_strcmp0 (app_id, "CC1AD845") == 0)
-//                         {
-//                           json_reader_end_member (reader);
-//                           json_reader_read_member (reader, "transportId");
-//                           const char *transport_id = json_reader_get_string_value (reader);
-//                           g_debug ("CcComm: Transport Id: %s!", transport_id);
-
-//                           // start a new virtual connection
-//                           comm->destination_id = g_strdup (transport_id);
-//                           g_debug ("CcComm: Sending second connect request");
-//                           if (!cc_comm_send_request (comm, CC_MESSAGE_TYPE_CONNECT, NULL, NULL))
-//                             {
-//                               g_warning ("CcComm: Something went wrong with VC request for media");
-//                               return TRUE;
-//                             }
-//                           // call the LOAD media request after 2 seconds
-//                           g_timeout_add_seconds (2, G_SOURCE_FUNC (cc_comm_load_media_cb), comm);
-//                         }
-//                       json_reader_end_member (reader);
-//                     }
-//                   json_reader_end_element (reader);
-//                 }
-//               json_reader_end_member (reader);
-//             }
-//           json_reader_end_member (reader);
-//         }
-//     }
-
-//   return TRUE;
-// }
+  if (line->len)
+    g_debug ("%s", line->str);
+#endif
+}
 
 static void
 cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_size)
@@ -192,6 +117,7 @@ cc_comm_message_read_cb (GObject      *source_object,
 
   g_assert (comm->con);
   g_assert (G_INPUT_STREAM (source_object) == g_io_stream_get_input_stream (G_IO_STREAM (comm->con)));
+
   if (!success || io_bytes == 0)
     {
       if (error)
@@ -205,8 +131,8 @@ cc_comm_message_read_cb (GObject      *source_object,
       return;
     }
 
-  // dump the received message and try to parse it
-  // cc_comm_dump_message (comm->message_buffer, io_bytes);
+  /* dump the received message and try to parse it */
+  cc_comm_dump_message ("Received message bytes:", comm->message_buffer, io_bytes);
   cc_comm_parse_received_data (comm, comm->message_buffer, io_bytes);
 
   cc_comm_listen (comm);
@@ -425,8 +351,7 @@ cc_comm_tls_send (CcComm  * comm,
       return FALSE;
     }
 
-  // g_debug ("Writing data to Chromecast command channel:");
-  // cc_comm_dump_message (message, size);
+  cc_comm_dump_message ("Sending message bytes:", message, size);
 
   ostream = g_io_stream_get_output_stream (G_IO_STREAM (comm->con));
 
