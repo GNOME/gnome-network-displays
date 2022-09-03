@@ -43,11 +43,11 @@ typedef enum
 } CcJsonType;
 
 
-// void cc_json_helper_build_node (JsonNode **output, gchar *first_key, ...) G_GNUC_NULL_TERMINATED;
-void cc_json_helper_build_node (JsonNode **output, gchar *first_key, ...);
-void cc_json_helper_build_string (gchar **output, gchar *first_key, ...);
-// void cc_json_helper_build_string (gchar **output, gboolean pretty_print, gchar *first_key, ...);
-void cc_json_helper_node_to_string (gchar **output, JsonNode *node);
+/* G_GNUC_NULL_TERMINATED */
+
+JsonNode * cc_json_helper_build_node (gchar *first_key, ...);
+gchar * cc_json_helper_build_string (/* gboolean pretty_print, */ gchar *first_key, ...);
+gchar * cc_json_helper_node_to_string (JsonNode *node);
 CcReceivedMessageType cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
                                                        JsonReader *json_reader);
 void cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borked);

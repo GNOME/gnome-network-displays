@@ -89,9 +89,8 @@ cc_json_helper_build_internal (JsonBuilder *builder,
     }
 }
 
-void
-cc_json_helper_build_node (JsonNode **output,
-                           gchar     *first_key,
+JsonNode *
+cc_json_helper_build_node (gchar     *first_key,
                            ...)
 {
   va_list var_args;
@@ -103,15 +102,16 @@ cc_json_helper_build_node (JsonNode **output,
   cc_json_helper_build_internal (builder, first_key, var_args);
   json_builder_end_object (builder);
 
-  *output = json_builder_get_root (builder);
+  JsonNode *node = json_builder_get_root (builder);
 
   va_end (var_args);
   g_object_unref (builder);
+
+  return g_steal_pointer (&node);
 }
 
-void
-cc_json_helper_build_string (gchar  **output,
-                            //  gboolean pretty_print,
+gchar *
+cc_json_helper_build_string (/* gboolean pretty_print, */
                              gchar   *first_key,
                              ...)
 {
@@ -129,21 +129,25 @@ cc_json_helper_build_string (gchar  **output,
 
   // json_generator_set_pretty (gen, pretty_print);
   json_generator_set_root (gen, root);
-  *output = json_generator_to_data (gen, NULL);
+  gchar *output = json_generator_to_data (gen, NULL);
 
   va_end (var_args);
   json_node_free (root);
   g_object_unref (gen);
   g_object_unref (builder);
+
+  return g_steal_pointer (&output);
 }
 
-void
-cc_json_helper_node_to_string (gchar **output, JsonNode *node)
+gchar *
+cc_json_helper_node_to_string (JsonNode *node)
 {
   JsonGenerator *gen = json_generator_new ();
   json_generator_set_root (gen, node);
-  *output = json_generator_to_data (gen, NULL);
+  gchar *output = json_generator_to_data (gen, NULL);
   g_object_unref (gen);
+
+  return g_steal_pointer (&output);
 }
 
 CcReceivedMessageType
@@ -152,21 +156,6 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
 {
   const gchar *message_type;
   g_autoptr (GError) error = NULL;
-
-  // if (reader == NULL)
-  //   {
-  //     g_autoptr(JsonParser) parser = NULL;
-
-  //     parser = json_parser_new ();
-  //     if (!json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
-  //       {
-  //         cc_json_helper_dump_message (message);
-  //         g_warning ("CcJsonHelper: Error parsing received message JSON: %s", error->message);
-  //         return -1;
-  //       }
-
-  //     reader = json_reader_new (json_parser_get_root (parser));
-  //   }
 
   gboolean typeExists = json_reader_read_member (reader, "type");
   if (typeExists)
@@ -229,8 +218,7 @@ cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borke
 
   payload_utf8_node = json_parser_get_root (parser);
 
-  gchar *output;
-  cc_json_helper_build_string (&output, //TRUE,
+  gchar *output = cc_json_helper_build_string (
     "source_id", CC_JSON_TYPE_STRING, message->source_id,
     "destination_id", CC_JSON_TYPE_STRING, message->destination_id,
     "namespace", CC_JSON_TYPE_STRING, message->namespace_,
