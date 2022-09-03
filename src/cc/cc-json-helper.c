@@ -23,47 +23,35 @@ cc_json_helper_build_internal (JsonBuilder *builder,
                                gchar       *first_key,
                                va_list	    var_args)
 {
-  gchar *key = first_key;
-
-  while (key)
+  for (gchar *key = first_key; key != NULL; key = va_arg (var_args, gchar *))
     {
       json_builder_set_member_name (builder, key);
       CcJsonType type = va_arg (var_args, CcJsonType);
 
-      if (type < CC_JSON_TYPE_STRING || type > CC_JSON_TYPE_ARRAY_OBJECT)
-        {
-          g_warning ("CcJsonHelper: Incorrect type passed in json contructor: %d", type);
-          return;
-        }
+      g_assert (type >= CC_JSON_TYPE_STRING && type <= CC_JSON_TYPE_ARRAY_OBJECT);
 
       switch (type)
         {
         case CC_JSON_TYPE_STRING:
           json_builder_add_string_value (builder, va_arg (var_args, gchar *));
-          break;
+          continue;
         case CC_JSON_TYPE_INT:
           json_builder_add_int_value (builder, va_arg (var_args, gint));
-          break;
+          continue;
         case CC_JSON_TYPE_DOUBLE:
           json_builder_add_double_value (builder, va_arg (var_args, gdouble));
-          break;
+          continue;
         case CC_JSON_TYPE_BOOLEAN:
           json_builder_add_boolean_value (builder, va_arg (var_args, gboolean));
-          break;
+          continue;
         case CC_JSON_TYPE_NULL: /* no additional arg is required here */
           json_builder_add_null_value (builder);
-          break;
+          continue;
         case CC_JSON_TYPE_OBJECT:
           json_builder_add_value (builder, va_arg (var_args, JsonNode *));
-          break;
-        default:
-          break;
-        }
-
-      if (type < CC_JSON_TYPE_ARRAY_STRING)
-        {
-          key = va_arg (var_args, gchar *);
           continue;
+        default:
+          return;
         }
 
       json_builder_begin_array (builder);
@@ -93,13 +81,11 @@ cc_json_helper_build_internal (JsonBuilder *builder,
               json_builder_add_value (builder, g_array_index (arr, JsonNode *, i));
               break;
             default:
-              break;
+              return;
           }
         }
 
       json_builder_end_array (builder);
-
-      key = va_arg (var_args, gchar *);
     }
 }
 
