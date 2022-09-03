@@ -77,6 +77,7 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
                             GTlsCertificateFlags  errors,
                             gpointer              user_data)
 {
+#if 0
   g_print ("Certificate would have been rejected ( ");
   if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA)
     g_print ("unknown-ca ");
@@ -91,6 +92,7 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
   if (errors & G_TLS_CERTIFICATE_INSECURE)
     g_print ("insecure ");
   g_print (") but accepting anyway.\n");
+#endif
 
   return TRUE;
 }
