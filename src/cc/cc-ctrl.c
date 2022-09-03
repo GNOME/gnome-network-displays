@@ -622,7 +622,9 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
   ctrl->ping_timeout_handle = g_timeout_add_seconds (5, G_SOURCE_FUNC (cc_ctrl_send_ping), ctrl);
 
   // check waiting for every 15 seconds
-  ctrl->waiting_check_timeout_handle = g_timeout_add_seconds (15, G_SOURCE_FUNC (cc_ctrl_check_waiting_for), ctrl);
+  ctrl->waiting_check_timeout_handle = g_timeout_add_seconds (CC_MAX_MESSAGE_TIMEOUT,
+                                                              G_SOURCE_FUNC (cc_ctrl_check_waiting_for),
+                                                              ctrl);
 
   // we can skip some message interchange if the mirroring app is already up
   if (!cc_ctrl_send_get_status (ctrl, CC_DEFAULT_RECEIVER_ID, &error))
