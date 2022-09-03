@@ -19,11 +19,7 @@
 #include "cc-comm.h"
 
 // function decl
-static void cc_comm_listen (CcComm *comm);
-static void cc_comm_read (CcComm  *comm,
-                          gsize    io_bytes,
-                          gboolean read_header);
-
+static void cc_comm_read_header (CcComm *comm);
 
 /* DEBUG HEX DUMP */
 
@@ -116,8 +112,18 @@ cc_comm_message_read_cb (GObject      *source_object,
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
-  g_assert (comm->con);
-  g_assert (G_INPUT_STREAM (source_object) == g_io_stream_get_input_stream (G_IO_STREAM (comm->con)));
+  if (!comm->con)
+    {
+      g_error ("CcComm: Connection error while reading message body");
+      comm->closure->fatal_error_cb (comm->closure, NULL);
+      return;
+    }
+
+  if (G_INPUT_STREAM (source_object) != g_io_stream_get_input_stream (G_IO_STREAM (comm->con)))
+    {
+      g_warning ("CcComm: Old stream encountered while reading message body, ignoring");
+      return;
+    }
 
   if (!success || io_bytes == 0)
     {
@@ -136,7 +142,7 @@ cc_comm_message_read_cb (GObject      *source_object,
   cc_comm_dump_message ("Received message bytes:", comm->message_buffer, io_bytes);
   cc_comm_parse_received_data (comm, comm->message_buffer, io_bytes);
 
-  cc_comm_listen (comm);
+  cc_comm_read_header (comm);
 }
 
 // async callback for header read
@@ -145,9 +151,11 @@ cc_comm_header_read_cb (GObject      *source_object,
                         GAsyncResult *res,
                         gpointer      user_data)
 {
-  CcComm * comm = (CcComm *) user_data;
+  
+  CcComm *comm = (CcComm *) user_data;
 
-  g_autoptr(GError) error = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GInputStream) istream = NULL;
   gboolean success;
   gsize io_bytes;
   guint32 message_size;
@@ -157,8 +165,19 @@ cc_comm_header_read_cb (GObject      *source_object,
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
-  g_assert (comm->con);
-  g_assert (G_INPUT_STREAM (source_object) == g_io_stream_get_input_stream (G_IO_STREAM (comm->con)));
+  if (!comm->con)
+    {
+      g_error ("CcComm: Connection error while reading header");
+      comm->closure->fatal_error_cb (comm->closure, NULL);
+      return;
+    }
+
+  istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
+  if (G_INPUT_STREAM (source_object) != istream)
+    {
+      g_warning ("CcComm: Old stream encountered while reading header, ignoring");
+      return;
+    }
 
   if (!success || io_bytes != 4)
     {
@@ -180,30 +199,9 @@ cc_comm_header_read_cb (GObject      *source_object,
   g_clear_pointer (&comm->header_buffer, g_free);
 
   comm->message_buffer = g_malloc0 (message_size);
-  cc_comm_read (comm, message_size, FALSE);
-}
-
-static void
-cc_comm_read (CcComm *comm, gsize io_bytes, gboolean read_header)
-{
-  GInputStream *istream;
-
-  istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
-
-  if (read_header)
-    {
-      g_input_stream_read_all_async (istream,
-                                     comm->header_buffer,
-                                     io_bytes,
-                                     G_PRIORITY_DEFAULT,
-                                     comm->cancellable,
-                                     cc_comm_header_read_cb,
-                                     comm);
-      return;
-    }
   g_input_stream_read_all_async (istream,
                                  comm->message_buffer,
-                                 io_bytes,
+                                 message_size,
                                  G_PRIORITY_DEFAULT,
                                  comm->cancellable,
                                  cc_comm_message_read_cb,
@@ -212,10 +210,17 @@ cc_comm_read (CcComm *comm, gsize io_bytes, gboolean read_header)
 
 // listen to all incoming messages from Chromecast
 static void
-cc_comm_listen (CcComm *comm)
+cc_comm_read_header (CcComm *comm)
 {
+  GInputStream *istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
   comm->header_buffer = g_malloc0 (4);
-  cc_comm_read (comm, 4, TRUE);
+  g_input_stream_read_all_async (istream,
+                                 comm->header_buffer,
+                                 4,
+                                 G_PRIORITY_DEFAULT,
+                                 comm->cancellable,
+                                 cc_comm_header_read_cb,
+                                 comm);
 }
 
 gboolean
@@ -294,7 +299,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
   g_debug ("CcComm: Connected to %s", remote_address);
 
-  cc_comm_listen (comm);
+  cc_comm_read_header (comm);
 
   return TRUE;
 }
