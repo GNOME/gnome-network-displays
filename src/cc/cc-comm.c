@@ -141,9 +141,6 @@ cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_
 
   g_clear_pointer (&comm->message_buffer, g_free);
 
-  // go for another round while we process this one
-  cc_comm_listen (comm);
-
   comm->closure->message_received_cb (comm->closure, message);
 
   cast__channel__cast_message__free_unpacked (message, NULL);
@@ -212,6 +209,7 @@ cc_comm_message_read_cb (GObject      *source_object,
   // cc_comm_dump_message (comm->message_buffer, io_bytes);
   cc_comm_parse_received_data (comm, comm->message_buffer, io_bytes);
 
+  cc_comm_listen (comm);
 }
 
 // async callback for header read
