@@ -73,7 +73,9 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
                             GTlsCertificateFlags  errors,
                             gpointer              user_data)
 {
-#if 0
+  if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA || errors & G_TLS_CERTIFICATE_BAD_IDENTITY)
+    return TRUE;
+
   g_print ("Certificate would have been rejected ( ");
   if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA)
     g_print ("unknown-ca ");
@@ -88,7 +90,6 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
   if (errors & G_TLS_CERTIFICATE_INSECURE)
     g_print ("insecure ");
   g_print (") but accepting anyway.\n");
-#endif
 
   return TRUE;
 }
@@ -151,7 +152,6 @@ cc_comm_header_read_cb (GObject      *source_object,
                         GAsyncResult *res,
                         gpointer      user_data)
 {
-  
   CcComm *comm = (CcComm *) user_data;
 
   g_autoptr (GError) error = NULL;
