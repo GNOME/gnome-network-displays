@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// #include <time.h>
-
 #include "gnome-network-displays-config.h"
 #include "nd-cc-sink.h"
 #include "cc/cc-client.h"
@@ -25,8 +23,6 @@
 #include "wfd/wfd-server.h"
 #include "cc/cc-ctrl.h"
 #include "cc/cc-common.h"
-
-// TODO: add cancellable everywhere
 
 struct _NdCCSink
 {
@@ -66,7 +62,7 @@ enum {
   PROP_LAST = PROP_DISPLAY_NAME,
 };
 
-// interface related functions
+/* interface related functions */
 static void nd_cc_sink_sink_iface_init (NdSinkIface *iface);
 static NdSink * nd_cc_sink_sink_start_stream (NdSink *sink);
 static void nd_cc_sink_sink_stop_stream (NdSink *sink);
@@ -313,7 +309,7 @@ server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
 static void
 nd_cc_sink_start_webrtc_stream (CcCtrlClosure *closure)
 {
-  // TODO
+  /* TODO */
   g_debug ("Received webrtc stream signal from ctrl");
 }
 
@@ -339,14 +335,14 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   NdCCSink *self = ND_CC_SINK (sink);
 
   g_autoptr(GError) error = NULL;
-  // gchar six_digits[6];
+  /* gchar six_digits[6]; */
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
   g_assert (self->server == NULL);
 
-  // self->state = ND_SINK_STATE_ENSURE_FIREWALL;
-  // g_object_notify (G_OBJECT (self), "state");
+  /* self->state = ND_SINK_STATE_ENSURE_FIREWALL;
+  g_object_notify (G_OBJECT (self), "state"); */
 
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
@@ -368,7 +364,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   self->state = ND_SINK_STATE_STREAMING;
   g_object_notify (G_OBJECT (self), "state");
 
-  // TODO: maybe we don't need this part
+  /* TODO: maybe we don't need this part */
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
 
@@ -399,12 +395,14 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
                            self,
                            G_CONNECT_SWAPPED);
 
-  // self->state = ND_SINK_STATE_WAIT_SOCKET;
-  // g_object_notify (G_OBJECT (self), "state");
+  /*
+  self->state = ND_SINK_STATE_WAIT_SOCKET;
+  g_object_notify (G_OBJECT (self), "state");
 
-  // these were originally here
-  // 1. send connect request
-  // 2. send ping
+  these were originally here
+  1. send connect request
+  2. send ping
+  */
 
   return g_object_ref (sink);
 }
@@ -413,9 +411,6 @@ static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
   cc_ctrl_finish (&self->ctrl, NULL);
-
-  // g_cancellable_cancel (self->cancellable);
-  // g_clear_object (&self->cancellable);
 
   self->cancellable = g_cancellable_new ();
 
@@ -452,7 +447,7 @@ nd_cc_sink_sink_stop_stream (NdSink *sink)
 * NdCCSink public functions
 ******************************************************************/
 
-// XXX: no use for client
+/* XXX: no use for client */
 NdCCSink *
 nd_cc_sink_new (GSocketClient *client,
                 gchar         *name,

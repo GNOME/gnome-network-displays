@@ -22,9 +22,9 @@
 
 G_BEGIN_DECLS
 
-#define CC_MAX_MSG_SIZE (64 * 1024) // 64KB
-#define CC_MAX_MESSAGE_TIMEOUT (20) // 20 seconds
-// this might pose a problem when there are two gnd applications around
+#define CC_MAX_MSG_SIZE (64 * 1024) /* 64KB */
+#define CC_MAX_MESSAGE_TIMEOUT (20) /* 20 seconds */
+/* this might pose a problem when there are two gnd applications around */
 #define CC_DEFAULT_SENDER_ID "sender-gnd"
 #define CC_DEFAULT_RECEIVER_ID "receiver-0"
 #define CC_MIRRORING_APP_ID "0F5096E8"
@@ -36,7 +36,7 @@ G_BEGIN_DECLS
 #define CC_NAMESPACE_MEDIA "urn:x-cast:com.google.cast.media"
 #define CC_NAMESPACE_WEBRTC "urn:x-cast:com.google.cast.webrtc"
 
-// string switch case
+/* string switch case */
 #define cc_switch(x) \
   const gchar *to_cmp = x; \
   do \
@@ -64,25 +64,28 @@ typedef CcReceivedMessageType CcWaitingFor;
 typedef struct _Stream {
   gint index;
 
-  // Default channel count is 1, e.g. for video.
+  /* Default channel count is 1, e.g. for video. */
   gint channels;
   gint rtp_payload_type;
   gint ssrc;
   gint target_delay;
 
-  // AES Key and IV mask format is very strict: a 32 digit hex string that
-  // must be converted to a 16 digit byte array.
-  // uint8_t aes_key[16];
-  // uint8_t aes_iv_mask[16];
+  /*
+   * AES Key and IV mask format is very strict: a 32 digit hex string that
+   * must be converted to a 16 digit byte array.
+   * uint8_t aes_key[16];
+   * uint8_t aes_iv_mask[16];
+   */
   gchar *aes_iv_mask;
   gchar *aes_key;
   gboolean receiver_rtcp_event_log;
   gchar *receiver_rtcp_dscp;
-  // gint rtp_timebase;
+  /* gint rtp_timebase; */
   gchar *rtp_timebase;
 
-  // The codec parameter field honors the format laid out in RFC 6381:
-  // https://datatracker.ietf.org/doc/html/rfc6381.
+  /* The codec parameter field honors the format laid out in RFC 6381:
+   * https://datatracker.ietf.org/doc/html/rfc6381.
+   */
   gchar *codec_parameter;
 } Stream;
 

@@ -18,7 +18,7 @@
 
 #include "cc-comm.h"
 
-// function decl
+/* function decl */
 static void cc_comm_read_header (CcComm *comm);
 
 /* DEBUG HEX DUMP */
@@ -94,9 +94,9 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
   return TRUE;
 }
 
-// LISTENER
+/* LISTENER */
 
-// async callback for message read
+/* async callback for message read */
 static void
 cc_comm_message_read_cb (GObject      *source_object,
                          GAsyncResult *res,
@@ -149,7 +149,7 @@ cc_comm_message_read_cb (GObject      *source_object,
   cc_comm_read_header (comm);
 }
 
-// async callback for header read
+/* async callback for header read */
 static void
 cc_comm_header_read_cb (GObject      *source_object,
                         GAsyncResult *res,
@@ -197,7 +197,7 @@ cc_comm_header_read_cb (GObject      *source_object,
       return;
     }
 
-  // if everything is well, read all `io_bytes`
+  /* if everything is well, read all `io_bytes` */
   message_size = GINT32_FROM_BE (*(guint32 *) comm->header_buffer);
   g_debug ("CcComm: Message size: %d", message_size);
 
@@ -213,7 +213,7 @@ cc_comm_header_read_cb (GObject      *source_object,
                                  comm);
 }
 
-// listen to all incoming messages from Chromecast
+/* listen to all incoming messages from Chromecast */
 static void
 cc_comm_read_header (CcComm *comm)
 {
@@ -349,7 +349,7 @@ cc_comm_tls_send (CcComm  * comm,
 
   ostream = g_io_stream_get_output_stream (G_IO_STREAM (comm->con));
 
-  // start sending data synchronously
+  /* start sending data synchronously */
   while (size > 0)
     {
       io_bytes = g_output_stream_write (ostream, message, size, comm->cancellable, error);
@@ -448,7 +448,7 @@ cc_comm_send_request (CcComm       *comm,
 
   switch (message_type)
     {
-    // CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_3 allows for binary payloads over utf8
+    /* CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_3 allows for binary payloads over utf8 */
     case CC_MESSAGE_TYPE_AUTH:
       ProtobufCBinaryData binary_payload;
       binary_payload.data = NULL;

@@ -127,7 +127,7 @@ cc_json_helper_build_string (/* gboolean pretty_print, */
   JsonNode *root = json_builder_get_root (builder);
   JsonGenerator *gen = json_generator_new ();
 
-  // json_generator_set_pretty (gen, pretty_print);
+  /* json_generator_set_pretty (gen, pretty_print); */
   json_generator_set_root (gen, root);
   gchar *output = json_generator_to_data (gen, NULL);
 
@@ -192,7 +192,7 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
         return CC_RWAIT_TYPE_PONG;
       cc_case ("CLOSE") 
         return CC_RWAIT_TYPE_CLOSE;
-      // default
+      /* default */
         return CC_RWAIT_TYPE_UNKNOWN;
     } cc_end
 }
