@@ -111,7 +111,6 @@ cc_comm_message_read_cb (GObject      *source_object,
 
   success = g_input_stream_read_all_finish (G_INPUT_STREAM (source_object), res, &io_bytes, &error);
 
-  // If we cancelled, just return immediately.
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
@@ -153,7 +152,6 @@ cc_comm_header_read_cb (GObject      *source_object,
 
   success = g_input_stream_read_all_finish (G_INPUT_STREAM (source_object), res, &io_bytes, &error);
 
-  // If we cancelled, just return immediately.
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
@@ -267,9 +265,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
       if (g_socket_connect (socket, address, comm->cancellable, &err))
         break;
 
-      // g_message ("Connection to %s failed: %s, trying next", socket_address_to_string (address), err->message);
       g_clear_error (&err);
-
       g_object_unref (address);
     }
   g_object_unref (enumerator);
@@ -288,7 +284,6 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
   comm->con = G_IO_STREAM (tls_conn);
 
-  // see what should be done about cancellable
   if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn), comm->cancellable, error))
     {
       g_warning ("CcComm: Failed to handshake: %s", (*error)->message);
@@ -297,7 +292,6 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
   g_debug ("CcComm: Connected to %s", remote_address);
 
-  // start listening to all incoming messages
   cc_comm_listen (comm);
 
   return TRUE;
@@ -364,7 +358,6 @@ cc_comm_tls_send (CcComm  * comm,
   return TRUE;
 }
 
-// builds message based on available types
 static gboolean
 cc_comm_build_message (Cast__Channel__CastMessage             *message,
                        gchar                                  *sender_id,
