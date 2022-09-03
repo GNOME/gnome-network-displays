@@ -237,19 +237,16 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   GSocketConnectable * connectable;
   GIOStream *tls_conn;
   GSocketAddressEnumerator * enumerator;
-  GSocketAddress * address = NULL;
-  g_autoptr(GError) err = NULL;
 
   /* we must be disconnected */
   g_assert (comm->con == NULL);
 
   socket_type = G_SOCKET_TYPE_STREAM;
   socket_family = G_SOCKET_FAMILY_IPV4;
-  socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, &err);
+  socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, error);
   if (socket == NULL)
     {
-      g_warning ("CcComm: Failed to create socket: %s", err->message);
-      g_propagate_error (error, g_steal_pointer (&err));
+      g_error ("CcComm: Failed to create socket");
       return FALSE;
     }
 
@@ -258,24 +255,23 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   connectable = g_network_address_parse (remote_address, 8009, error);
   if (connectable == NULL)
     {
-      g_warning ("CcComm: Failed to create connectable: %s", (*error)->message);
+      g_error ("CcComm: Failed to create connectable");
       return FALSE;
     }
 
   enumerator = g_socket_connectable_enumerate (connectable);
   while (TRUE)
     {
-      address = g_socket_address_enumerator_next (enumerator, comm->cancellable, error);
+      GSocketAddress * address = g_socket_address_enumerator_next (enumerator, comm->cancellable, error);
       if (address == NULL)
         {
-          g_warning ("CcComm: Failed to create address: %s", (*error)->message);
+          g_error ("CcComm: Failed to create address");
           return FALSE;
         }
 
-      if (g_socket_connect (socket, address, comm->cancellable, &err))
+      if (g_socket_connect (socket, address, comm->cancellable, error))
         break;
 
-      g_clear_error (&err);
       g_object_unref (address);
     }
   g_object_unref (enumerator);
@@ -285,7 +281,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   tls_conn = g_tls_client_connection_new (comm->con, connectable, error);
   if (tls_conn == NULL)
     {
-      g_warning ("CcComm: Failed to create TLS connection: %s", (*error)->message);
+      g_warning ("CcComm: Failed to create TLS connection:");
       return FALSE;
     }
 
@@ -296,7 +292,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
   if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn), comm->cancellable, error))
     {
-      g_warning ("CcComm: Failed to handshake: %s", (*error)->message);
+      g_warning ("CcComm: Failed to handshake");
       return FALSE;
     }
 
