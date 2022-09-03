@@ -161,7 +161,6 @@ cc_comm_header_read_cb (GObject      *source_object,
     return;
 
   g_autoptr (GError) error = NULL;
-  g_autoptr (GInputStream) istream = NULL;
   gboolean success;
   gsize io_bytes;
   guint32 message_size;
@@ -178,7 +177,7 @@ cc_comm_header_read_cb (GObject      *source_object,
       return;
     }
 
-  istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
+  GInputStream *istream = istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
   if (G_INPUT_STREAM (source_object) != istream)
     {
       g_warning ("CcComm: Old stream encountered while reading header, ignoring");
