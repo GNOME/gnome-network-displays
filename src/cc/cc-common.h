@@ -47,16 +47,16 @@ G_BEGIN_DECLS
 
 
 typedef enum {
-  CC_RWAIT_TYPE_NONE                 = 0b0,
-  CC_RWAIT_TYPE_GET_APP_AVAILABILITY = 0b1 << 0, /* key is `responseType` */
-  CC_RWAIT_TYPE_LAUNCH_ERROR         = 0b1 << 1, /* all other keys are `type` */
-  CC_RWAIT_TYPE_ANSWER               = 0b1 << 2,
-  CC_RWAIT_TYPE_RECEIVER_STATUS      = 0b1 << 3,
-  CC_RWAIT_TYPE_MEDIA_STATUS         = 0b1 << 4,
-  CC_RWAIT_TYPE_PING                 = 0b1 << 5,
-  CC_RWAIT_TYPE_PONG                 = 0b1 << 6,
-  CC_RWAIT_TYPE_CLOSE                = 0b1 << 7,
-  CC_RWAIT_TYPE_UNKNOWN              = 0b1 << 8,
+  CC_RWAIT_TYPE_NONE                 = 0,
+  CC_RWAIT_TYPE_GET_APP_AVAILABILITY = 1 << 0, /* key is `responseType` */
+  CC_RWAIT_TYPE_LAUNCH_ERROR         = 1 << 1, /* all other keys are `type` */
+  CC_RWAIT_TYPE_ANSWER               = 1 << 2,
+  CC_RWAIT_TYPE_RECEIVER_STATUS      = 1 << 3,
+  CC_RWAIT_TYPE_MEDIA_STATUS         = 1 << 4,
+  CC_RWAIT_TYPE_PING                 = 1 << 5,
+  CC_RWAIT_TYPE_PONG                 = 1 << 6,
+  CC_RWAIT_TYPE_CLOSE                = 1 << 7,
+  CC_RWAIT_TYPE_UNKNOWN              = 1 << 8,
 } CcReceivedMessageType;
 
 typedef CcReceivedMessageType CcWaitingFor;
