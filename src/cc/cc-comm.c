@@ -246,10 +246,11 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
   socket_type = G_SOCKET_TYPE_STREAM;
   socket_family = G_SOCKET_FAMILY_IPV4;
-  socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, error);
+  socket = g_socket_new (socket_family, socket_type, G_SOCKET_PROTOCOL_DEFAULT, &err);
   if (socket == NULL)
     {
-      g_warning ("CcComm: Failed to create socket: %s", (*error)->message);
+      g_warning ("CcComm: Failed to create socket: %s", err->message);
+      g_propagate_error (error, g_steal_pointer (&err));
       return FALSE;
     }
 
