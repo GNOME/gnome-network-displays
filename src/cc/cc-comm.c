@@ -123,11 +123,11 @@ cc_comm_message_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading message from stream: %s", error->message);
-          cc_comm_listen (comm);
+          comm->closure->fatal_error_cb (comm->closure, &error);
           return;
         }
       g_error ("CcComm: Error reading message from stream.");
-      cc_comm_listen (comm);
+      comm->closure->fatal_error_cb (comm->closure, NULL);
       return;
     }
 
@@ -175,11 +175,11 @@ cc_comm_header_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading header from stream: %s", error->message);
-          cc_comm_listen (comm);
+          comm->closure->fatal_error_cb (comm->closure, &error);
           return;
         }
       g_error ("CcComm: Error reading header from stream.");
-      cc_comm_listen (comm);
+      comm->closure->fatal_error_cb (comm->closure, NULL);
       return;
     }
 
