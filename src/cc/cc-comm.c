@@ -241,9 +241,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   GSocketAddress * address = NULL;
   g_autoptr(GError) err = NULL;
 
-  /* It is a programming error if ->con is not NULL at this point
-   * i.e. when disconnecting con needs to be set to NULL!
-   */
+  /* we must be disconnected */
   g_assert (comm->con == NULL);
 
   socket_type = G_SOCKET_TYPE_STREAM;
