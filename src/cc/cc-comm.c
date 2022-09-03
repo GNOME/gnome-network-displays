@@ -381,7 +381,6 @@ cc_comm_build_message (Cast__Channel__CastMessage             *message,
   cast__channel__cast_message__init (message);
 
   message->protocol_version = CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0;
-  // pray we don't free these pointers before being used
   message->source_id = sender_id;
   message->destination_id = destination_id;
 
