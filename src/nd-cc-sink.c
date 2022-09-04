@@ -414,6 +414,7 @@ static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
   cc_ctrl_finish (&self->ctrl);
+  self->ctrl.state = CC_CTRL_STATE_DISCONNECTED;
 
   self->cancellable = g_cancellable_new ();
 

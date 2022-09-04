@@ -672,6 +672,9 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
 void
 cc_ctrl_finish (CcCtrl *ctrl)
 {
+  if (ctrl->state == CC_CTRL_STATE_DISCONNECTED)
+    return;
+
   g_clear_handle_id (&ctrl->ping_timeout_handle, g_source_remove);
   g_clear_handle_id (&ctrl->waiting_check_timeout_handle, g_source_remove);
 
