@@ -250,8 +250,6 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
       return FALSE;
     }
 
-  g_socket_set_timeout (socket, CC_MAX_MESSAGE_TIMEOUT);
-
   connectable = g_network_address_parse (remote_address, 8009, error);
   if (connectable == NULL)
     {
