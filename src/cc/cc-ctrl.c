@@ -19,6 +19,9 @@
 #include "cc-ctrl.h"
 #include "cc-comm.h"
 
+/* FUNCTION DECLS */
+static void cc_ctrl_fatal_error (CcCtrl *ctrl);
+
 /* WAITING FOR */
 
 static void
@@ -42,22 +45,25 @@ cc_ctrl_is_waiting_for (CcCtrl *ctrl, CcWaitingFor waiting_for)
 /* SEND HELPER FUNCTIONS */
 
 static gboolean
-cc_ctrl_send_auth (CcCtrl *ctrl, GError **error)
+cc_ctrl_send_auth (CcCtrl *ctrl)
 {
-  g_debug ("CcCtrl: Sending auth");
-
-  return cc_comm_send_request (&ctrl->comm,
+  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                CC_DEFAULT_RECEIVER_ID,
                                CC_MESSAGE_TYPE_AUTH,
-                               NULL,
-                               error);
+                               NULL);
+
+  if (!send_ok)
+    {
+      g_error ("CcCtrl: Failed to send auth message");
+      cc_ctrl_fatal_error (ctrl);
+    }
+  
+  return send_ok;
 }
 
 static gboolean
-cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id, GError **error)
+cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id)
 {
-  g_debug ("CcCtrl: Sending CONNECT");
-
   JsonNode *origin = cc_json_helper_build_node (NULL);
   JsonNode *senderInfo = cc_json_helper_build_node (
     "sdkType", CC_JSON_TYPE_INT, 2,
@@ -75,34 +81,44 @@ cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id, GError **error)
     "senderInfo", CC_JSON_TYPE_OBJECT, senderInfo,
     NULL);
 
-  return cc_comm_send_request (&ctrl->comm,
+  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                destination_id,
                                CC_MESSAGE_TYPE_CONNECT,
-                               json,
-                               error);
+                               json);
+
+  if (!send_ok)
+    {
+      g_error ("CcCtrl: Failed to send connect message");
+      cc_ctrl_fatal_error (ctrl);
+    }
+
+  return send_ok;
 }
 
 static gboolean
-cc_ctrl_send_disconnect (CcCtrl *ctrl, gchar *destination_id, GError **error)
+cc_ctrl_send_disconnect (CcCtrl *ctrl, gchar *destination_id)
 {
-  g_debug ("CcCtrl: Sending CLOSE");
-
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "CLOSE",
     NULL);
 
-  return cc_comm_send_request (&ctrl->comm,
+  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                destination_id,
                                CC_MESSAGE_TYPE_DISCONNECT,
-                               json,
-                               error);
+                               json);
+
+  if (!send_ok)
+    {
+      g_error ("CcCtrl: Failed to send disconnect message");
+      cc_ctrl_fatal_error (ctrl);
+    }
+
+  return send_ok;
 }
 
 static gboolean
-cc_ctrl_send_get_status (CcCtrl *ctrl, gchar *destination_id, GError **error)
+cc_ctrl_send_get_status (CcCtrl *ctrl, gchar *destination_id)
 {
-  g_debug ("CcCtrl: Sending GET_STATUS");
-
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "GET_STATUS",
     "requestId", CC_JSON_TYPE_INT, ctrl->request_id++,
@@ -111,19 +127,22 @@ cc_ctrl_send_get_status (CcCtrl *ctrl, gchar *destination_id, GError **error)
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                destination_id,
                                CC_MESSAGE_TYPE_RECEIVER,
-                               json,
-                               error);
+                               json);
+
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
+  else
+    {
+      g_error ("CcCtrl: Failed to send get status message");
+      cc_ctrl_fatal_error (ctrl);
+    }
 
   return send_ok;
 }
 
 static gboolean
-cc_ctrl_send_get_app_availability (CcCtrl *ctrl, gchar *destination_id, gchar *appId, GError **error)
+cc_ctrl_send_get_app_availability (CcCtrl *ctrl, gchar *destination_id, gchar *appId)
 {
-  g_debug ("CcCtrl: Sending GET_APP_AVAILABILITY");
-
   g_autoptr (GArray) appIds = g_array_new (FALSE, FALSE, sizeof (gchar *));
   g_array_append_val (appIds, CC_MIRRORING_APP_ID);
 
@@ -136,19 +155,22 @@ cc_ctrl_send_get_app_availability (CcCtrl *ctrl, gchar *destination_id, gchar *a
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                destination_id,
                                CC_MESSAGE_TYPE_RECEIVER,
-                               json,
-                               error);
+                               json);
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_GET_APP_AVAILABILITY);
+  else
+    {
+      g_error ("CcCtrl: Failed to send get app availability message");
+      cc_ctrl_fatal_error (ctrl);
+    }
+
   return send_ok;
 }
 
 static gboolean
-cc_ctrl_send_launch_app (CcCtrl *ctrl, gchar *destination_id, gchar *appId, GError **error)
+cc_ctrl_send_launch_app (CcCtrl *ctrl, gchar *destination_id, gchar *appId)
 {
-  g_debug ("CcCtrl: Sending LAUNCH");
-
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "LAUNCH",
     "launguage", CC_JSON_TYPE_STRING, "en-US",
@@ -159,19 +181,22 @@ cc_ctrl_send_launch_app (CcCtrl *ctrl, gchar *destination_id, gchar *appId, GErr
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                destination_id,
                                CC_MESSAGE_TYPE_RECEIVER,
-                               json,
-                               error);
+                               json);
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
+  else
+    {
+      g_error ("CcCtrl: Failed to send launch app message");
+      cc_ctrl_fatal_error (ctrl);
+    }
+
   return send_ok;
 }
 
 static gboolean
-cc_ctrl_send_close_app (CcCtrl *ctrl, gchar *sessionId, GError **error)
+cc_ctrl_send_close_app (CcCtrl *ctrl, gchar *sessionId)
 {
-  g_debug ("CcCtrl: Sending STOP");
-
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "STOP",
     "sessionId", CC_JSON_TYPE_STRING, sessionId,
@@ -181,11 +206,16 @@ cc_ctrl_send_close_app (CcCtrl *ctrl, gchar *sessionId, GError **error)
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                sessionId,
                                CC_MESSAGE_TYPE_RECEIVER,
-                               json,
-                               error);
+                               json);
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
+  else
+    {
+      g_error ("CcCtrl: Failed to send close app message");
+      cc_ctrl_fatal_error (ctrl);
+    }
+
   return send_ok;
 }
 
@@ -277,11 +307,16 @@ cc_ctrl_send_offer (CcCtrl *ctrl, gchar *destination_id, GError **error)
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
                                destination_id,
                                CC_MESSAGE_TYPE_WEBRTC,
-                               cc_json_helper_node_to_string (root),
-                               error);
+                               cc_json_helper_node_to_string (root));
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_ANSWER);
+  else
+    {
+      g_error ("CcCtrl: Failed to send OFFER message");
+      cc_ctrl_fatal_error (ctrl);
+    }
+
   return send_ok;
 }
 
@@ -294,8 +329,8 @@ cc_ctrl_check_waiting_for (CcCtrl *ctrl)
   if (ctrl->waiting_for == CC_RWAIT_TYPE_NONE)
     return G_SOURCE_CONTINUE;
 
-  g_warning ("CcCtrl: Timed out waiting for %d", ctrl->waiting_for);
-  ctrl->closure->end_stream (ctrl->closure);
+  g_error ("CcCtrl: Timed out waiting for %d", ctrl->waiting_for);
+  cc_ctrl_fatal_error (ctrl);
 
   return G_SOURCE_REMOVE;
 }
@@ -310,15 +345,9 @@ cc_ctrl_send_ping (CcCtrl *ctrl)
   if (!cc_comm_send_request (&ctrl->comm,
                              CC_DEFAULT_RECEIVER_ID,
                              CC_MESSAGE_TYPE_PING,
-                             NULL,
-                             &error))
+                             NULL))
     {
-      if (error != NULL)
-        {
-          g_warning ("CcCtrl: Failed to send ping message: %s", error->message);
-          return G_SOURCE_REMOVE;
-        }
-      g_warning ("CcCtrl: Failed to send ping message");
+      g_error ("CcCtrl: Failed to send ping message");
       return G_SOURCE_REMOVE;
     }
 
@@ -332,16 +361,22 @@ cc_ctrl_send_offer_cb (CcCtrl *ctrl)
 {
   g_autoptr (GError) error = NULL;
   if (!cc_ctrl_send_offer (ctrl, ctrl->session_id, &error))
-    g_warning ("CcCtrl: Failed to send OFFER to the mirroring app: %s", error->message);
+    {
+      if (error)
+        g_warning ("CcCtrl: Failed to send OFFER to the mirroring app: %s", error->message);
+      else
+        g_warning ("CcCtrl: Failed to send OFFER to the mirroring app");
+    }
   return G_SOURCE_REMOVE;
 }
 
 static void
-cc_ctrl_mirroring_app_init (CcCtrl *ctrl, GError **error)
+cc_ctrl_mirroring_app_init (CcCtrl *ctrl)
 {
-  if (!cc_ctrl_send_connect (ctrl, ctrl->session_id, error))
+  g_autoptr (GError) err = NULL;
+  if (!cc_ctrl_send_connect (ctrl, ctrl->session_id))
     {
-      g_warning ("CcCtrl: Failed to send CONNECT to the mirroring app: %s", (*error)->message);
+      g_error ("CcCtrl: Failed to send CONNECT to the mirroring app");
       return;
     }
 
@@ -364,16 +399,16 @@ cc_ctrl_handle_get_app_availability (CcCtrl *ctrl, JsonReader *reader)
           if (g_strcmp0 (available, "APP_AVAILABLE"))
             {
               /* launch the app now */
-              if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID, &error))
+              if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID))
                 {
-                  g_warning ("CcCtrl: Failed to launch the app: %s", error->message);
+                  g_error ("CcCtrl: Failed to launch the app");
                   return;
                 }
             }
           
           /* since the app is not available, stop attempts */
           g_warning ("CcCtrl: %s app is not available, quiting", CC_MIRRORING_APP_ID);
-          ctrl->closure->end_stream (ctrl->closure);
+          cc_ctrl_fatal_error (ctrl);
         }
     }
 }
@@ -407,9 +442,9 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
       if (ctrl->state >= CC_CTRL_STATE_APP_OPEN) /* app closed unexpectedly */
         g_debug ("CcCtrl: App closed unexpectedly");
 
-      if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID, &error))
+      if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID))
         {
-          g_warning ("CcCtrl: Failed to launch the app: %s", error->message);
+          g_error ("CcCtrl: Failed to launch the app");
           return;
         }
 
@@ -441,14 +476,14 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
                   g_clear_pointer (&ctrl->session_id, g_free);
                   ctrl->session_id = g_strdup (sessionId);
 
-                  cc_ctrl_mirroring_app_init (ctrl, &error);
+                  cc_ctrl_mirroring_app_init (ctrl);
                   return;
                 }
 
               /* some other app is open, check if `CC_MIRRORING_APP_ID` is available */
-              if (!cc_ctrl_send_get_app_availability (ctrl, CC_MIRRORING_APP_ID, CC_DEFAULT_RECEIVER_ID, &error))
+              if (!cc_ctrl_send_get_app_availability (ctrl, CC_MIRRORING_APP_ID, CC_DEFAULT_RECEIVER_ID))
                 {
-                  g_warning ("CcCtrl: Failed to send GET_APP_AVAILABILITY: %s", error->message);
+                  g_error ("CcCtrl: Failed to send GET_APP_AVAILABILITY");
                   return;
                 }
             }
@@ -475,16 +510,14 @@ cc_ctrl_handle_close (CcCtrl *ctrl, Cast__Channel__CastMessage *message)
   if (g_strcmp0 (message->source_id, CC_DEFAULT_RECEIVER_ID) == 0)
     {
       g_warning ("CcCtrl: Receiver closed the connection");
-      ctrl->closure->end_stream (ctrl->closure);
+      cc_ctrl_fatal_error (ctrl);
       return;
     }
 
   /* the app closed */
   g_debug ("CcCtrl: App sent a close message, launching again");
-  if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID, &error))
-    {
-      g_warning ("CcCtrl: Failed to launch app");
-    }
+  if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID))
+    g_error ("CcCtrl: Failed to launch app");
 }
 
 void
@@ -526,7 +559,7 @@ cc_ctrl_handle_received_msg (CcCommClosure *closure,
       break;
     case CC_RWAIT_TYPE_LAUNCH_ERROR:
       g_warning ("CcCtrl: Failed to launch app");
-      ctrl->closure->end_stream (ctrl->closure);
+      cc_ctrl_fatal_error (ctrl);
       break;
     case CC_RWAIT_TYPE_ANSWER:
       cc_ctrl_unset_waiting_for (ctrl, CC_RWAIT_TYPE_ANSWER);
@@ -548,17 +581,32 @@ cc_ctrl_handle_received_msg (CcCommClosure *closure,
     case CC_RWAIT_TYPE_UNKNOWN:
     default:
       g_warning ("CcCtrl: Unknown message type");
-      ctrl->closure->end_stream (ctrl->closure);
+      cc_ctrl_fatal_error (ctrl);
       break;
     }
 }
 
+static void
+cc_ctrl_fatal_error (CcCtrl *ctrl)
+{
+  if (ctrl->state == CC_CTRL_STATE_ERROR) /* function has already been called */
+    return;
+
+  ctrl->closure->end_stream (ctrl->closure);
+  ctrl->state = CC_CTRL_STATE_ERROR;
+}
+
 void
-cc_ctrl_fatal_error (CcCommClosure *closure, GError **error)
+cc_ctrl_fatal_error_closure (CcCommClosure *closure, GError *error)
 {
   /* XXX: add error arg in end_stream and display an error message to user */
+  if (error)
+    g_warning ("CcCtrl: Fatal error: %s", error->message);
+  else
+    g_error ("CcCtrl: Fatal error");
+
   CcCtrl *ctrl = (CcCtrl *) closure->userdata;
-  ctrl->closure->end_stream (ctrl->closure);
+  cc_ctrl_fatal_error (ctrl);
 }
 
 CcCommClosure *
@@ -567,7 +615,7 @@ cc_ctrl_get_callback_closure (CcCtrl *ctrl)
   CcCommClosure *closure = (CcCommClosure *) g_malloc (sizeof (CcCommClosure));
   closure->userdata = ctrl;
   closure->message_received_cb = cc_ctrl_handle_received_msg;
-  closure->fatal_error_cb = cc_ctrl_fatal_error;
+  closure->fatal_error_cb = cc_ctrl_fatal_error_closure;
   return closure;
 }
 
@@ -584,22 +632,22 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
 
   if (!cc_comm_make_connection (&ctrl->comm, remote_address, &error))
     {
-      g_warning ("CcCtrl: Failed to make connection to %s: %s", remote_address, error->message);
+      if (error != NULL)
+        g_warning ("CcCtrl: Failed to make connection to %s: %s", remote_address, error->message);
+      else
+        g_warning ("CcCtrl: Failed to make connection to %s", remote_address);
       return FALSE;
     }
 
-  if (!cc_ctrl_send_auth (ctrl, &error))
+  if (!cc_ctrl_send_auth (ctrl))
+    return FALSE;
+
+  if (!cc_ctrl_send_connect (ctrl, CC_DEFAULT_RECEIVER_ID))
     {
-      g_warning ("CcCtrl: Failed to send auth: %s", error->message);
+      g_warning ("CcCtrl: Failed to send connect");
       return FALSE;
     }
 
-  if (!cc_ctrl_send_connect (ctrl, CC_DEFAULT_RECEIVER_ID, &error))
-    {
-      g_warning ("CcCtrl: Failed to send connect: %s", error->message);
-      return FALSE;
-    }
-  
   /* since tls_send is a synchronous call */
   ctrl->state = CC_CTRL_STATE_CONNECTED;
   
@@ -612,9 +660,9 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
                                                               ctrl);
 
   /* we can skip some message interchange if the mirroring app is already up */
-  if (!cc_ctrl_send_get_status (ctrl, CC_DEFAULT_RECEIVER_ID, &error))
+  if (!cc_ctrl_send_get_status (ctrl, CC_DEFAULT_RECEIVER_ID))
     {
-      g_warning ("CcCtrl: Failed to send get status: %s", error->message);
+      g_error ("CcCtrl: Failed to send get status");
       return FALSE;
     }
 
@@ -622,32 +670,24 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
 }
 
 void
-cc_ctrl_finish (CcCtrl *ctrl, GError **r_error)
+cc_ctrl_finish (CcCtrl *ctrl)
 {
-  g_autoptr(GError) err = NULL;
-
   g_clear_handle_id (&ctrl->ping_timeout_handle, g_source_remove);
   g_clear_handle_id (&ctrl->waiting_check_timeout_handle, g_source_remove);
 
   /* close app if open */
   if (ctrl->state >= CC_CTRL_STATE_APP_OPEN)
     {
-      if (!cc_ctrl_send_disconnect (ctrl, CC_DEFAULT_RECEIVER_ID, &err))
-        {
-          g_warning ("CcCtrl: Error closing virtual connection to app: %s", err->message);
-          g_clear_error (&err);
-        }
-      if (!cc_ctrl_send_close_app (ctrl, ctrl->session_id, &err))
-        {
-          g_warning ("CcCtrl: Error closing app: %s", err->message);
-          g_clear_error (&err);
-        }
+      if (!cc_ctrl_send_disconnect (ctrl, CC_DEFAULT_RECEIVER_ID))
+        g_error ("CcCtrl: Error closing virtual connection to app");
+      if (!cc_ctrl_send_close_app (ctrl, ctrl->session_id))
+        g_error ("CcCtrl: Error closing app");
       g_clear_pointer (&ctrl->session_id, g_free);
     }
 
   /* close the virtual connection */
-  if (!cc_ctrl_send_disconnect (ctrl, CC_DEFAULT_RECEIVER_ID, NULL))
-    g_warning ("CcCtrl: Error closing virtual connection: %s", err->message);
+  if (!cc_ctrl_send_disconnect (ctrl, CC_DEFAULT_RECEIVER_ID))
+    g_error ("CcCtrl: Error closing virtual connection");
 
   /* free up the resources */
   g_clear_pointer (&ctrl->comm.closure, g_free);

@@ -354,8 +354,11 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   if (!cc_ctrl_connection_init (&self->ctrl, self->remote_address))
     {
       g_warning ("NdCCSink: Failed to init cc-ctrl");
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
+      if (self->state != ND_SINK_STATE_ERROR)
+        {
+          self->state = ND_SINK_STATE_ERROR;
+          g_object_notify (G_OBJECT (self), "state");
+        }
       g_clear_object (&self->server);
 
       return NULL;
@@ -410,7 +413,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
-  cc_ctrl_finish (&self->ctrl, NULL);
+  cc_ctrl_finish (&self->ctrl);
 
   self->cancellable = g_cancellable_new ();
 

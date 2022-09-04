@@ -31,7 +31,7 @@ struct _CcCommClosure
   gpointer userdata;
   void (*message_received_cb) (struct _CcCommClosure *closure,
                                Cast__Channel__CastMessage *message);
-  void (*fatal_error_cb) (struct _CcCommClosure *closure, GError **error);
+  void (*fatal_error_cb) (struct _CcCommClosure *closure, GError *error);
 };
 
 typedef struct _CcCommClosure CcCommClosure;
@@ -71,7 +71,6 @@ void cc_comm_close_connection (CcComm *comm);
 gboolean cc_comm_send_request (CcComm       *comm,
                                gchar        *destination_id,
                                CcMessageType message_type,
-                               gchar        *utf8_payload,
-                               GError      **error);
+                               gchar        *utf8_payload);
 
 G_END_DECLS

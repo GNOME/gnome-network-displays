@@ -134,7 +134,7 @@ cc_comm_message_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading message from stream: %s", error->message);
-          comm->closure->fatal_error_cb (comm->closure, &error);
+          comm->closure->fatal_error_cb (comm->closure, g_steal_pointer (&error));
           return;
         }
       g_error ("CcComm: Error reading message from stream.");
@@ -189,7 +189,7 @@ cc_comm_header_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading header from stream: %s", error->message);
-          comm->closure->fatal_error_cb (comm->closure, &error);
+          comm->closure->fatal_error_cb (comm->closure, g_steal_pointer (&error));
           return;
         }
       g_error ("CcComm: Error reading header from stream.");
@@ -307,12 +307,10 @@ void
 cc_comm_close_connection (CcComm *comm)
 {
   g_autoptr (GError) error = NULL;
-  gboolean close_ok;
 
   if (comm->con != NULL)
     {
-      close_ok = g_io_stream_close (G_IO_STREAM (comm->con), NULL, &error);
-      if (!close_ok)
+      if (!g_io_stream_close (G_IO_STREAM (comm->con), NULL, &error))
         {
           if (error != NULL)
             g_warning ("CcComm: Error closing communication client connection: %s", error->message);
@@ -328,16 +326,19 @@ cc_comm_close_connection (CcComm *comm)
 static gboolean
 cc_comm_tls_send (CcComm  * comm,
                   uint8_t * message,
-                  gssize    size,
-                  GError  **error)
+                  gssize    size)
 {
   GOutputStream *ostream;
   gssize io_bytes;
+  g_autoptr (GError) err = NULL;
+
+  if (g_cancellable_is_cancelled (comm->cancellable))
+    return FALSE;
 
   if (!G_IS_TLS_CONNECTION (comm->con))
     {
-      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_CONNECTED,
-                           "Connection has not been established");
+      g_error ("Connection has not been established");
+      comm->closure->fatal_error_cb (comm->closure, NULL);
       return FALSE;
     }
 
@@ -348,13 +349,12 @@ cc_comm_tls_send (CcComm  * comm,
   /* start sending data synchronously */
   while (size > 0)
     {
-      io_bytes = g_output_stream_write (ostream, message, size, comm->cancellable, error);
+      io_bytes = g_output_stream_write (ostream, message, size, comm->cancellable, &err);
 
       if (io_bytes <= 0)
         {
-          g_warning ("CcComm: Failed to write: %s", (*error)->message);
-          comm->closure->fatal_error_cb (comm->closure, error);
-          g_clear_error (error);
+          g_warning ("CcComm: Failed to write: %s", err->message);
+          comm->closure->fatal_error_cb (comm->closure, g_steal_pointer (&err));
           return FALSE;
         }
 
@@ -435,8 +435,7 @@ gboolean
 cc_comm_send_request (CcComm       *comm,
                       gchar        *destination_id,
                       CcMessageType message_type,
-                      gchar        *utf8_payload,
-                      GError      **error)
+                      gchar        *utf8_payload)
 {
   Cast__Channel__CastMessage message;
   guint32 packed_size = 0;
@@ -458,7 +457,7 @@ cc_comm_send_request (CcComm       *comm,
                                   &binary_payload,
                                   NULL))
         {
-          *error = g_error_new (1, 1, "Auth message building failed!");
+          g_error ("Auth message building failed!");
           return FALSE;
         }
       break;
@@ -472,10 +471,9 @@ cc_comm_send_request (CcComm       *comm,
                                   NULL,
                                   utf8_payload))
         {
-          *error = g_error_new (1, 1, "Message building failed for message type: %d", message_type);
+          g_error ("Message building failed for message type: %d", message_type);
           return FALSE;
         }
-      break;
     }
 
   packed_size = cast__channel__cast_message__get_packed_size (&message);
@@ -496,6 +494,5 @@ cc_comm_send_request (CcComm       *comm,
 
   return cc_comm_tls_send (comm,
                            sock_buffer,
-                           packed_size + 4,
-                           error);
+                           packed_size + 4);
 }
