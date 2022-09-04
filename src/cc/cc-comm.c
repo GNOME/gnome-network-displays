@@ -160,7 +160,7 @@ cc_comm_header_read_cb (GObject      *source_object,
   if (g_cancellable_is_cancelled (comm->cancellable))
     return;
 
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
   gboolean success;
   gsize io_bytes;
   guint32 message_size;
@@ -178,6 +178,7 @@ cc_comm_header_read_cb (GObject      *source_object,
     }
 
   GInputStream *istream = istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
+
   if (G_INPUT_STREAM (source_object) != istream)
     {
       g_warning ("CcComm: Old stream encountered while reading header, ignoring");
@@ -218,6 +219,7 @@ static void
 cc_comm_read_header (CcComm *comm)
 {
   GInputStream *istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
+
   comm->header_buffer = g_malloc0 (4);
   g_input_stream_read_all_async (istream,
                                  comm->header_buffer,
@@ -304,7 +306,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 void
 cc_comm_close_connection (CcComm *comm)
 {
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
 
   if (comm->con != NULL)
     {
@@ -328,7 +330,8 @@ cc_comm_tls_send (CcComm  * comm,
 {
   GOutputStream *ostream;
   gssize io_bytes;
-  g_autoptr (GError) err = NULL;
+
+  g_autoptr(GError) err = NULL;
 
   if (g_cancellable_is_cancelled (comm->cancellable))
     return FALSE;
@@ -482,9 +485,9 @@ cc_comm_send_request (CcComm       *comm,
   memcpy (sock_buffer, &packed_size_be, 4);
   cast__channel__cast_message__pack (&message, 4 + sock_buffer);
 
-  if (message_type != CC_MESSAGE_TYPE_PING
-      && message_type != CC_MESSAGE_TYPE_PONG
-      && message_type != CC_MESSAGE_TYPE_AUTH)
+  if (message_type != CC_MESSAGE_TYPE_PING &&
+      message_type != CC_MESSAGE_TYPE_PONG &&
+      message_type != CC_MESSAGE_TYPE_AUTH)
     {
       g_debug ("CcComm: Sending message:");
       cc_json_helper_dump_message (&message, FALSE);

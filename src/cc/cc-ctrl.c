@@ -48,16 +48,16 @@ static gboolean
 cc_ctrl_send_auth (CcCtrl *ctrl)
 {
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               CC_DEFAULT_RECEIVER_ID,
-                               CC_MESSAGE_TYPE_AUTH,
-                               NULL);
+                                           CC_DEFAULT_RECEIVER_ID,
+                                           CC_MESSAGE_TYPE_AUTH,
+                                           NULL);
 
   if (!send_ok)
     {
       g_error ("CcCtrl: Failed to send auth message");
       cc_ctrl_fatal_error (ctrl);
     }
-  
+
   return send_ok;
 }
 
@@ -82,9 +82,9 @@ cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id)
     NULL);
 
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               destination_id,
-                               CC_MESSAGE_TYPE_CONNECT,
-                               json);
+                                           destination_id,
+                                           CC_MESSAGE_TYPE_CONNECT,
+                                           json);
 
   if (!send_ok)
     {
@@ -103,9 +103,9 @@ cc_ctrl_send_disconnect (CcCtrl *ctrl, gchar *destination_id)
     NULL);
 
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               destination_id,
-                               CC_MESSAGE_TYPE_DISCONNECT,
-                               json);
+                                           destination_id,
+                                           CC_MESSAGE_TYPE_DISCONNECT,
+                                           json);
 
   if (!send_ok)
     {
@@ -125,9 +125,9 @@ cc_ctrl_send_get_status (CcCtrl *ctrl, gchar *destination_id)
     NULL);
 
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               destination_id,
-                               CC_MESSAGE_TYPE_RECEIVER,
-                               json);
+                                           destination_id,
+                                           CC_MESSAGE_TYPE_RECEIVER,
+                                           json);
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
@@ -143,7 +143,7 @@ cc_ctrl_send_get_status (CcCtrl *ctrl, gchar *destination_id)
 static gboolean
 cc_ctrl_send_get_app_availability (CcCtrl *ctrl, gchar *destination_id, gchar *appId)
 {
-  g_autoptr (GArray) appIds = g_array_new (FALSE, FALSE, sizeof (gchar *));
+  g_autoptr(GArray) appIds = g_array_new (FALSE, FALSE, sizeof (gchar *));
   g_array_append_val (appIds, CC_MIRRORING_APP_ID);
 
   gchar *json = cc_json_helper_build_string (
@@ -153,9 +153,9 @@ cc_ctrl_send_get_app_availability (CcCtrl *ctrl, gchar *destination_id, gchar *a
     NULL);
 
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               destination_id,
-                               CC_MESSAGE_TYPE_RECEIVER,
-                               json);
+                                           destination_id,
+                                           CC_MESSAGE_TYPE_RECEIVER,
+                                           json);
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_GET_APP_AVAILABILITY);
@@ -179,9 +179,9 @@ cc_ctrl_send_launch_app (CcCtrl *ctrl, gchar *destination_id, gchar *appId)
     NULL);
 
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               destination_id,
-                               CC_MESSAGE_TYPE_RECEIVER,
-                               json);
+                                           destination_id,
+                                           CC_MESSAGE_TYPE_RECEIVER,
+                                           json);
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
@@ -204,9 +204,9 @@ cc_ctrl_send_close_app (CcCtrl *ctrl, gchar *sessionId)
     NULL);
 
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               sessionId,
-                               CC_MESSAGE_TYPE_RECEIVER,
-                               json);
+                                           sessionId,
+                                           CC_MESSAGE_TYPE_RECEIVER,
+                                           json);
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
@@ -247,7 +247,7 @@ build_audio_source (AudioStream *audio_stream)
 JsonNode *
 build_video_source (VideoStream *video_stream)
 {
-  g_autoptr (GArray) resolutions = g_array_new (FALSE, FALSE, sizeof (JsonNode *));
+  g_autoptr(GArray) resolutions = g_array_new (FALSE, FALSE, sizeof (JsonNode *));
 
   JsonNode *resolution = cc_json_helper_build_node (
     "height", CC_JSON_TYPE_INT, 1080,
@@ -288,7 +288,7 @@ cc_ctrl_send_offer (CcCtrl *ctrl, gchar *destination_id, GError **error)
   JsonNode *audio_source_node = build_audio_source (&offer->audio_stream);
   JsonNode *video_source_node = build_video_source (&offer->video_stream);
 
-  g_autoptr (GArray) streams = g_array_new (FALSE, FALSE, sizeof (JsonNode *));
+  g_autoptr(GArray) streams = g_array_new (FALSE, FALSE, sizeof (JsonNode *));
   g_array_append_val (streams, audio_source_node);
   g_array_append_val (streams, video_source_node);
 
@@ -305,9 +305,9 @@ cc_ctrl_send_offer (CcCtrl *ctrl, gchar *destination_id, GError **error)
     NULL);
 
   gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                               destination_id,
-                               CC_MESSAGE_TYPE_WEBRTC,
-                               cc_json_helper_node_to_string (root));
+                                           destination_id,
+                                           CC_MESSAGE_TYPE_WEBRTC,
+                                           cc_json_helper_node_to_string (root));
 
   if (send_ok)
     cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_ANSWER);
@@ -359,7 +359,7 @@ cc_ctrl_send_ping (CcCtrl *ctrl)
 static gboolean
 cc_ctrl_send_offer_cb (CcCtrl *ctrl)
 {
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
   if (!cc_ctrl_send_offer (ctrl, ctrl->session_id, &error))
     {
       if (error)
@@ -373,7 +373,7 @@ cc_ctrl_send_offer_cb (CcCtrl *ctrl)
 static void
 cc_ctrl_mirroring_app_init (CcCtrl *ctrl)
 {
-  g_autoptr (GError) err = NULL;
+  g_autoptr(GError) err = NULL;
   if (!cc_ctrl_send_connect (ctrl, ctrl->session_id))
     {
       g_error ("CcCtrl: Failed to send CONNECT to the mirroring app");
@@ -389,7 +389,7 @@ cc_ctrl_mirroring_app_init (CcCtrl *ctrl)
 static void
 cc_ctrl_handle_get_app_availability (CcCtrl *ctrl, JsonReader *reader)
 {
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
 
   if (json_reader_read_member (reader, "availability"))
     {
@@ -405,7 +405,7 @@ cc_ctrl_handle_get_app_availability (CcCtrl *ctrl, JsonReader *reader)
                   return;
                 }
             }
-          
+
           /* since the app is not available, stop attempts */
           g_warning ("CcCtrl: %s app is not available, quiting", CC_MIRRORING_APP_ID);
           cc_ctrl_fatal_error (ctrl);
@@ -422,16 +422,16 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
    * connect to it, and then propose an offer
    */
 
-  g_autoptr (GError) error = NULL;
-	g_autoptr (JsonNode) app_status = NULL;
-	g_autoptr (JsonPath) path = json_path_new();
-	json_path_compile(path, "$.status.applications[0]", NULL);
-	app_status = json_path_match(path, json_parser_get_root(parser));
+  g_autoptr(GError) error = NULL;
+  g_autoptr(JsonNode) app_status = NULL;
+  g_autoptr(JsonPath) path = json_path_new ();
+  json_path_compile (path, "$.status.applications[0]", NULL);
+  app_status = json_path_match (path, json_parser_get_root (parser));
 
-	g_autoptr (JsonGenerator) generator = json_generator_new();
-	json_generator_set_root(generator, app_status);
+  g_autoptr(JsonGenerator) generator = json_generator_new ();
+  json_generator_set_root (generator, app_status);
   gsize size;
-	json_generator_to_data(generator, &size);
+  json_generator_to_data (generator, &size);
 
   if (size == 2) /* empty array [] */
     {
@@ -453,7 +453,7 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
     }
 
   /* one or more apps is/are open */
-  g_autoptr (JsonReader) reader = json_reader_new(app_status);
+  g_autoptr(JsonReader) reader = json_reader_new (app_status);
 
   if (json_reader_read_element (reader, 0))
     {
@@ -505,7 +505,7 @@ cc_ctrl_handle_media_status (CcCtrl *ctrl, Cast__Channel__CastMessage *message, 
 static void
 cc_ctrl_handle_close (CcCtrl *ctrl, Cast__Channel__CastMessage *message)
 {
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
 
   if (g_strcmp0 (message->source_id, CC_DEFAULT_RECEIVER_ID) == 0)
     {
@@ -521,10 +521,11 @@ cc_ctrl_handle_close (CcCtrl *ctrl, Cast__Channel__CastMessage *message)
 }
 
 void
-cc_ctrl_handle_received_msg (CcCommClosure *closure,
+cc_ctrl_handle_received_msg (CcCommClosure              *closure,
                              Cast__Channel__CastMessage *message)
 {
   CcCtrl *ctrl = (CcCtrl *) closure->userdata;
+
   g_autoptr(GError) error = NULL;
   g_autoptr(JsonParser) parser = NULL;
   g_autoptr(JsonReader) reader = NULL;
@@ -553,31 +554,39 @@ cc_ctrl_handle_received_msg (CcCommClosure *closure,
       cc_ctrl_unset_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
       cc_ctrl_handle_receiver_status (ctrl, parser);
       break;
+
     case CC_RWAIT_TYPE_GET_APP_AVAILABILITY:
       cc_ctrl_unset_waiting_for (ctrl, CC_RWAIT_TYPE_GET_APP_AVAILABILITY);
       cc_ctrl_handle_get_app_availability (ctrl, reader);
       break;
+
     case CC_RWAIT_TYPE_LAUNCH_ERROR:
       g_warning ("CcCtrl: Failed to launch app");
       cc_ctrl_fatal_error (ctrl);
       break;
+
     case CC_RWAIT_TYPE_ANSWER:
       cc_ctrl_unset_waiting_for (ctrl, CC_RWAIT_TYPE_ANSWER);
       /* cc_ctrl_handle_answer (ctrl, reader); */
       break;
+
     case CC_RWAIT_TYPE_MEDIA_STATUS:
       cc_ctrl_unset_waiting_for (ctrl, CC_RWAIT_TYPE_MEDIA_STATUS);
       cc_ctrl_handle_media_status (ctrl, message, reader);
       break;
+
     case CC_RWAIT_TYPE_PING:
       cc_ctrl_unset_waiting_for (ctrl, CC_RWAIT_TYPE_PING);
       break;
+
     case CC_RWAIT_TYPE_PONG:
       cc_ctrl_unset_waiting_for (ctrl, CC_RWAIT_TYPE_PONG);
       break;
+
     case CC_RWAIT_TYPE_CLOSE:
       cc_ctrl_handle_close (ctrl, message);
       break;
+
     case CC_RWAIT_TYPE_UNKNOWN:
     default:
       g_warning ("CcCtrl: Unknown message type");
@@ -613,6 +622,7 @@ CcCommClosure *
 cc_ctrl_get_callback_closure (CcCtrl *ctrl)
 {
   CcCommClosure *closure = (CcCommClosure *) g_malloc (sizeof (CcCommClosure));
+
   closure->userdata = ctrl;
   closure->message_received_cb = cc_ctrl_handle_received_msg;
   closure->fatal_error_cb = cc_ctrl_fatal_error_closure;
@@ -622,7 +632,7 @@ cc_ctrl_get_callback_closure (CcCtrl *ctrl)
 gboolean
 cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
 {
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
 
   ctrl->state = CC_CTRL_STATE_DISCONNECTED;
   ctrl->comm.cancellable = ctrl->cancellable;
@@ -650,7 +660,7 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
 
   /* since tls_send is a synchronous call */
   ctrl->state = CC_CTRL_STATE_CONNECTED;
-  
+
   /* send pings to device every 5 seconds */
   ctrl->ping_timeout_handle = g_timeout_add_seconds (5, G_SOURCE_FUNC (cc_ctrl_send_ping), ctrl);
 

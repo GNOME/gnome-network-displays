@@ -29,9 +29,10 @@ G_BEGIN_DECLS
 struct _CcCommClosure
 {
   gpointer userdata;
-  void (*message_received_cb) (struct _CcCommClosure *closure,
-                               Cast__Channel__CastMessage *message);
-  void (*fatal_error_cb) (struct _CcCommClosure *closure, GError *error);
+  void     (*message_received_cb) (struct _CcCommClosure      *closure,
+                                   Cast__Channel__CastMessage *message);
+  void     (*fatal_error_cb) (struct _CcCommClosure *closure,
+                              GError                *error);
 };
 
 typedef struct _CcCommClosure CcCommClosure;
@@ -39,14 +40,14 @@ typedef struct _CcCommClosure CcCommClosure;
 struct _CcComm
 {
   /*< public >*/
-  GIOStream    *con;
+  GIOStream     *con;
 
-  guint8       *header_buffer;
-  guint8       *message_buffer;
+  guint8        *header_buffer;
+  guint8        *message_buffer;
 
-  GCancellable *cancellable;
+  GCancellable  *cancellable;
 
-  CcCommClosure    *closure;
+  CcCommClosure *closure;
 };
 
 typedef struct _CcComm CcComm;

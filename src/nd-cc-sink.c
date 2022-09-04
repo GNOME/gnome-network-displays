@@ -323,6 +323,7 @@ CcCtrlClosure *
 nd_cc_sink_get_callback_closure (NdCCSink *sink)
 {
   CcCtrlClosure *closure = (CcCtrlClosure *) g_malloc (sizeof (CcCtrlClosure));
+
   closure->userdata = sink;
   closure->start_stream = nd_cc_sink_start_webrtc_stream;
   closure->end_stream = nd_cc_sink_error_in_ctrl;
@@ -342,7 +343,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   g_assert (self->server == NULL);
 
   /* self->state = ND_SINK_STATE_ENSURE_FIREWALL;
-  g_object_notify (G_OBJECT (self), "state"); */
+     g_object_notify (G_OBJECT (self), "state"); */
 
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
@@ -399,13 +400,13 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
                            G_CONNECT_SWAPPED);
 
   /*
-  self->state = ND_SINK_STATE_WAIT_SOCKET;
-  g_object_notify (G_OBJECT (self), "state");
+     self->state = ND_SINK_STATE_WAIT_SOCKET;
+     g_object_notify (G_OBJECT (self), "state");
 
-  these were originally here
-  1. send connect request
-  2. send ping
-  */
+     these were originally here
+     1. send connect request
+     2. send ping
+   */
 
   return g_object_ref (sink);
 }

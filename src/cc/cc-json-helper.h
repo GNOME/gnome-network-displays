@@ -25,8 +25,7 @@
 
 G_BEGIN_DECLS
 
-typedef enum
-{
+typedef enum {
   CC_JSON_TYPE_STRING,
   CC_JSON_TYPE_INT,
   CC_JSON_TYPE_DOUBLE,
@@ -45,11 +44,14 @@ typedef enum
 
 /* G_GNUC_NULL_TERMINATED */
 
-JsonNode * cc_json_helper_build_node (gchar *first_key, ...);
-gchar * cc_json_helper_build_string (/* gboolean pretty_print, */ gchar *first_key, ...);
+JsonNode * cc_json_helper_build_node (gchar *first_key,
+                                      ...);
+gchar * cc_json_helper_build_string (/* gboolean pretty_print, */ gchar *first_key,
+                                     ...);
 gchar * cc_json_helper_node_to_string (JsonNode *node);
 CcReceivedMessageType cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
-                                                       JsonReader *json_reader);
-void cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borked);
+                                                       JsonReader                 *json_reader);
+void cc_json_helper_dump_message (Cast__Channel__CastMessage *message,
+                                  gboolean                    borked);
 
 G_END_DECLS

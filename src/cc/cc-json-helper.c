@@ -21,7 +21,7 @@
 static void
 cc_json_helper_build_internal (JsonBuilder *builder,
                                gchar       *first_key,
-                               va_list	    var_args)
+                               va_list      var_args)
 {
   for (gchar *key = first_key; key != NULL; key = va_arg (var_args, gchar *))
     {
@@ -35,21 +35,27 @@ cc_json_helper_build_internal (JsonBuilder *builder,
         case CC_JSON_TYPE_STRING:
           json_builder_add_string_value (builder, va_arg (var_args, gchar *));
           continue;
+
         case CC_JSON_TYPE_INT:
           json_builder_add_int_value (builder, va_arg (var_args, gint));
           continue;
+
         case CC_JSON_TYPE_DOUBLE:
           json_builder_add_double_value (builder, va_arg (var_args, gdouble));
           continue;
+
         case CC_JSON_TYPE_BOOLEAN:
           json_builder_add_boolean_value (builder, va_arg (var_args, gboolean));
           continue;
+
         case CC_JSON_TYPE_NULL: /* no additional arg is required here */
           json_builder_add_null_value (builder);
           continue;
+
         case CC_JSON_TYPE_OBJECT:
           json_builder_add_value (builder, va_arg (var_args, JsonNode *));
           continue;
+
         default:
           return;
         }
@@ -58,31 +64,37 @@ cc_json_helper_build_internal (JsonBuilder *builder,
       GArray *arr = va_arg (var_args, GArray *);
       guint i;
 
-      for (i=0; i<arr->len; i++)
+      for (i = 0; i < arr->len; i++)
         {
           switch (type)
-          {
+            {
             case CC_JSON_TYPE_ARRAY_STRING:
               json_builder_add_string_value (builder, g_array_index (arr, gchar *, i));
               break;
+
             case CC_JSON_TYPE_ARRAY_INT:
               json_builder_add_int_value (builder, g_array_index (arr, gint, i));
               break;
+
             case CC_JSON_TYPE_ARRAY_DOUBLE:
               json_builder_add_double_value (builder, g_array_index (arr, gdouble, i));
               break;
+
             case CC_JSON_TYPE_ARRAY_BOOLEAN:
               json_builder_add_boolean_value (builder, g_array_index (arr, gboolean, i));
               break;
+
             case CC_JSON_TYPE_ARRAY_NULL:
               json_builder_add_null_value (builder);
               break;
+
             case CC_JSON_TYPE_ARRAY_OBJECT:
               json_builder_add_value (builder, g_array_index (arr, JsonNode *, i));
               break;
+
             default:
               return;
-          }
+            }
         }
 
       json_builder_end_array (builder);
@@ -90,10 +102,11 @@ cc_json_helper_build_internal (JsonBuilder *builder,
 }
 
 JsonNode *
-cc_json_helper_build_node (gchar     *first_key,
+cc_json_helper_build_node (gchar *first_key,
                            ...)
 {
   va_list var_args;
+
   va_start (var_args, first_key);
 
   JsonBuilder *builder = json_builder_new ();
@@ -112,10 +125,11 @@ cc_json_helper_build_node (gchar     *first_key,
 
 gchar *
 cc_json_helper_build_string (/* gboolean pretty_print, */
-                             gchar   *first_key,
-                             ...)
+  gchar *first_key,
+  ...)
 {
   va_list var_args;
+
   va_start (var_args, first_key);
 
   JsonBuilder *builder = json_builder_new ();
@@ -143,8 +157,10 @@ gchar *
 cc_json_helper_node_to_string (JsonNode *node)
 {
   JsonGenerator *gen = json_generator_new ();
+
   json_generator_set_root (gen, node);
   gchar *output = json_generator_to_data (gen, NULL);
+
   g_object_unref (gen);
 
   return g_steal_pointer (&output);
@@ -152,12 +168,14 @@ cc_json_helper_node_to_string (JsonNode *node)
 
 CcReceivedMessageType
 cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
-                                 JsonReader *reader)
+                                 JsonReader                 *reader)
 {
   const gchar *message_type;
-  g_autoptr (GError) error = NULL;
+
+  g_autoptr(GError) error = NULL;
 
   gboolean typeExists = json_reader_read_member (reader, "type");
+
   if (typeExists)
     message_type = json_reader_get_string_value (reader);
   else
@@ -175,26 +193,26 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
   json_reader_end_member (reader);
 
   cc_switch (message_type)
-    {
-      cc_case ("RECEIVER_STATUS") 
-        return CC_RWAIT_TYPE_RECEIVER_STATUS;
-      cc_case ("GET_APP_AVAILABILITY") 
-        return CC_RWAIT_TYPE_GET_APP_AVAILABILITY;
-      cc_case ("LAUNCH_ERROR") 
-        return CC_RWAIT_TYPE_LAUNCH_ERROR;
-      cc_case ("ANSWER") 
-        return CC_RWAIT_TYPE_ANSWER;
-      cc_case ("MEDIA_STATUS") 
-        return CC_RWAIT_TYPE_MEDIA_STATUS;
-      cc_case ("PING") 
-        return CC_RWAIT_TYPE_PING;
-      cc_case ("PONG") 
-        return CC_RWAIT_TYPE_PONG;
-      cc_case ("CLOSE") 
-        return CC_RWAIT_TYPE_CLOSE;
-      /* default */
-        return CC_RWAIT_TYPE_UNKNOWN;
-    } cc_end
+  {
+    cc_case ("RECEIVER_STATUS")
+    return CC_RWAIT_TYPE_RECEIVER_STATUS;
+    cc_case ("GET_APP_AVAILABILITY")
+    return CC_RWAIT_TYPE_GET_APP_AVAILABILITY;
+    cc_case ("LAUNCH_ERROR")
+    return CC_RWAIT_TYPE_LAUNCH_ERROR;
+    cc_case ("ANSWER")
+    return CC_RWAIT_TYPE_ANSWER;
+    cc_case ("MEDIA_STATUS")
+    return CC_RWAIT_TYPE_MEDIA_STATUS;
+    cc_case ("PING")
+    return CC_RWAIT_TYPE_PING;
+    cc_case ("PONG")
+    return CC_RWAIT_TYPE_PONG;
+    cc_case ("CLOSE")
+    return CC_RWAIT_TYPE_CLOSE;
+    /* default */
+    return CC_RWAIT_TYPE_UNKNOWN;
+  } cc_end
 }
 
 /* borked var reduces extra computation */
@@ -203,16 +221,17 @@ cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borke
 {
   JsonNode *payload_utf8_node;
   JsonParser *parser = json_parser_new ();
-  g_autoptr (GError) error = NULL;
+
+  g_autoptr(GError) error = NULL;
 
   if (borked || !json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
     {
       g_warning ("CcJsonHelper: Error parsing received JSON payload: %s", error->message);
       g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_utf8: %s }",
-        message->source_id,
-        message->destination_id,
-        message->namespace_,
-        message->payload_utf8);
+               message->source_id,
+               message->destination_id,
+               message->namespace_,
+               message->payload_utf8);
       return;
     }
 
@@ -224,6 +243,6 @@ cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borke
     "namespace", CC_JSON_TYPE_STRING, message->namespace_,
     "payload_utf8", CC_JSON_TYPE_OBJECT, payload_utf8_node,
     NULL);
-  
+
   g_debug ("%s", output);
 }
