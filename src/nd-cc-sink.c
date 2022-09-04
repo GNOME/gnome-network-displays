@@ -18,9 +18,8 @@
 
 #include "gnome-network-displays-config.h"
 #include "nd-cc-sink.h"
-#include "cc/cc-client.h"
-#include "wfd/wfd-media-factory.h"
 #include "wfd/wfd-server.h"
+#include "wfd/wfd-client.h"
 #include "cc/cc-ctrl.h"
 #include "cc/cc-common.h"
 
@@ -201,7 +200,7 @@ nd_cc_sink_class_init (NdCCSinkClass *klass)
 
   props[PROP_CLIENT] =
     g_param_spec_object ("client", "Communication Client",
-                         "The GSocketClient used for Chromecast communication.",
+                         "Unused client",
                          G_TYPE_SOCKET_CLIENT,
                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
 
@@ -247,7 +246,7 @@ nd_cc_sink_sink_iface_init (NdSinkIface *iface)
 }
 
 static void
-play_request_cb (NdCCSink *sink, GstRTSPContext *ctx, CCClient *client)
+play_request_cb (NdCCSink *sink, GstRTSPContext *ctx, WfdClient *client)
 {
   g_debug ("NdCCSink: Got play request from client");
 
@@ -256,14 +255,15 @@ play_request_cb (NdCCSink *sink, GstRTSPContext *ctx, CCClient *client)
 }
 
 static void
-closed_cb (NdCCSink *sink, CCClient *client)
+closed_cb (NdCCSink *sink, WfdClient *client)
 {
   /* Connection was closed, do a clean shutdown */
   nd_cc_sink_sink_stop_stream (ND_SINK (sink));
 }
 
+// TODO
 static void
-client_connected_cb (NdCCSink *sink, CCClient *client, WfdServer *server)
+client_connected_cb (NdCCSink *sink, WfdClient *client, WfdServer *server)
 {
   g_debug ("NdCCSink: Got client connection");
 
@@ -367,7 +367,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   self->state = ND_SINK_STATE_STREAMING;
   g_object_notify (G_OBJECT (self), "state");
 
-  /* TODO: maybe we don't need this part */
+  /* TODO: shiny new cc_server coming right up */
   self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
 

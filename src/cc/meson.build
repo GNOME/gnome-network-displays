@@ -1,6 +1,5 @@
 
 cc_sources = [
-  'cc-client.c',
   'cast_channel.pb-c.c',
   'cc-comm.c',
   'cc-ctrl.c',
