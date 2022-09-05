@@ -60,8 +60,6 @@ cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_
       return;
     }
 
-  g_clear_pointer (&comm->message_buffer, g_free);
-
   comm->closure->message_received_cb (comm->closure->userdata, message);
 
   cast__channel__cast_message__free_unpacked (message, NULL);
@@ -142,6 +140,8 @@ cc_comm_message_read_cb (GObject      *source_object,
   /* dump the received message and try to parse it */
   cc_comm_dump_message ("Received message bytes:", comm->message_buffer, io_bytes);
   cc_comm_parse_received_data (comm, comm->message_buffer, io_bytes);
+
+  g_clear_pointer (&comm->message_buffer, g_free);
 
   cc_comm_read_header (comm);
 }
