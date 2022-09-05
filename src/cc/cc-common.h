@@ -110,7 +110,7 @@ typedef struct _VideoStream
   gchar *protection;
   gchar *profile;
   gchar *level;
-  gint **resolutions;
+  gint  *resolutions;
   gchar *error_recovery_mode;
 } VideoStream;
 
