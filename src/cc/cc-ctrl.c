@@ -716,3 +716,4 @@ cc_ctrl_finish (CcCtrl *ctrl)
 
 /* TODO: make the code less coupled with the mirroring app */
 /* TODO: use waiting_for for error messages */
+/* TODO: free all the vars in structs */
