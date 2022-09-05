@@ -50,16 +50,16 @@ struct _CcCtrl
 {
   /*< public >*/
   CcComm         comm;
-
-  CcCtrlState    state;
-  gchar         *session_id;
-  guint          request_id;
-  guint8         waiting_for;
-  guint          ping_timeout_handle;
-  guint          waiting_check_timeout_handle;
-
   GCancellable  *cancellable;
   CcCtrlClosure *closure;
+
+  /*< private >*/
+  CcCtrlState state;
+  gchar      *session_id;
+  guint       request_id;
+  guint8      waiting_for;
+  guint       ping_timeout_handle;
+  guint       waiting_check_timeout_handle;
 };
 
 typedef struct _CcCtrl CcCtrl;

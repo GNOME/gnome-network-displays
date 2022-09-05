@@ -41,13 +41,12 @@ struct _CcComm
 {
   /*< public >*/
   GIOStream     *con;
-
-  guint8        *header_buffer;
-  guint8        *message_buffer;
-
   GCancellable  *cancellable;
-
   CcCommClosure *closure;
+
+  /*< private >*/
+  guint8 *header_buffer;
+  guint8 *message_buffer;
 };
 
 typedef struct _CcComm CcComm;
