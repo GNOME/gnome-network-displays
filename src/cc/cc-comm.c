@@ -102,11 +102,6 @@ cc_comm_message_read_cb (GObject      *source_object,
                          GAsyncResult *res,
                          gpointer      user_data)
 {
-  CcComm * comm = (CcComm *) user_data;
-
-  if (g_cancellable_is_cancelled (comm->cancellable))
-    return;
-
   g_autoptr(GError) error = NULL;
   gboolean success;
   gsize io_bytes;
@@ -115,6 +110,8 @@ cc_comm_message_read_cb (GObject      *source_object,
 
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
+
+  CcComm * comm = (CcComm *) user_data;
 
   if (!comm->con)
     {
@@ -155,11 +152,6 @@ cc_comm_header_read_cb (GObject      *source_object,
                         GAsyncResult *res,
                         gpointer      user_data)
 {
-  CcComm *comm = (CcComm *) user_data;
-
-  if (g_cancellable_is_cancelled (comm->cancellable))
-    return;
-
   g_autoptr(GError) error = NULL;
   gboolean success;
   gsize io_bytes;
@@ -169,6 +161,8 @@ cc_comm_header_read_cb (GObject      *source_object,
 
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
+
+  CcComm *comm = (CcComm *) user_data;
 
   if (!comm->con)
     {
