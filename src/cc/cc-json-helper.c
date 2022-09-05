@@ -18,7 +18,6 @@
 
 #include "cc-json-helper.h"
 
-/* TODO: recursive nested object building */
 static void
 cc_json_helper_build_internal (JsonBuilder *builder,
                                gchar       *first_key,
