@@ -62,7 +62,7 @@ cc_comm_parse_received_data (CcComm *comm, uint8_t * input_buffer, gssize input_
 
   g_clear_pointer (&comm->message_buffer, g_free);
 
-  comm->closure->message_received_cb (comm->closure, message);
+  comm->closure->message_received_cb (comm->closure->userdata, message);
 
   cast__channel__cast_message__free_unpacked (message, NULL);
 }
@@ -116,7 +116,7 @@ cc_comm_message_read_cb (GObject      *source_object,
   if (!comm->con)
     {
       g_error ("CcComm: Connection error while reading message body");
-      comm->closure->fatal_error_cb (comm->closure, NULL);
+      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -131,11 +131,11 @@ cc_comm_message_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading message from stream: %s", error->message);
-          comm->closure->fatal_error_cb (comm->closure, g_steal_pointer (&error));
+          comm->closure->fatal_error_cb (comm->closure->userdata, g_steal_pointer (&error));
           return;
         }
       g_error ("CcComm: Error reading message from stream.");
-      comm->closure->fatal_error_cb (comm->closure, NULL);
+      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -167,7 +167,7 @@ cc_comm_header_read_cb (GObject      *source_object,
   if (!comm->con)
     {
       g_error ("CcComm: Connection error while reading header");
-      comm->closure->fatal_error_cb (comm->closure, NULL);
+      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -184,11 +184,11 @@ cc_comm_header_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading header from stream: %s", error->message);
-          comm->closure->fatal_error_cb (comm->closure, g_steal_pointer (&error));
+          comm->closure->fatal_error_cb (comm->closure->userdata, g_steal_pointer (&error));
           return;
         }
       g_error ("CcComm: Error reading header from stream.");
-      comm->closure->fatal_error_cb (comm->closure, NULL);
+      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -333,7 +333,7 @@ cc_comm_tls_send (CcComm  * comm,
   if (!G_IS_TLS_CONNECTION (comm->con))
     {
       g_error ("Connection has not been established");
-      comm->closure->fatal_error_cb (comm->closure, NULL);
+      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
       return FALSE;
     }
 
@@ -349,7 +349,7 @@ cc_comm_tls_send (CcComm  * comm,
       if (io_bytes <= 0)
         {
           g_warning ("CcComm: Failed to write: %s", err->message);
-          comm->closure->fatal_error_cb (comm->closure, g_steal_pointer (&err));
+          comm->closure->fatal_error_cb (comm->closure->userdata, g_steal_pointer (&err));
           return FALSE;
         }
 

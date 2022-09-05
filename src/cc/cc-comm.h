@@ -29,10 +29,10 @@ G_BEGIN_DECLS
 struct _CcCommClosure
 {
   gpointer userdata;
-  void     (*message_received_cb) (struct _CcCommClosure      *closure,
+  void     (*message_received_cb) (gpointer                    userdata,
                                    Cast__Channel__CastMessage *message);
-  void     (*fatal_error_cb) (struct _CcCommClosure *closure,
-                              GError                *error);
+  void     (*fatal_error_cb) (gpointer userdata,
+                              GError  *error);
 };
 
 typedef struct _CcCommClosure CcCommClosure;

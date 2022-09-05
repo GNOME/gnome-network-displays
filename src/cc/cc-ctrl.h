@@ -39,9 +39,9 @@ typedef enum {
 struct _CcCtrlClosure
 {
   gpointer userdata;
-  Offer  * (*get_offer_message) (struct _CcCtrlClosure *closure);
-  void     (*start_stream) (struct _CcCtrlClosure *closure);
-  void     (*end_stream) (struct _CcCtrlClosure *closure);
+  Offer  * (*get_offer_message) (gpointer userdata);
+  void     (*start_stream) (gpointer userdata);
+  void     (*end_stream) (gpointer userdata);
 };
 
 typedef struct _CcCtrlClosure CcCtrlClosure;

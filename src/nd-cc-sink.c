@@ -307,16 +307,18 @@ server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
 }
 
 static void
-nd_cc_sink_start_webrtc_stream (CcCtrlClosure *closure)
+nd_cc_sink_start_webrtc_stream (gpointer userdata)
 {
+  NdCCSink *sink = ND_CC_SINK (userdata);
+
   /* TODO */
   g_debug ("Received webrtc stream signal from ctrl");
 }
 
 static void
-nd_cc_sink_error_in_ctrl (CcCtrlClosure *closure)
+nd_cc_sink_error_in_ctrl (gpointer userdata)
 {
-  nd_cc_sink_sink_stop_stream (ND_SINK (closure->userdata));
+  nd_cc_sink_sink_stop_stream (ND_SINK (userdata));
 }
 
 CcCtrlClosure *
@@ -327,7 +329,7 @@ nd_cc_sink_get_callback_closure (NdCCSink *sink)
   closure->userdata = sink;
   closure->start_stream = nd_cc_sink_start_webrtc_stream;
   closure->end_stream = nd_cc_sink_error_in_ctrl;
-  return closure;
+  return g_steal_pointer (&closure);
 }
 
 static NdSink *

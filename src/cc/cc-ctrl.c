@@ -284,7 +284,7 @@ cc_ctrl_send_offer (CcCtrl *ctrl, gchar *destination_id, GError **error)
 
   /* look into [ adaptive_playout_delay, rtpExtensions, rtpPayloadType, rtpProfile, aes stuff, ssrc increment in received msg ] */
 
-  Offer *offer = ctrl->closure->get_offer_message (ctrl->closure);
+  Offer *offer = ctrl->closure->get_offer_message (ctrl->closure->userdata);
   JsonNode *audio_source_node = build_audio_source (&offer->audio_stream);
   JsonNode *video_source_node = build_video_source (&offer->video_stream);
 
@@ -521,10 +521,10 @@ cc_ctrl_handle_close (CcCtrl *ctrl, Cast__Channel__CastMessage *message)
 }
 
 void
-cc_ctrl_handle_received_msg (CcCommClosure              *closure,
+cc_ctrl_handle_received_msg (gpointer                    userdata,
                              Cast__Channel__CastMessage *message)
 {
-  CcCtrl *ctrl = (CcCtrl *) closure->userdata;
+  CcCtrl *ctrl = (CcCtrl *) userdata;
 
   g_autoptr(GError) error = NULL;
   g_autoptr(JsonParser) parser = NULL;
@@ -601,12 +601,12 @@ cc_ctrl_fatal_error (CcCtrl *ctrl)
   if (ctrl->state == CC_CTRL_STATE_ERROR) /* function has already been called */
     return;
 
-  ctrl->closure->end_stream (ctrl->closure);
+  ctrl->closure->end_stream (ctrl->closure->userdata);
   ctrl->state = CC_CTRL_STATE_ERROR;
 }
 
 void
-cc_ctrl_fatal_error_closure (CcCommClosure *closure, GError *error)
+cc_ctrl_fatal_error_closure (gpointer userdata, GError *error)
 {
   /* XXX: add error arg in end_stream and display an error message to user */
   if (error)
@@ -614,7 +614,7 @@ cc_ctrl_fatal_error_closure (CcCommClosure *closure, GError *error)
   else
     g_error ("CcCtrl: Fatal error");
 
-  CcCtrl *ctrl = (CcCtrl *) closure->userdata;
+  CcCtrl *ctrl = (CcCtrl *) userdata;
   cc_ctrl_fatal_error (ctrl);
 }
 
