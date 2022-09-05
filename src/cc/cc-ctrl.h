@@ -69,7 +69,4 @@ gboolean cc_ctrl_connection_init (CcCtrl *ctrl,
                                   gchar  *remote_address);
 void cc_ctrl_finish (CcCtrl *ctrl);
 
-// XXX: is this required?
-// G_DEFINE_AUTOPTR_CLEANUP_FUNC (CcCtrl, g_object_unref)
-
 G_END_DECLS
