@@ -94,7 +94,6 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
 
 /* LISTENER */
 
-/* async callback for message read */
 static void
 cc_comm_message_read_cb (GObject      *source_object,
                          GAsyncResult *res,
@@ -146,7 +145,6 @@ cc_comm_message_read_cb (GObject      *source_object,
   cc_comm_read_header (comm);
 }
 
-/* async callback for header read */
 static void
 cc_comm_header_read_cb (GObject      *source_object,
                         GAsyncResult *res,
