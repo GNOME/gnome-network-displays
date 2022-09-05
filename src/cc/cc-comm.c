@@ -191,10 +191,8 @@ cc_comm_header_read_cb (GObject      *source_object,
     }
 
   /* if everything is well, read all `io_bytes` */
-  message_size = GINT32_FROM_BE (*(guint32 *) comm->header_buffer);
+  message_size = GINT32_FROM_BE (comm->header_buffer);
   g_debug ("CcComm: Message size: %d", message_size);
-
-  g_clear_pointer (&comm->header_buffer, g_free);
 
   comm->message_buffer = g_malloc0 (message_size);
   g_input_stream_read_all_async (istream,
@@ -212,7 +210,6 @@ cc_comm_read_header (CcComm *comm)
 {
   GInputStream *istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
 
-  comm->header_buffer = g_malloc0 (4);
   g_input_stream_read_all_async (istream,
                                  comm->header_buffer,
                                  4,
