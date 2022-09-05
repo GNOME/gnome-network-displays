@@ -710,6 +710,8 @@ cc_ctrl_finish (CcCtrl *ctrl)
 
   /* close the socket connection */
   cc_comm_close_connection (&ctrl->comm);
+
+  ctrl->state = CC_CTRL_STATE_DISCONNECTED;
 }
 
 /* TODO: make the code less coupled with the mirroring app */
