@@ -18,6 +18,7 @@
 
 #include "cc-json-helper.h"
 
+/* TODO: recursive nested object building */
 static void
 cc_json_helper_build_internal (JsonBuilder *builder,
                                gchar       *first_key,
@@ -61,7 +62,7 @@ cc_json_helper_build_internal (JsonBuilder *builder,
         }
 
       json_builder_begin_array (builder);
-      GArray *arr = va_arg (var_args, GArray *);
+      g_autoptr (GArray) arr = va_arg (var_args, GArray *);
       guint i;
 
       for (i = 0; i < arr->len; i++)
@@ -172,8 +173,6 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
 {
   const gchar *message_type;
 
-  g_autoptr(GError) error = NULL;
-
   gboolean typeExists = json_reader_read_member (reader, "type");
 
   if (typeExists)
@@ -226,7 +225,11 @@ cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borke
 
   if (borked || !json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
     {
-      g_warning ("CcJsonHelper: Error parsing received JSON payload: %s", error->message);
+      if (error)
+        g_warning ("CcJsonHelper: Error parsing received JSON payload: %s", error->message);
+      else
+        g_warning ("CcJsonHelper: Error parsing received JSON payload");
+
       g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_utf8: %s }",
                message->source_id,
                message->destination_id,
