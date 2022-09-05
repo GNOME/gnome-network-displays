@@ -71,6 +71,7 @@ cc_comm_accept_certificate (GTlsClientConnection *conn,
                             GTlsCertificateFlags  errors,
                             gpointer              user_data)
 {
+  /* chromecast uses a self-signed certificate */
   if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA || errors & G_TLS_CERTIFICATE_BAD_IDENTITY)
     return TRUE;
 
