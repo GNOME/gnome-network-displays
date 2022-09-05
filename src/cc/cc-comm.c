@@ -171,7 +171,7 @@ cc_comm_header_read_cb (GObject      *source_object,
       return;
     }
 
-  GInputStream *istream = istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
+  GInputStream *istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
 
   if (G_INPUT_STREAM (source_object) != istream)
     {
