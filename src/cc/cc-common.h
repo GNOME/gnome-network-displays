@@ -93,6 +93,7 @@ typedef struct _Stream
 typedef struct _AudioStream
 {
   Stream stream;
+
   gchar *codec;
   gint   bit_rate;
   gint   sample_rate;
@@ -102,6 +103,7 @@ typedef struct _AudioStream
 typedef struct _VideoStream
 {
   Stream stream;
+
   gchar *codec;
   gchar *max_frame_rate;
   gint   max_bit_rate;
@@ -117,6 +119,7 @@ typedef struct _Offer
   gchar      *cast_mode;
   guint       seq_num;
   gboolean    receiver_get_status;
+
   AudioStream audio_stream;
   VideoStream video_stream;
 } Offer;
