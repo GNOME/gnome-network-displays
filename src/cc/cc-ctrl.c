@@ -47,52 +47,47 @@ cc_ctrl_is_waiting_for (CcCtrl *ctrl, CcWaitingFor waiting_for)
 static gboolean
 cc_ctrl_send_auth (CcCtrl *ctrl)
 {
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           CC_DEFAULT_RECEIVER_ID,
-                                           CC_MESSAGE_TYPE_AUTH,
-                                           NULL);
-
-  if (!send_ok)
+  if (!cc_comm_send_request (&ctrl->comm,
+                             CC_DEFAULT_RECEIVER_ID,
+                             CC_MESSAGE_TYPE_AUTH,
+                             NULL))
     {
-      g_error ("CcCtrl: Failed to send auth message");
+      g_warning ("CcCtrl: Failed to send auth message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  return TRUE;
 }
 
 static gboolean
 cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id)
 {
-  JsonNode *origin = cc_json_helper_build_node (NULL);
-  JsonNode *senderInfo = cc_json_helper_build_node (
-    "sdkType", CC_JSON_TYPE_INT, 2,
-    "version", CC_JSON_TYPE_STRING, "X11; Linux x86_64",
-    "browserVersion", CC_JSON_TYPE_STRING, "X11; Linux x86_64",
-    "platform", CC_JSON_TYPE_INT, 6,
-    "connectionType", CC_JSON_TYPE_INT, 1,
-    NULL);
-
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "CONNECT",
     "userAgent", CC_JSON_TYPE_STRING, "GND/0.90.5  (X11; Linux x86_64)",
     "connType", CC_JSON_TYPE_INT, 0,
-    "origin", CC_JSON_TYPE_OBJECT, origin,
-    "senderInfo", CC_JSON_TYPE_OBJECT, senderInfo,
+    "origin", CC_JSON_TYPE_OBJECT, cc_json_helper_build_node (NULL),
+    "senderInfo", CC_JSON_TYPE_OBJECT, cc_json_helper_build_node (
+      "sdkType", CC_JSON_TYPE_INT, 2,
+      "version", CC_JSON_TYPE_STRING, "X11; Linux x86_64",
+      "browserVersion", CC_JSON_TYPE_STRING, "X11; Linux x86_64",
+      "platform", CC_JSON_TYPE_INT, 6,
+      "connectionType", CC_JSON_TYPE_INT, 1,
+      NULL),
     NULL);
 
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           destination_id,
-                                           CC_MESSAGE_TYPE_CONNECT,
-                                           json);
-
-  if (!send_ok)
+  if (!cc_comm_send_request (&ctrl->comm,
+                             destination_id,
+                             CC_MESSAGE_TYPE_CONNECT,
+                             json))
     {
-      g_error ("CcCtrl: Failed to send connect message");
+      g_warning ("CcCtrl: Failed to send connect message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  return TRUE;
 }
 
 static gboolean
@@ -102,18 +97,17 @@ cc_ctrl_send_disconnect (CcCtrl *ctrl, gchar *destination_id)
     "type", CC_JSON_TYPE_STRING, "CLOSE",
     NULL);
 
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           destination_id,
-                                           CC_MESSAGE_TYPE_DISCONNECT,
-                                           json);
-
-  if (!send_ok)
+  if (!cc_comm_send_request (&ctrl->comm,
+                             destination_id,
+                             CC_MESSAGE_TYPE_DISCONNECT,
+                             json))
     {
-      g_error ("CcCtrl: Failed to send disconnect message");
+      g_warning ("CcCtrl: Failed to send disconnect message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  return TRUE;
 }
 
 static gboolean
@@ -124,20 +118,17 @@ cc_ctrl_send_get_status (CcCtrl *ctrl, gchar *destination_id)
     "requestId", CC_JSON_TYPE_INT, ctrl->request_id++,
     NULL);
 
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           destination_id,
-                                           CC_MESSAGE_TYPE_RECEIVER,
-                                           json);
-
-  if (send_ok)
-    cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
-  else
+  if (!cc_comm_send_request (&ctrl->comm,
+                             destination_id,
+                             CC_MESSAGE_TYPE_RECEIVER,
+                             json))
     {
-      g_error ("CcCtrl: Failed to send get status message");
+      g_warning ("CcCtrl: Failed to send get status message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  return TRUE;
 }
 
 static gboolean
@@ -152,20 +143,19 @@ cc_ctrl_send_get_app_availability (CcCtrl *ctrl, gchar *destination_id, gchar *a
     "requestId", CC_JSON_TYPE_INT, ctrl->request_id++,
     NULL);
 
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           destination_id,
-                                           CC_MESSAGE_TYPE_RECEIVER,
-                                           json);
-
-  if (send_ok)
-    cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_GET_APP_AVAILABILITY);
-  else
+  if (!cc_comm_send_request (&ctrl->comm,
+                             destination_id,
+                             CC_MESSAGE_TYPE_RECEIVER,
+                             json))
     {
-      g_error ("CcCtrl: Failed to send get app availability message");
+      g_warning ("CcCtrl: Failed to send get app availability message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_GET_APP_AVAILABILITY);
+
+  return TRUE;
 }
 
 static gboolean
@@ -178,20 +168,19 @@ cc_ctrl_send_launch_app (CcCtrl *ctrl, gchar *destination_id, gchar *appId)
     "requestId", CC_JSON_TYPE_INT, ctrl->request_id++,
     NULL);
 
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           destination_id,
-                                           CC_MESSAGE_TYPE_RECEIVER,
-                                           json);
-
-  if (send_ok)
-    cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
-  else
+  if (!cc_comm_send_request (&ctrl->comm,
+                             destination_id,
+                             CC_MESSAGE_TYPE_RECEIVER,
+                             json))
     {
-      g_error ("CcCtrl: Failed to send launch app message");
+      g_warning ("CcCtrl: Failed to send launch app message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
+
+  return TRUE;
 }
 
 static gboolean
@@ -203,20 +192,19 @@ cc_ctrl_send_close_app (CcCtrl *ctrl, gchar *sessionId)
     "requestId", CC_JSON_TYPE_INT, ctrl->request_id++,
     NULL);
 
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           sessionId,
-                                           CC_MESSAGE_TYPE_RECEIVER,
-                                           json);
-
-  if (send_ok)
-    cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
-  else
+  if (!cc_comm_send_request (&ctrl->comm,
+                             sessionId,
+                             CC_MESSAGE_TYPE_RECEIVER,
+                             json))
     {
-      g_error ("CcCtrl: Failed to send close app message");
+      g_warning ("CcCtrl: Failed to send close app message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_RECEIVER_STATUS);
+
+  return TRUE;
 }
 
 /* OFFER MESSAGE */
@@ -304,20 +292,19 @@ cc_ctrl_send_offer (CcCtrl *ctrl, gchar *destination_id, GError **error)
     "type", CC_JSON_TYPE_STRING, "OFFER",
     NULL);
 
-  gboolean send_ok = cc_comm_send_request (&ctrl->comm,
-                                           destination_id,
-                                           CC_MESSAGE_TYPE_WEBRTC,
-                                           cc_json_helper_node_to_string (root));
-
-  if (send_ok)
-    cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_ANSWER);
-  else
+  if (!cc_comm_send_request (&ctrl->comm,
+                             destination_id,
+                             CC_MESSAGE_TYPE_WEBRTC,
+                             cc_json_helper_node_to_string (root)))
     {
-      g_error ("CcCtrl: Failed to send OFFER message");
+      g_warning ("CcCtrl: Failed to send OFFER message");
       cc_ctrl_fatal_error (ctrl);
+      return FALSE;
     }
 
-  return send_ok;
+  cc_ctrl_set_waiting_for (ctrl, CC_RWAIT_TYPE_ANSWER);
+
+  return TRUE;
 }
 
 /* INTERVAL FUNCTIONS */
