@@ -234,7 +234,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   GSocketFamily socket_family;
   GSocketConnectable * connectable;
   GIOStream *tls_conn;
-  GSocketAddressEnumerator * enumerator;
+  g_autoptr(GSocketAddressEnumerator) enumerator = NULL;
 
   /* we must be disconnected */
   g_assert (comm->con == NULL);
@@ -258,7 +258,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
   enumerator = g_socket_connectable_enumerate (connectable);
   while (TRUE)
     {
-      GSocketAddress * address = g_socket_address_enumerator_next (enumerator, comm->cancellable, error);
+      g_autoptr(GSocketAddress) address = g_socket_address_enumerator_next (enumerator, comm->cancellable, error);
       if (address == NULL)
         {
           g_warning ("CcComm: Failed to create address");
@@ -267,10 +267,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
       if (g_socket_connect (socket, address, comm->cancellable, error))
         break;
-
-      g_object_unref (address);
     }
-  g_object_unref (enumerator);
 
   comm->con = G_IO_STREAM (g_socket_connection_factory_create_connection (socket));
 
