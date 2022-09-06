@@ -27,19 +27,19 @@ static void cc_ctrl_fatal_error (CcCtrl *ctrl);
 static void
 cc_ctrl_set_waiting_for (CcCtrl *ctrl, CcWaitingFor waiting_for)
 {
-  ctrl->waiting_for |= waiting_for;
+  ctrl->waiting_for |= 1 << waiting_for;
 }
 
 static void
 cc_ctrl_unset_waiting_for (CcCtrl *ctrl, CcWaitingFor waiting_for)
 {
-  ctrl->waiting_for &= ~waiting_for;
+  ctrl->waiting_for &= ~(1 << waiting_for);
 }
 
 static gboolean
 cc_ctrl_is_waiting_for (CcCtrl *ctrl, CcWaitingFor waiting_for)
 {
-  return (ctrl->waiting_for & waiting_for) > CC_RWAIT_TYPE_NONE;
+  return (ctrl->waiting_for & (1 << waiting_for)) > 1 << CC_RWAIT_TYPE_NONE;
 }
 
 /* SEND HELPER FUNCTIONS */

@@ -57,7 +57,7 @@ struct _CcCtrl
   CcCtrlState state;
   gchar      *session_id;
   guint       request_id;
-  guint8      waiting_for;
+  guint       waiting_for;
   guint       ping_timeout_handle;
   guint       waiting_check_timeout_handle;
 };
