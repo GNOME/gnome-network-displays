@@ -179,12 +179,14 @@ nd_cc_sink_finalize (GObject *object)
 
   nd_cc_sink_sink_stop_stream_int (sink);
 
-  g_cancellable_cancel (sink->cancellable);
-  g_clear_object (&sink->cancellable);
-
   g_clear_pointer (&sink->missing_video_codec, g_strfreev);
   g_clear_pointer (&sink->missing_audio_codec, g_strfreev);
   g_clear_pointer (&sink->missing_firewall_zone, g_free);
+
+  g_clear_pointer (&sink->remote_address, g_free);
+  g_clear_pointer (&sink->remote_name, g_free);
+
+  g_clear_object (&sink->comm_client);
 
   G_OBJECT_CLASS (nd_cc_sink_parent_class)->finalize (object);
 }
