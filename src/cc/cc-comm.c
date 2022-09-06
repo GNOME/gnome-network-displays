@@ -115,7 +115,7 @@ cc_comm_message_read_cb (GObject      *source_object,
   if (!comm->con)
     {
       g_error ("CcComm: Connection error while reading message body");
-      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
+      comm->closure->error_close_connection_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -130,11 +130,11 @@ cc_comm_message_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading message from stream: %s", error->message);
-          comm->closure->fatal_error_cb (comm->closure->userdata, g_steal_pointer (&error));
+          comm->closure->error_close_connection_cb (comm->closure->userdata, g_steal_pointer (&error));
           return;
         }
       g_error ("CcComm: Error reading message from stream.");
-      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
+      comm->closure->error_close_connection_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -169,7 +169,7 @@ cc_comm_header_read_cb (GObject      *source_object,
   if (!comm->con)
     {
       g_error ("CcComm: Connection error while reading header");
-      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
+      comm->closure->error_close_connection_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -186,11 +186,11 @@ cc_comm_header_read_cb (GObject      *source_object,
       if (error)
         {
           g_error ("CcComm: Error reading header from stream: %s", error->message);
-          comm->closure->fatal_error_cb (comm->closure->userdata, g_steal_pointer (&error));
+          comm->closure->error_close_connection_cb (comm->closure->userdata, g_steal_pointer (&error));
           return;
         }
       g_error ("CcComm: Error reading header from stream.");
-      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
+      comm->closure->error_close_connection_cb (comm->closure->userdata, NULL);
       return;
     }
 
@@ -335,7 +335,7 @@ cc_comm_tls_send (CcComm  * comm,
   if (!G_IS_TLS_CONNECTION (comm->con))
     {
       g_error ("Connection has not been established");
-      comm->closure->fatal_error_cb (comm->closure->userdata, NULL);
+      comm->closure->error_close_connection_cb (comm->closure->userdata, NULL);
       return FALSE;
     }
 
@@ -351,7 +351,7 @@ cc_comm_tls_send (CcComm  * comm,
       if (io_bytes <= 0)
         {
           g_warning ("CcComm: Failed to write: %s", err->message);
-          comm->closure->fatal_error_cb (comm->closure->userdata, g_steal_pointer (&err));
+          comm->closure->error_close_connection_cb (comm->closure->userdata, g_steal_pointer (&err));
           return FALSE;
         }
 

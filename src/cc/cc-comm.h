@@ -31,7 +31,7 @@ struct _CcCommClosure
   gpointer userdata;
   void     (*message_received_cb) (gpointer                    userdata,
                                    Cast__Channel__CastMessage *message);
-  void     (*fatal_error_cb) (gpointer userdata,
+  void     (*error_close_connection_cb) (gpointer userdata,
                               GError  *error);
 };
 

@@ -20,7 +20,7 @@
 #include "cc-comm.h"
 
 /* FUNCTION DECLS */
-static void cc_ctrl_fatal_error (CcCtrl *ctrl);
+static void cc_ctrl_close_connection (CcCtrl *ctrl);
 
 /* WAITING FOR */
 
@@ -53,7 +53,7 @@ cc_ctrl_send_auth (CcCtrl *ctrl)
                              NULL))
     {
       g_warning ("CcCtrl: Failed to send auth message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -83,7 +83,7 @@ cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id)
                              json))
     {
       g_warning ("CcCtrl: Failed to send connect message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -103,7 +103,7 @@ cc_ctrl_send_disconnect (CcCtrl *ctrl, gchar *destination_id)
                              json))
     {
       g_warning ("CcCtrl: Failed to send disconnect message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -124,7 +124,7 @@ cc_ctrl_send_get_status (CcCtrl *ctrl, gchar *destination_id)
                              json))
     {
       g_warning ("CcCtrl: Failed to send get status message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -149,7 +149,7 @@ cc_ctrl_send_get_app_availability (CcCtrl *ctrl, gchar *destination_id, gchar *a
                              json))
     {
       g_warning ("CcCtrl: Failed to send get app availability message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -174,7 +174,7 @@ cc_ctrl_send_launch_app (CcCtrl *ctrl, gchar *destination_id, gchar *appId)
                              json))
     {
       g_warning ("CcCtrl: Failed to send launch app message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -198,7 +198,7 @@ cc_ctrl_send_close_app (CcCtrl *ctrl, gchar *sessionId)
                              json))
     {
       g_warning ("CcCtrl: Failed to send close app message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -298,7 +298,7 @@ cc_ctrl_send_offer (CcCtrl *ctrl, gchar *destination_id, GError **error)
                              cc_json_helper_node_to_string (root)))
     {
       g_warning ("CcCtrl: Failed to send OFFER message");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return FALSE;
     }
 
@@ -317,7 +317,7 @@ cc_ctrl_check_waiting_for (CcCtrl *ctrl)
     return G_SOURCE_CONTINUE;
 
   g_error ("CcCtrl: Timed out waiting for %d", ctrl->waiting_for);
-  cc_ctrl_fatal_error (ctrl);
+  cc_ctrl_close_connection (ctrl);
 
   return G_SOURCE_REMOVE;
 }
@@ -395,7 +395,7 @@ cc_ctrl_handle_get_app_availability (CcCtrl *ctrl, JsonReader *reader)
 
           /* since the app is not available, stop attempts */
           g_warning ("CcCtrl: %s app is not available, quiting", CC_MIRRORING_APP_ID);
-          cc_ctrl_fatal_error (ctrl);
+          cc_ctrl_close_connection (ctrl);
         }
     }
 }
@@ -497,7 +497,7 @@ cc_ctrl_handle_close (CcCtrl *ctrl, Cast__Channel__CastMessage *message)
   if (g_strcmp0 (message->source_id, CC_DEFAULT_RECEIVER_ID) == 0)
     {
       g_warning ("CcCtrl: Receiver closed the connection");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       return;
     }
 
@@ -550,7 +550,7 @@ cc_ctrl_handle_received_msg (gpointer                    userdata,
 
     case CC_RWAIT_TYPE_LAUNCH_ERROR:
       g_warning ("CcCtrl: Failed to launch app");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       break;
 
     case CC_RWAIT_TYPE_ANSWER:
@@ -578,13 +578,13 @@ cc_ctrl_handle_received_msg (gpointer                    userdata,
     case CC_RWAIT_TYPE_UNKNOWN:
     default:
       g_warning ("CcCtrl: Unknown message type");
-      cc_ctrl_fatal_error (ctrl);
+      cc_ctrl_close_connection (ctrl);
       break;
     }
 }
 
 static void
-cc_ctrl_fatal_error (CcCtrl *ctrl)
+cc_ctrl_close_connection (CcCtrl *ctrl)
 {
   if (ctrl->state == CC_CTRL_STATE_ERROR) /* function has already been called */
     return;
@@ -594,18 +594,18 @@ cc_ctrl_fatal_error (CcCtrl *ctrl)
 }
 
 void
-cc_ctrl_fatal_error_closure (gpointer userdata, GError *error)
+cc_ctrl_error_close_connection_cb (gpointer userdata, GError *error)
 {
   CcCtrl *ctrl;
 
-  /* XXX: add error arg in end_stream and display an error message to user */
+  /* TODO: future work: add error arg in end_stream and display an error message to user */
   if (error)
-    g_warning ("CcCtrl: Fatal error: %s", error->message);
+    g_warning ("CcCtrl: Connection error: %s", error->message);
   else
-    g_error ("CcCtrl: Fatal error");
+    g_error ("CcCtrl: Connection error");
 
   ctrl = (CcCtrl *) userdata;
-  cc_ctrl_fatal_error (ctrl);
+  cc_ctrl_close_connection (ctrl);
 }
 
 CcCommClosure *
@@ -615,7 +615,7 @@ cc_ctrl_get_callback_closure (CcCtrl *ctrl)
 
   closure->userdata = ctrl;
   closure->message_received_cb = cc_ctrl_handle_received_msg;
-  closure->fatal_error_cb = cc_ctrl_fatal_error_closure;
+  closure->error_close_connection_cb = cc_ctrl_error_close_connection_cb;
   return closure;
 }
 
