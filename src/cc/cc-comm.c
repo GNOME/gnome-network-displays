@@ -194,6 +194,9 @@ cc_comm_header_read_cb (GObject      *source_object,
       return;
     }
 
+  /* be sure the size of guint32 is 4 bytes */
+  G_STATIC_ASSERT (sizeof (comm->header_buffer) == sizeof (guint32));
+
   /* if everything is well, read all `io_bytes` */
   message_size = GINT32_FROM_BE (comm->header_buffer);
   g_debug ("CcComm: Message size: %d", message_size);

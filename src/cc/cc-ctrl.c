@@ -651,10 +651,13 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
   /* since tls_send is a synchronous call */
   ctrl->state = CC_CTRL_STATE_CONNECTED;
 
-  /* send pings to device every 5 seconds */
+  /* keeps the connection alive */
   ctrl->ping_timeout_handle = g_timeout_add_seconds (5, G_SOURCE_FUNC (cc_ctrl_send_ping), ctrl);
 
-  /* check waiting for every 15 seconds */
+  /* assert waiting_for can accmodate all the bits */
+  G_STATIC_ASSERT (sizeof (ctrl->waiting_for) * 8 >= CC_RWAIT_TYPE_UNKNOWN);
+
+  /* timeout waiting for messages */
   ctrl->waiting_check_timeout_handle = g_timeout_add_seconds (CC_MAX_MESSAGE_TIMEOUT,
                                                               G_SOURCE_FUNC (cc_ctrl_check_waiting_for),
                                                               ctrl);
