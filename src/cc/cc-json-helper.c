@@ -25,8 +25,11 @@ cc_json_helper_build_internal (JsonBuilder *builder,
 {
   for (gchar *key = first_key; key != NULL; key = va_arg (var_args, gchar *))
     {
+      CcJsonType type;
+      g_autoptr(GArray) arr = NULL;
+
       json_builder_set_member_name (builder, key);
-      CcJsonType type = va_arg (var_args, CcJsonType);
+      type = va_arg (var_args, CcJsonType);
 
       g_assert (type >= CC_JSON_TYPE_STRING && type <= CC_JSON_TYPE_ARRAY_OBJECT);
 
@@ -61,10 +64,9 @@ cc_json_helper_build_internal (JsonBuilder *builder,
         }
 
       json_builder_begin_array (builder);
-      g_autoptr (GArray) arr = va_arg (var_args, GArray *);
-      guint i;
+      arr = va_arg (var_args, GArray *);
 
-      for (i = 0; i < arr->len; i++)
+      for (guint i = 0; i < arr->len; i++)
         {
           switch (type)
             {
@@ -105,17 +107,20 @@ JsonNode *
 cc_json_helper_build_node (gchar *first_key,
                            ...)
 {
+  JsonBuilder *builder;
+  JsonNode *node;
+
   va_list var_args;
 
   va_start (var_args, first_key);
 
-  JsonBuilder *builder = json_builder_new ();
+  builder = json_builder_new ();
 
   json_builder_begin_object (builder);
   cc_json_helper_build_internal (builder, first_key, var_args);
   json_builder_end_object (builder);
 
-  JsonNode *node = json_builder_get_root (builder);
+  node = json_builder_get_root (builder);
 
   va_end (var_args);
   g_object_unref (builder);
@@ -128,22 +133,27 @@ cc_json_helper_build_string (/* gboolean pretty_print, */
   gchar *first_key,
   ...)
 {
+  JsonBuilder *builder;
+  JsonNode *root;
+  JsonGenerator *gen;
+  gchar *output;
+
   va_list var_args;
 
   va_start (var_args, first_key);
 
-  JsonBuilder *builder = json_builder_new ();
+  builder = json_builder_new ();
 
   json_builder_begin_object (builder);
   cc_json_helper_build_internal (builder, first_key, var_args);
   json_builder_end_object (builder);
 
-  JsonNode *root = json_builder_get_root (builder);
-  JsonGenerator *gen = json_generator_new ();
+  root = json_builder_get_root (builder);
+  gen = json_generator_new ();
 
   /* json_generator_set_pretty (gen, pretty_print); */
   json_generator_set_root (gen, root);
-  gchar *output = json_generator_to_data (gen, NULL);
+  output = json_generator_to_data (gen, NULL);
 
   va_end (var_args);
   json_node_free (root);
@@ -156,10 +166,11 @@ cc_json_helper_build_string (/* gboolean pretty_print, */
 gchar *
 cc_json_helper_node_to_string (JsonNode *node)
 {
+  gchar *output;
   JsonGenerator *gen = json_generator_new ();
 
   json_generator_set_root (gen, node);
-  gchar *output = json_generator_to_data (gen, NULL);
+  output = json_generator_to_data (gen, NULL);
 
   g_object_unref (gen);
 
@@ -218,6 +229,7 @@ void
 cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borked)
 {
   JsonNode *payload_utf8_node;
+  gchar *output;
   JsonParser *parser = json_parser_new ();
 
   g_autoptr(GError) error = NULL;
@@ -239,7 +251,7 @@ cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borke
 
   payload_utf8_node = json_parser_get_root (parser);
 
-  gchar *output = cc_json_helper_build_string (
+  output = cc_json_helper_build_string (
     "source_id", CC_JSON_TYPE_STRING, message->source_id,
     "destination_id", CC_JSON_TYPE_STRING, message->destination_id,
     "namespace", CC_JSON_TYPE_STRING, message->namespace_,

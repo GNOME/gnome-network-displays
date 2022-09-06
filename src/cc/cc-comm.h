@@ -45,7 +45,7 @@ struct _CcComm
   CcCommClosure *closure;
 
   /*< private >*/
-  guint8 header_buffer [4];
+  guint8  header_buffer[4];
   guint8 *message_buffer;
 };
 

@@ -101,6 +101,7 @@ cc_comm_message_read_cb (GObject      *source_object,
                          gpointer      user_data)
 {
   g_autoptr(GError) error = NULL;
+  CcComm *comm;
   gboolean success;
   gsize io_bytes;
 
@@ -109,7 +110,7 @@ cc_comm_message_read_cb (GObject      *source_object,
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
-  CcComm * comm = (CcComm *) user_data;
+  comm = (CcComm *) user_data;
 
   if (!comm->con)
     {
@@ -152,6 +153,8 @@ cc_comm_header_read_cb (GObject      *source_object,
                         gpointer      user_data)
 {
   g_autoptr(GError) error = NULL;
+  CcComm *comm;
+  GInputStream *istream;
   gboolean success;
   gsize io_bytes;
   guint32 message_size;
@@ -161,7 +164,7 @@ cc_comm_header_read_cb (GObject      *source_object,
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     return;
 
-  CcComm *comm = (CcComm *) user_data;
+  comm = (CcComm *) user_data;
 
   if (!comm->con)
     {
@@ -170,7 +173,7 @@ cc_comm_header_read_cb (GObject      *source_object,
       return;
     }
 
-  GInputStream *istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
+  istream = g_io_stream_get_input_stream (G_IO_STREAM (comm->con));
 
   if (G_INPUT_STREAM (source_object) != istream)
     {
@@ -430,6 +433,7 @@ cc_comm_send_request (CcComm       *comm,
 {
   Cast__Channel__CastMessage message;
   guint32 packed_size = 0;
+  guint32 packed_size_be;
   g_autofree uint8_t *sock_buffer = NULL;
 
   switch (message_type)
@@ -470,7 +474,7 @@ cc_comm_send_request (CcComm       *comm,
   packed_size = cast__channel__cast_message__get_packed_size (&message);
   sock_buffer = malloc (4 + packed_size);
 
-  guint32 packed_size_be = GUINT32_TO_BE (packed_size);
+  packed_size_be = GUINT32_TO_BE (packed_size);
 
   memcpy (sock_buffer, &packed_size_be, 4);
   cast__channel__cast_message__pack (&message, 4 + sock_buffer);

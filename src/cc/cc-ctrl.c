@@ -529,6 +529,7 @@ cc_ctrl_handle_received_msg (gpointer                    userdata,
   g_autoptr(GError) error = NULL;
   g_autoptr(JsonParser) parser = NULL;
   g_autoptr(JsonReader) reader = NULL;
+  CcReceivedMessageType type;
 
   parser = json_parser_new ();
   if (!json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
@@ -540,7 +541,7 @@ cc_ctrl_handle_received_msg (gpointer                    userdata,
 
   reader = json_reader_new (json_parser_get_root (parser));
 
-  CcReceivedMessageType type = cc_json_helper_get_message_type (message, reader);
+  type = cc_json_helper_get_message_type (message, reader);
 
   if (!(type == CC_RWAIT_TYPE_PING || type == CC_RWAIT_TYPE_PONG || type == -1))
     {
@@ -608,13 +609,15 @@ cc_ctrl_fatal_error (CcCtrl *ctrl)
 void
 cc_ctrl_fatal_error_closure (gpointer userdata, GError *error)
 {
+  CcCtrl *ctrl;
+
   /* XXX: add error arg in end_stream and display an error message to user */
   if (error)
     g_warning ("CcCtrl: Fatal error: %s", error->message);
   else
     g_error ("CcCtrl: Fatal error");
 
-  CcCtrl *ctrl = (CcCtrl *) userdata;
+  ctrl = (CcCtrl *) userdata;
   cc_ctrl_fatal_error (ctrl);
 }
 
