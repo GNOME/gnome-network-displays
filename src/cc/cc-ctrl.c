@@ -316,7 +316,7 @@ cc_ctrl_check_waiting_for (CcCtrl *ctrl)
   if (ctrl->waiting_for == CC_RWAIT_TYPE_NONE)
     return G_SOURCE_CONTINUE;
 
-  g_error ("CcCtrl: Timed out waiting for %d", ctrl->waiting_for);
+  g_warning ("CcCtrl: Timed out waiting for %d", ctrl->waiting_for);
   cc_ctrl_close_connection (ctrl);
 
   return G_SOURCE_REMOVE;
@@ -334,7 +334,7 @@ cc_ctrl_send_ping (CcCtrl *ctrl)
                              CC_MESSAGE_TYPE_PING,
                              NULL))
     {
-      g_error ("CcCtrl: Failed to send ping message");
+      g_warning ("CcCtrl: Failed to send ping message");
       return G_SOURCE_REMOVE;
     }
 
@@ -363,7 +363,7 @@ cc_ctrl_mirroring_app_init (CcCtrl *ctrl)
   g_autoptr(GError) err = NULL;
   if (!cc_ctrl_send_connect (ctrl, ctrl->session_id))
     {
-      g_error ("CcCtrl: Failed to send CONNECT to the mirroring app");
+      g_warning ("CcCtrl: Failed to send CONNECT to the mirroring app");
       return;
     }
 
@@ -388,7 +388,7 @@ cc_ctrl_handle_get_app_availability (CcCtrl *ctrl, JsonReader *reader)
               /* launch the app now */
               if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID))
                 {
-                  g_error ("CcCtrl: Failed to launch the app");
+                  g_warning ("CcCtrl: Failed to launch the app");
                   return;
                 }
             }
@@ -431,7 +431,7 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
 
       if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID))
         {
-          g_error ("CcCtrl: Failed to launch the app");
+          g_warning ("CcCtrl: Failed to launch the app");
           return;
         }
 
@@ -470,7 +470,7 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
               /* some other app is open, check if `CC_MIRRORING_APP_ID` is available */
               if (!cc_ctrl_send_get_app_availability (ctrl, CC_MIRRORING_APP_ID, CC_DEFAULT_RECEIVER_ID))
                 {
-                  g_error ("CcCtrl: Failed to send GET_APP_AVAILABILITY");
+                  g_warning ("CcCtrl: Failed to send GET_APP_AVAILABILITY");
                   return;
                 }
             }
@@ -504,7 +504,7 @@ cc_ctrl_handle_close (CcCtrl *ctrl, Cast__Channel__CastMessage *message)
   /* the app closed */
   g_debug ("CcCtrl: App sent a close message, launching again");
   if (!cc_ctrl_send_launch_app (ctrl, CC_DEFAULT_RECEIVER_ID, CC_MIRRORING_APP_ID))
-    g_error ("CcCtrl: Failed to launch app");
+    g_warning ("CcCtrl: Failed to launch app");
 }
 
 void
@@ -602,7 +602,7 @@ cc_ctrl_error_close_connection_cb (gpointer userdata, GError *error)
   if (error)
     g_warning ("CcCtrl: Connection error: %s", error->message);
   else
-    g_error ("CcCtrl: Connection error");
+    g_warning ("CcCtrl: Connection error");
 
   ctrl = (CcCtrl *) userdata;
   cc_ctrl_close_connection (ctrl);
@@ -665,7 +665,7 @@ cc_ctrl_connection_init (CcCtrl *ctrl, gchar *remote_address)
   /* we can skip some message interchange if the mirroring app is already up */
   if (!cc_ctrl_send_get_status (ctrl, CC_DEFAULT_RECEIVER_ID))
     {
-      g_error ("CcCtrl: Failed to send get status");
+      g_warning ("CcCtrl: Failed to send get status");
       return FALSE;
     }
 
@@ -685,15 +685,15 @@ cc_ctrl_finish (CcCtrl *ctrl)
   if (ctrl->state >= CC_CTRL_STATE_APP_OPEN)
     {
       if (!cc_ctrl_send_disconnect (ctrl, CC_DEFAULT_RECEIVER_ID))
-        g_error ("CcCtrl: Error closing virtual connection to app");
+        g_warning ("CcCtrl: Error closing virtual connection to app");
       if (!cc_ctrl_send_close_app (ctrl, ctrl->session_id))
-        g_error ("CcCtrl: Error closing app");
+        g_warning ("CcCtrl: Error closing app");
       g_clear_pointer (&ctrl->session_id, g_free);
     }
 
   /* close the virtual connection */
   if (!cc_ctrl_send_disconnect (ctrl, CC_DEFAULT_RECEIVER_ID))
-    g_error ("CcCtrl: Error closing virtual connection");
+    g_warning ("CcCtrl: Error closing virtual connection");
 
   /* free up the resources */
   g_clear_pointer (&ctrl->comm.closure, g_free);

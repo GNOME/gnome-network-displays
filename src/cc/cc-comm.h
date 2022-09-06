@@ -32,7 +32,7 @@ struct _CcCommClosure
   void     (*message_received_cb) (gpointer                    userdata,
                                    Cast__Channel__CastMessage *message);
   void     (*error_close_connection_cb) (gpointer userdata,
-                              GError  *error);
+                                         GError  *error);
 };
 
 typedef struct _CcCommClosure CcCommClosure;
