@@ -60,7 +60,7 @@ cc_json_helper_build_internal (JsonBuilder *builder,
           continue;
 
         default:
-          return;
+          g_assert_not_reached ();
         }
 
       json_builder_begin_array (builder);
@@ -95,7 +95,7 @@ cc_json_helper_build_internal (JsonBuilder *builder,
               break;
 
             default:
-              return;
+              g_assert_not_reached ();
             }
         }
 

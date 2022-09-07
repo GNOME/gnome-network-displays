@@ -358,7 +358,7 @@ cc_comm_tls_send (CcComm  * comm,
   return TRUE;
 }
 
-static gboolean
+static void
 cc_comm_build_message (Cast__Channel__CastMessage             *message,
                        gchar                                  *sender_id,
                        gchar                                  *destination_id,
@@ -402,7 +402,7 @@ cc_comm_build_message (Cast__Channel__CastMessage             *message,
       break;
 
     default:
-      return FALSE;
+      g_assert_not_reached ();
     }
 
   message->payload_type = payload_type;
@@ -419,10 +419,8 @@ cc_comm_build_message (Cast__Channel__CastMessage             *message,
       break;
 
     default:
-      return FALSE;
+      g_assert_not_reached ();
     }
-
-  return TRUE;
 }
 
 gboolean
@@ -444,31 +442,23 @@ cc_comm_send_request (CcComm       *comm,
       binary_payload.data = NULL;
       binary_payload.len = 0;
 
-      if (!cc_comm_build_message (&message,
-                                  CC_DEFAULT_SENDER_ID,
-                                  destination_id,
-                                  message_type,
-                                  CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
-                                  &binary_payload,
-                                  NULL))
-        {
-          g_warning ("Auth message building failed!");
-          return FALSE;
-        }
+      cc_comm_build_message (&message,
+                             CC_DEFAULT_SENDER_ID,
+                             destination_id,
+                             message_type,
+                             CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
+                             &binary_payload,
+                             NULL);
       break;
 
     default:
-      if (!cc_comm_build_message (&message,
-                                  CC_DEFAULT_SENDER_ID,
-                                  destination_id,
-                                  message_type,
-                                  CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
-                                  NULL,
-                                  utf8_payload))
-        {
-          g_warning ("Message building failed for message type: %d", message_type);
-          return FALSE;
-        }
+      cc_comm_build_message (&message,
+                             CC_DEFAULT_SENDER_ID,
+                             destination_id,
+                             message_type,
+                             CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING,
+                             NULL,
+                             utf8_payload);
     }
 
   packed_size = cast__channel__cast_message__get_packed_size (&message);

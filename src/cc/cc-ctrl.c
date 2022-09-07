@@ -577,8 +577,7 @@ cc_ctrl_handle_received_msg (gpointer                    userdata,
 
     case CC_RWAIT_TYPE_UNKNOWN:
     default:
-      g_warning ("CcCtrl: Unknown message type");
-      cc_ctrl_close_connection (ctrl);
+      g_debug ("CcCtrl: Unknown message type");
       break;
     }
 }
