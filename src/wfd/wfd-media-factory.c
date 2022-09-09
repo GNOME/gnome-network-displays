@@ -131,17 +131,14 @@ free_qos_data (QOSData *qos_data)
 }
 
 GstElement *
-wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl *url)
+wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
 {
-  g_autoptr(GstBin) bin = NULL;
   g_autoptr(GstCaps) caps = NULL;
-  g_autoptr(GstBin) audio_pipeline = NULL;
   g_autoptr(GstPad) encoding_perf_sink = NULL;
-  WfdMediaFactory *self = WFD_MEDIA_FACTORY (factory);
+  g_autoptr(GstElement) source = NULL;
+
   QOSData *qos_data;
 
-  g_autoptr(GstElement) source = NULL;
-  g_autoptr(GstElement) audio_source = NULL;
   GstElement *scale;
   GstElement *sizefilter;
   GstElement *convert;
@@ -152,12 +149,8 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   GstElement *parse;
   GstElement *codecfilter;
   GstElement *queue_mpegmux_video;
-  GstElement *mpegmux;
-  GstElement *queue_pre_payloader;
-  GstElement *payloader;
-  gboolean success = TRUE;
 
-  bin = GST_BIN (gst_bin_new ("wfd-encoder-bin"));
+  gboolean success = TRUE;
 
   /* Test input, will be replaced by real source */
   g_signal_emit (self, signals[SIGNAL_CREATE_SOURCE], 0, &source);
@@ -316,37 +309,6 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
                 "max-size-time", 500 * GST_MSECOND,
                 NULL);
 
-  /* TODO: With gstreamer 1.17 we should be able to set things up so
-   *       that audio frames are still send even if there are no new
-   *       video frames. At that point, some semantics should be
-   *       changed like doing proper variable framerate and such.
-   *       This is possible as mpegtsmux was being ported to GstAggregator.
-   */
-  mpegmux = gst_element_factory_make ("mpegtsmux", "wfd-mpegtsmux");
-  success &= gst_bin_add (bin, mpegmux);
-  g_object_set (mpegmux,
-                "alignment", (gint) 7, /* Force the correct alignment for UDP */
-                NULL);
-
-
-  queue_pre_payloader = gst_element_factory_make ("queue", "wfd-pre-payloader-queue");
-  success &= gst_bin_add (bin, queue_pre_payloader);
-  g_object_set (queue_pre_payloader,
-                "max-size-buffers", (guint) 1,
-                "leaky", 0,
-                NULL);
-
-  payloader = gst_element_factory_make ("rtpmp2tpay", "pay0");
-  success &= gst_bin_add (bin, payloader);
-  g_object_set (payloader,
-                "ssrc", 1,
-                /* Perfect is in relation to the input buffers, but we want the
-                 * proper clock from when the packet was sent. */
-                "perfect-rtptime", FALSE,
-                "timestamp-offset", (guint) 0,
-                "seqnum-offset", (gint) 0,
-                NULL);
-
   success &= gst_element_link_many (source,
                                     scale,
                                     sizefilter,
@@ -359,20 +321,26 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
                                     queue_mpegmux_video,
                                     NULL);
 
-  /* The WFD specification says we should use stream ID 0x1011. */
-  success &= gst_element_link_pads (queue_mpegmux_video, "src", mpegmux, "sink_4113");
-  success &= gst_element_link_many (mpegmux,
-                                    queue_pre_payloader,
-                                    payloader,
-                                    NULL);
+  if (!success)
+    g_error ("WfdMediaFactory: Error creating the video encoding pipeline. If gstreamer is compiled with debugging and GST_DEBUG_DUMP_DOT_DIR is set, then the pipeline will have been dumped.");
 
+  return (GstElement *) g_steal_pointer (&queue_mpegmux_video);
+}
 
-  /* Add audio elements */
+GstElement *
+wfd_media_factory_create_audio_element (WfdMediaFactory *self, GstBin *bin)
+{
+  g_autoptr(GstElement) audio_source = NULL;
+  gboolean success = TRUE;
+
   if (self->aac_encoder != ENCODER_AAC_NONE)
     g_signal_emit (self, signals[SIGNAL_CREATE_AUDIO_SOURCE], 0, &audio_source);
 
   if (audio_source)
     {
+      g_autoptr(GstCaps) caps = NULL;
+      g_autoptr(GstBin) audio_pipeline = NULL;
+
       GstElement *audioencoder;
       GstElement *audioresample;
       GstElement *audioconvert;
@@ -433,7 +401,72 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
                            gst_ghost_pad_new ("src",
                                               gst_element_get_static_pad (queue_mpegmux_audio,
                                                                           "src")));
+
+      return (GstElement *) g_steal_pointer (&queue_mpegmux_audio);
     }
+  return NULL;
+}
+
+GstElement *
+wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl *url)
+{
+  g_autoptr(GstBin) bin = NULL;
+  WfdMediaFactory *self = WFD_MEDIA_FACTORY (factory);
+
+  GstElement *queue_mpegmux_video;
+  GstElement *queue_mpegmux_audio;
+  GstElement *mpegmux;
+  GstElement *queue_pre_payloader;
+  GstElement *payloader;
+  gboolean success = TRUE;
+
+  bin = GST_BIN (gst_bin_new ("wfd-encoder-bin"));
+
+  queue_mpegmux_video = wfd_media_factory_create_video_element (self, bin);
+
+  /* TODO: With gstreamer 1.17 we should be able to set things up so
+   *       that audio frames are still send even if there are no new
+   *       video frames. At that point, some semantics should be
+   *       changed like doing proper variable framerate and such.
+   *       This is possible as mpegtsmux was being ported to GstAggregator.
+   */
+  mpegmux = gst_element_factory_make ("mpegtsmux", "wfd-mpegtsmux");
+  success &= gst_bin_add (bin, mpegmux);
+  g_object_set (mpegmux,
+                "alignment", (gint) 7, /* Force the correct alignment for UDP */
+                NULL);
+
+
+  queue_pre_payloader = gst_element_factory_make ("queue", "wfd-pre-payloader-queue");
+  success &= gst_bin_add (bin, queue_pre_payloader);
+  g_object_set (queue_pre_payloader,
+                "max-size-buffers", (guint) 1,
+                "leaky", 0,
+                NULL);
+
+  payloader = gst_element_factory_make ("rtpmp2tpay", "pay0");
+  success &= gst_bin_add (bin, payloader);
+  g_object_set (payloader,
+                "ssrc", 1,
+                /* Perfect is in relation to the input buffers, but we want the
+                 * proper clock from when the packet was sent. */
+                "perfect-rtptime", FALSE,
+                "timestamp-offset", (guint) 0,
+                "seqnum-offset", (gint) 0,
+                NULL);
+
+  /* The WFD specification says we should use stream ID 0x1011. */
+  success &= gst_element_link_pads (queue_mpegmux_video, "src", mpegmux, "sink_4113");
+  success &= gst_element_link_many (mpegmux,
+                                    queue_pre_payloader,
+                                    payloader,
+                                    NULL);
+
+
+  /* Add audio elements */
+  queue_mpegmux_audio = wfd_media_factory_create_audio_element (self, bin);
+  if (queue_mpegmux_audio != NULL)
+    success &= gst_element_link_pads (queue_mpegmux_audio, "src", mpegmux, "sink_4114");
 
   GST_DEBUG_BIN_TO_DOT_FILE (bin,
                              GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE,

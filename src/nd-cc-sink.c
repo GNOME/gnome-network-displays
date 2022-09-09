@@ -18,31 +18,30 @@
 
 #include "gnome-network-displays-config.h"
 #include "nd-cc-sink.h"
-#include "wfd/wfd-server.h"
 #include "wfd/wfd-client.h"
+#include "wfd/wfd-media-factory.h"
 #include "cc/cc-ctrl.h"
 #include "cc/cc-common.h"
 
 struct _NdCCSink
 {
-  GObject        parent_instance;
+  GObject          parent_instance;
 
-  NdSinkState    state;
+  NdSinkState      state;
 
-  GCancellable  *cancellable;
+  GCancellable    *cancellable;
 
-  GStrv          missing_video_codec;
-  GStrv          missing_audio_codec;
-  char          *missing_firewall_zone;
+  GStrv            missing_video_codec;
+  GStrv            missing_audio_codec;
+  char            *missing_firewall_zone;
 
-  gchar         *remote_address;
-  gchar         *remote_name;
+  gchar           *remote_address;
+  gchar           *remote_name;
 
-  GSocketClient *comm_client;
-  CcCtrl         ctrl;
+  GSocketClient   *comm_client;
+  CcCtrl           ctrl;
 
-  WfdServer     *server;
-  guint          server_source_id;
+  WfdMediaFactory *factory;
 };
 
 enum {
@@ -247,48 +246,8 @@ nd_cc_sink_sink_iface_init (NdSinkIface *iface)
   iface->stop_stream = nd_cc_sink_sink_stop_stream;
 }
 
-static void
-play_request_cb (NdCCSink *sink, GstRTSPContext *ctx, WfdClient *client)
-{
-  g_debug ("NdCCSink: Got play request from client");
-
-  sink->state = ND_SINK_STATE_STREAMING;
-  g_object_notify (G_OBJECT (sink), "state");
-}
-
-static void
-closed_cb (NdCCSink *sink, WfdClient *client)
-{
-  /* Connection was closed, do a clean shutdown */
-  nd_cc_sink_sink_stop_stream (ND_SINK (sink));
-}
-
-// TODO
-static void
-client_connected_cb (NdCCSink *sink, WfdClient *client, WfdServer *server)
-{
-  g_debug ("NdCCSink: Got client connection");
-
-  g_signal_handlers_disconnect_by_func (sink->server, client_connected_cb, sink);
-  sink->state = ND_SINK_STATE_WAIT_STREAMING;
-  g_object_notify (G_OBJECT (sink), "state");
-
-  /* XXX: connect to further events. */
-  g_signal_connect_object (client,
-                           "play-request",
-                           (GCallback) play_request_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
-
-  g_signal_connect_object (client,
-                           "closed",
-                           (GCallback) closed_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
-}
-
 static GstElement *
-server_create_source_cb (NdCCSink *sink, WfdServer *server)
+server_create_source_cb (NdCCSink *sink, WfdMediaFactory *factory)
 {
   GstElement *res;
 
@@ -298,7 +257,7 @@ server_create_source_cb (NdCCSink *sink, WfdServer *server)
 }
 
 static GstElement *
-server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
+server_create_audio_source_cb (NdCCSink *sink, WfdMediaFactory *factory)
 {
   GstElement *res;
 
@@ -306,6 +265,54 @@ server_create_audio_source_cb (NdCCSink *sink, WfdServer *server)
   g_debug ("NdCCSink: Create audio source signal emitted");
 
   return res;
+}
+
+static void
+nd_cc_sink_create_gst_elements (NdCCSink *sink, GstBin *bin)
+{
+  gboolean success = TRUE;
+  GstElement *queue_video;
+  GstElement *rtph264pay;
+  GstElement *rtp_bin;
+  GstElement *udp_sink;
+
+  GstPad *src_pad;
+  GstPad *sink_pad;
+
+  queue_video = wfd_media_factory_create_video_element (sink->factory, bin);
+  /* leave audio out for the time being */
+  /* GstElement *queue_mpegmux_audio = wfd_media_factory_create_audio_element (sink->factory, bin); */
+
+  rtph264pay = gst_element_factory_make ("rtph264pay", "rtph264pay");
+  success &= gst_bin_add (bin, rtph264pay);
+  g_object_set (rtph264pay,
+                "ssrc", 2200,
+                "seqnum-offset", (guint) 0,
+                NULL);
+
+  rtp_bin = gst_element_factory_make ( "gstrtpbin", "rtpbin" );
+  success &= gst_bin_add (bin, rtp_bin);
+  src_pad = gst_element_request_pad_simple (rtp_bin, "send_rtp_sink_0");
+
+  udp_sink = gst_element_factory_make ("udpsink", "udpsink");
+  success &= gst_bin_add (bin, udp_sink);
+  g_object_set (udp_sink,
+                // "host", sink->remote_address,
+                "port", 5000,
+                NULL);
+  sink_pad = gst_element_get_static_pad (udp_sink, "sink");
+
+  success &= gst_pad_link (src_pad, sink_pad) == GST_PAD_LINK_OK;
+  success &= gst_element_link_many (queue_video, rtph264pay, rtp_bin, NULL);
+
+  GST_DEBUG_BIN_TO_DOT_FILE (bin,
+                             GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE,
+                             "nd-cc-bin");
+
+  if (!success)
+    g_error ("NdCCSink: Failed to create gst elements");
+
+  g_debug ("NdCCSink: Created video element");
 }
 
 static void
@@ -344,10 +351,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
-  g_assert (self->server == NULL);
-
-  /* self->state = ND_SINK_STATE_ENSURE_FIREWALL;
-     g_object_notify (G_OBJECT (self), "state"); */
+  g_assert (self->factory == NULL);
 
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
@@ -355,49 +359,41 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   self->ctrl.cancellable = self->cancellable;
   self->ctrl.closure = nd_cc_sink_get_callback_closure (self);
 
-  g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
-  if (!cc_ctrl_connection_init (&self->ctrl, self->remote_address))
-    {
-      g_warning ("NdCCSink: Failed to init cc-ctrl");
-      if (self->state != ND_SINK_STATE_ERROR)
-        {
-          self->state = ND_SINK_STATE_ERROR;
-          g_object_notify (G_OBJECT (self), "state");
-        }
-      g_clear_object (&self->server);
+  /* FIXME */
+  // g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->remote_name);
+  // if (!cc_ctrl_connection_init (&self->ctrl, self->remote_address))
+  //   {
+  //     g_warning ("NdCCSink: Failed to init cc-ctrl");
+  //     if (self->state != ND_SINK_STATE_ERROR)
+  //       {
+  //         self->state = ND_SINK_STATE_ERROR;
+  //         g_object_notify (G_OBJECT (self), "state");
+  //       }
+  //     g_clear_object (&self->factory);
 
-      return NULL;
-    }
+  //     return NULL;
+  //   }
 
   self->state = ND_SINK_STATE_STREAMING;
   g_object_notify (G_OBJECT (self), "state");
 
-  /* TODO: shiny new cc_server coming right up */
-  self->server = wfd_server_new ();
-  self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
+  /* TODO */
+  self->factory = wfd_media_factory_new ();
 
-  if (self->server_source_id == 0 || self->remote_address == NULL)
+  if (self->remote_address == NULL)
     {
       self->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (self), "state");
-      g_clear_object (&self->server);
-
       return NULL;
     }
 
-  g_signal_connect_object (self->server,
-                           "client-connected",
-                           (GCallback) client_connected_cb,
-                           self,
-                           G_CONNECT_SWAPPED);
-
-  g_signal_connect_object (self->server,
+  g_signal_connect_object (self->factory,
                            "create-source",
                            (GCallback) server_create_source_cb,
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_signal_connect_object (self->server,
+  g_signal_connect_object (self->factory,
                            "create-audio-source",
                            (GCallback) server_create_audio_source_cb,
                            self,
@@ -412,6 +408,68 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
      2. send ping
    */
 
+  GstStateChangeReturn ret;
+
+  GstElement *pipeline = gst_pipeline_new ("pipeline");
+  GstBin *bin = GST_BIN (pipeline);
+  nd_cc_sink_create_gst_elements (self, bin);
+
+  gst_pipeline_set_latency (GST_PIPELINE (pipeline), 500 * GST_MSECOND);
+
+  /* Start playing */
+  ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+  if (ret == GST_STATE_CHANGE_FAILURE) {
+    g_printerr ("Unable to set the pipeline to the playing state.\n");
+    return NULL;
+  }
+
+  /* Wait until error, EOS or State Change */
+  GstMessage *msg;
+  gboolean terminate = FALSE;
+  g_autoptr(GstBus) bus = gst_element_get_bus (pipeline);
+
+  do {
+    msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE, GST_MESSAGE_ERROR | GST_MESSAGE_EOS |
+        GST_MESSAGE_STATE_CHANGED);
+
+    /* Parse message */
+    if (msg != NULL) {
+      GError *err;
+      gchar *debug_info;
+
+      switch (GST_MESSAGE_TYPE (msg)) {
+        case GST_MESSAGE_ERROR:
+          gst_message_parse_error (msg, &err, &debug_info);
+          g_printerr ("Error received from element %s: %s\n", GST_OBJECT_NAME (msg->src), err->message);
+          g_printerr ("Debugging information: %s\n", debug_info ? debug_info : "none");
+          g_clear_error (&err);
+          g_free (debug_info);
+          terminate = TRUE;
+          break;
+        case GST_MESSAGE_EOS:
+          g_print ("End-Of-Stream reached.\n");
+          terminate = TRUE;
+          break;
+        case GST_MESSAGE_STATE_CHANGED:
+          /* We are only interested in state-changed messages from the pipeline */
+          if (GST_MESSAGE_SRC (msg) == GST_OBJECT (pipeline)) {
+            GstState old_state, new_state, pending_state;
+            gst_message_parse_state_changed (msg, &old_state, &new_state, &pending_state);
+            g_print ("\nPipeline state changed from %s to %s:\n",
+                gst_element_state_get_name (old_state), gst_element_state_get_name (new_state));
+          }
+          break;
+        default:
+          /* We should not reach here because we only asked for ERRORs, EOS and STATE_CHANGED */
+          g_printerr ("Unexpected message received.\n");
+          break;
+      }
+      gst_message_unref (msg);
+    }
+  } while (!terminate);
+
+  gst_element_set_state (pipeline, GST_STATE_NULL);
+
   return g_object_ref (sink);
 }
 
@@ -419,25 +477,7 @@ static void
 nd_cc_sink_sink_stop_stream_int (NdCCSink *self)
 {
   cc_ctrl_finish (&self->ctrl);
-
   self->cancellable = g_cancellable_new ();
-
-  /* Destroy the server that is streaming. */
-  if (self->server_source_id)
-    {
-      g_source_remove (self->server_source_id);
-      self->server_source_id = 0;
-    }
-
-  /* Needs to protect against recursion. */
-  if (self->server)
-    {
-      g_autoptr(WfdServer) server = NULL;
-
-      server = g_steal_pointer (&self->server);
-      g_signal_handlers_disconnect_by_data (server, self);
-      wfd_server_purge (server);
-    }
 }
 
 static void
