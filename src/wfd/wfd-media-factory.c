@@ -328,7 +328,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
 }
 
 GstElement *
-wfd_media_factory_create_audio_element (WfdMediaFactory *self, GstBin *bin)
+wfd_media_factory_create_audio_element (WfdMediaFactory *self)
 {
   g_autoptr(GstElement) audio_source = NULL;
   gboolean success = TRUE;
@@ -347,7 +347,6 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self, GstBin *bin)
       GstElement *queue_mpegmux_audio;
 
       audio_pipeline = GST_BIN (gst_bin_new ("wfd-audio"));
-      success &= gst_bin_add (bin, GST_ELEMENT (g_object_ref (audio_pipeline)));
       /* The audio pipeline is disabled by default, we hook it up and
        * enable it during configuration. */
       gst_element_set_locked_state (GST_ELEMENT (audio_pipeline), TRUE);
@@ -402,7 +401,7 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self, GstBin *bin)
                                               gst_element_get_static_pad (queue_mpegmux_audio,
                                                                           "src")));
 
-      return (GstElement *) g_steal_pointer (&queue_mpegmux_audio);
+      return (GstElement *) g_steal_pointer (&audio_pipline);
     }
   return NULL;
 }
@@ -414,7 +413,7 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   WfdMediaFactory *self = WFD_MEDIA_FACTORY (factory);
 
   GstElement *queue_mpegmux_video;
-  GstElement *queue_mpegmux_audio;
+  GstElement *audio_pipeline;
   GstElement *mpegmux;
   GstElement *queue_pre_payloader;
   GstElement *payloader;
@@ -464,9 +463,11 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
 
 
   /* Add audio elements */
-  queue_mpegmux_audio = wfd_media_factory_create_audio_element (self, bin);
-  if (queue_mpegmux_audio != NULL)
-    success &= gst_element_link_pads (queue_mpegmux_audio, "src", mpegmux, "sink_4114");
+  audio_pipeline = wfd_media_factory_create_audio_element (self, bin);
+  if (audio_pipeline != NULL) {
+    success &= gst_bin_add (bin, audio_pipeline);
+    success &= gst_element_link_pads (audio_pipeline, "src", mpegmux, "sink_4114");
+  }
 
   GST_DEBUG_BIN_TO_DOT_FILE (bin,
                              GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE,
