@@ -189,12 +189,19 @@ discovery_start_stop (NdWFDP2PProvider *provider, NMDeviceState state)
     }
   else
     {
-      g_debug ("WFDP2PProvider: Stopping P2P discovery.");
       if (provider->p2p_find_source_id)
-        g_source_remove (provider->p2p_find_source_id);
-      provider->p2p_find_source_id = 0;
+        {
+          g_debug ("WFDP2PProvider: Stopping P2P discovery.");
+          g_source_remove (provider->p2p_find_source_id);
+          provider->p2p_find_source_id = 0;
 
-      nm_device_wifi_p2p_stop_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, NULL);
+          /* FIXME (upstream): Calling stop find for every state changes causes
+           * the connection to fail. While this was never a good idea,
+           * it does mean that something is going wrong elsewhere (likely
+           * in wpa_supplicant).
+           */
+          nm_device_wifi_p2p_stop_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, NULL);
+        }
     }
 }
 
