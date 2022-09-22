@@ -2,7 +2,7 @@
 # Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
 #
-# Matej Urbančič <mateju@svn.gnome.org>, 2020.
+# Matej Urbančič <mateju@svn.gnome.org>, 2020–2022.
 #
 msgid ""
 msgstr ""
@@ -10,17 +10,17 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues\n"
 "POT-Creation-Date: 2020-09-16 10:09+0000\n"
-"PO-Revision-Date: 2020-09-21 21:10+0200\n"
+"PO-Revision-Date: 2022-09-22 22:50+0200\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
-"%100==4 ? 3 : 0);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
+"n%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:6
@@ -81,7 +81,7 @@ msgstr "Namestite enega izmed navedenih vstavkov GStreamer"
 
 #: src/nd-window.c:158
 msgid "Checking and installing required firewall zones."
-msgstr ""
+msgstr "Preverjanje in nameščanje zahteva območja požarnih zidov."
 
 #: src/nd-window.c:165
 msgid "Making P2P connection"
@@ -89,7 +89,7 @@ msgstr "Poteka vzpostavljanje povezave P2P"
 
 #: src/nd-window.c:172
 msgid "Establishing connection to sink"
-msgstr ""
+msgstr "Vzpostavljanje povezave s koritom."
 
 #: src/nd-window.c:179
 msgid "Starting to stream"
@@ -111,7 +111,7 @@ msgstr ""
 
 #: src/nd-window.ui:176
 msgid "Available Video Sinks"
-msgstr ""
+msgstr "Razpoložljivi posnetki"
 
 #: src/nd-window.ui:337
 msgid "Connecting"
@@ -147,7 +147,7 @@ msgstr "Napaka"
 
 #: src/nd-window.ui:762
 msgid "Return"
-msgstr ""
+msgstr "Povrni"
 
 #: src/nd-window.ui:830
 msgid ""
@@ -155,3 +155,5 @@ msgid ""
 "try again and enter the password when prompted or contact a system "
 "administrator."
 msgstr ""
+"Zahtevanega območja požarnega zidu ni mogoče namestiti in ni na voljo. "
+"Poskusite znova in vnesite geslo ali pa stopite v stik s skrbnikom sistema."
