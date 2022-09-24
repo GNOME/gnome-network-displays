@@ -212,7 +212,7 @@ device_state_changed_cb (NdWFDP2PProvider   *provider,
                          NMDeviceStateReason reason,
                          NMDevice           *device)
 {
-  g_debug ("WFDP2PProvider: Device state changed. It is now %i.", new_state);
+  g_debug ("WFDP2PProvider: Device state changed. It is now %i. Reason: %i", new_state, reason);
 
   discovery_start_stop (provider, new_state);
 }
