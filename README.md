@@ -36,6 +36,7 @@ The following devices have been tested:
  * MiraScreen
  * Clayton TV (model CL43UHD19BSW)
  * HP Elite x3 Lap Dock
+ * Samsung 6 Series TV (model UE65MU6172)
 
 Testing
 =======
