@@ -17,11 +17,11 @@ Build
 
 To build it locally:
 
-- clone the repository
-- install build dependencies (e.g. on Fedora with `dnf build-dep gnome-network-displays`)
-- install `meson`
-- run `meson build` on the cloned repository
-- run `meson install` on the `build` folder created by meson
+- Clone the repository
+- Install build dependencies (e.g. on Fedora with `dnf build-dep gnome-network-displays`, on Ubuntu based system with `apt install libgstrtspserver-1.0-dev libgstreamer-plugins-base1.0-dev libavahi-client-dev libavahi-gobject-dev libgtk-3-dev libnm-dev libpulse-dev`)
+- Install `meson`
+- Run `meson build` on the cloned repository
+- Run `meson install` on the `build` folder created by meson
 
 Devices
 =======
@@ -37,15 +37,16 @@ The following devices have been tested:
  * Clayton TV (model CL43UHD19BSW)
  * HP Elite x3 Lap Dock
  * Samsung M7 43" Smart Monitor (model LS43AM700UUXEN)
+ * Hisense AE7000
 
 Testing
 =======
 
-For testing purposes you can run with NETWORK_DISPLAYS_DUMMY=1 set. In that case, a dummy
+For testing purposes you can run with `NETWORK_DISPLAYS_DUMMY=1` set. In that case, a dummy
 sink will be provided that allows connecting on localhost using any RTSP capable
 client to test WFD streaming.
 
-You can connect to rtsp://localhost:7236/wfd1.0 then.
+You can connect to `rtsp://localhost:7236/wfd1.0` then.
 
 Debugging
 =========
