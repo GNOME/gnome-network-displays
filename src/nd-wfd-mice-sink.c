@@ -73,15 +73,18 @@ G_DEFINE_TYPE_EXTENDED (NdWFDMiceSink, nd_wfd_mice_sink, G_TYPE_OBJECT, 0,
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
+static uint MICE_HOSTNAME_BUFFER_OFFSET = 7;
+static uint MICE_HOSTNAME_LEN_OFFSET = 5;
+/* Maximum friendly name size 520 bytes, divide to avoid any possible utf-16 overflows */
+#define MICE_HOSTNAME_MAX_UTF8_LEN ((520 / 4) - 1)
+
 static gchar msg_source_ready[] = {
-  0x00, 0x29, /* Length (41 bytes) */
+  0x00, 0x00, /* Length of the message. Will be populated at runtime */
   0x01, /* MICE Protocol Version */
   0x01, /* Command SOURCE_READY */
 
   0x00, /* Friendly Name TLV */
-  0x00, 0x0A, /* Length (10 bytes) */
-  /* GNOME (UTF-16-encoded) */
-  0x47, 0x00, 0x4E, 0x00, 0x4F, 0x00, 0x4D, 0x00, 0x45, 0x00,
+  0x00, 0x00, /* Hostname length (number of bytes, UTF-16 encoded) */
 
   0x02, /* RTSP Port TLV */
   0x00, 0x02, /* Length (2 bytes) */
@@ -393,6 +396,14 @@ static NdSink *
 nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
 {
   g_autoptr(GError) error = NULL;
+  const gchar *hostname = NULL;
+  g_autofree gunichar2 *hostname_utf16 = NULL;
+  gchar hostname_truncated[3 + 4*MICE_HOSTNAME_MAX_UTF8_LEN+1] = { 0xEF, 0xBB, 0xBF };
+  glong hostname_items_written = 0;
+  g_autofree gchar *rendered_msg_source_ready = NULL;
+  uint rendered_msg_source_ready_len = sizeof(msg_source_ready);
+  uint hostname_bytelen = 0;
+
   NdWFDMiceSink *self = ND_WFD_MICE_SINK (sink);
   gboolean have_basic_codecs, send_ok;
   GStrv missing_video, missing_audio;
@@ -427,11 +438,7 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
 
   if (self->server_source_id == 0 || self->remote_address == NULL)
     {
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
-      g_clear_object (&self->server);
-
-      return g_object_ref (sink);
+      goto fail;
     }
 
   g_signal_connect_object (self->server,
@@ -455,9 +462,50 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
 
+  hostname = g_get_host_name();
+
+  if (hostname == NULL){
+    g_warning ("Couldn't resolve the hostname. Defaulting to legacy device name \"GNOME\"");
+    hostname = "GNOME";
+  }
+
+  g_debug ("NdWFDMiceSink: device name is %s", hostname);
+
+  g_utf8_strncpy(hostname_truncated + 3, hostname, MICE_HOSTNAME_MAX_UTF8_LEN);
+  hostname_utf16 = g_utf8_to_utf16 (hostname_truncated, -1, NULL, &hostname_items_written, &error);
+
+  hostname_bytelen = hostname_items_written * 2;
+
+  if (hostname_bytelen > MICE_HOSTNAME_MAX_UTF8_LEN)
+    g_debug ("Device name is too long. Using the first %d bytes", MICE_HOSTNAME_MAX_UTF8_LEN);
+
+  rendered_msg_source_ready_len += hostname_bytelen;
+
+  rendered_msg_source_ready = g_malloc (rendered_msg_source_ready_len);
+
+  // Copy the header
+  memcpy (rendered_msg_source_ready, msg_source_ready, MICE_HOSTNAME_BUFFER_OFFSET);
+  // Copy the footer
+  memcpy (rendered_msg_source_ready + MICE_HOSTNAME_BUFFER_OFFSET + hostname_bytelen,
+          msg_source_ready + MICE_HOSTNAME_BUFFER_OFFSET,
+          sizeof(msg_source_ready) - MICE_HOSTNAME_BUFFER_OFFSET);
+
+
+  if (error != NULL || hostname_utf16 == NULL) {
+    g_warning ("NdWFDMiceSink: Unable to convert the device name '%s' to UTF-16: %s", hostname_truncated, error->message);
+    goto fail;
+  }
+
+  // Copy the friendly device name, its size and update the total message length
+  memcpy (rendered_msg_source_ready + MICE_HOSTNAME_BUFFER_OFFSET, hostname_utf16, hostname_bytelen);
+  rendered_msg_source_ready[MICE_HOSTNAME_LEN_OFFSET] = hostname_bytelen >> 8;
+  rendered_msg_source_ready[MICE_HOSTNAME_LEN_OFFSET + 1] = hostname_bytelen & 0xff;
+  rendered_msg_source_ready[0] = rendered_msg_source_ready_len >> 8;
+  rendered_msg_source_ready[1] = rendered_msg_source_ready_len & 0xff;
+
   send_ok = signalling_client_send (self,
-                                    msg_source_ready,
-                                    sizeof (msg_source_ready),
+                                    rendered_msg_source_ready,
+                                    rendered_msg_source_ready_len,
                                     NULL,
                                     error);
   if (!send_ok || error != NULL)
@@ -467,10 +515,15 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
       else
         g_warning ("NdWFDMiceSink: Failed to create MICE client");
 
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
-      g_clear_object (&self->server);
+      goto fail;
     }
+
+  return g_object_ref (sink);
+
+fail:
+  self->state = ND_SINK_STATE_ERROR;
+  g_object_notify (G_OBJECT (self), "state");
+  g_clear_object (&self->server);
 
   return g_object_ref (sink);
 }
