@@ -21,6 +21,7 @@
 	<update_contact>bberg@gnome.org</update_contact>
 	<content_rating type="oars-1.1"/>
 	<releases>
+		<release version="0.90.5" date="2021-04-27"/>
 		<release version="0.90.4" date="2020-06-22"/>
 		<release version="0.90.3" date="2020-04-29"/>
 		<release version="0.90.2" date="2019-12-16"/>
