@@ -36,6 +36,7 @@ The following devices have been tested:
  * MiraScreen
  * Clayton TV (model CL43UHD19BSW)
  * HP Elite x3 Lap Dock
+ * Samsung M7 43" Smart Monitor (model LS43AM700UUXEN)
 
 Testing
 =======
