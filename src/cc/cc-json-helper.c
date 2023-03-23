@@ -203,7 +203,7 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
     }
   json_reader_end_member (reader);
 
-  for (int i = CC_REC_MSG_TYPE_GET_APP_AVAILABILITY; i < CC_REC_MSG_SIZE - 1; ++i)
+  for (int i = CC_REC_MSG_TYPE_GET_APP_AVAILABILITY; i < CC_REC_MSG_SIZE; ++i)
     if (g_strcmp0 (message_type, CcReceivedMessageTypeStrings[i]) == 0)
       return i;
 
