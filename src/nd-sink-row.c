@@ -160,7 +160,7 @@ nd_sink_row_new (NdSink *sink)
  * nd_sink_row_get_sink
  * @sink_row: a #NdSinkRow
  *
- * Retrive the #NdSink for this #NdSinkRow.
+ * Retrieve the #NdSink for this #NdSinkRow.
  *
  * Returns: (transfer none):
  *   the sink for this row

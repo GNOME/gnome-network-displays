@@ -79,7 +79,7 @@ static void
 peer_notify_cb (NdWFDP2PSink *self, GParamSpec *pspec, NMWifiP2PPeer *peer)
 {
   /* TODO: Assumes the display name may have changed.
-   *       This is obviously overly agressive, on the other hand
+   *       This is obviously overly aggressive, on the other hand
    *       not really an issue. */
   g_object_notify (G_OBJECT (self), "display-name");
 }

@@ -316,7 +316,7 @@ on_portal_nd_proxy_acquired (GObject      *source_object,
   g_autofree gchar *token = NULL;
   g_autofree gchar *handle = NULL;
 
-  g_debug ("NdScreencastPortal: Aquired Portal proxy");
+  g_debug ("NdScreencastPortal: Acquired Portal proxy");
 
   screencast = g_dbus_proxy_new_for_bus_finish (res, &error);
   if (screencast == NULL)

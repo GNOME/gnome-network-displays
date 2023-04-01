@@ -6,7 +6,7 @@ G_BEGIN_DECLS
 
 #define ND_TYPE_FIREWALLD (nd_firewalld_get_type ())
 
-/* Can only contain numbers, characters and '_', '-', '/'. Also limitted to
+/* Can only contain numbers, characters and '_', '-', '/'. Also limited to
  * 17 characters.
  * Keep in sync with installable file name.
  */

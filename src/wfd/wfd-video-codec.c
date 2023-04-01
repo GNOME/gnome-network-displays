@@ -454,7 +454,7 @@ wfd_video_codec_get_descriptor_for_resolution (WfdVideoCodec *self, const WfdRes
   slice_enc_params = 0;
 
   return g_strdup_printf ("00 00 %02X %02X %08X %08X %08X %02X %04X %04X %02x none none",
-                          /* static: native, resolution and prefered display mode */
+                          /* static: native, resolution and preferred display mode */
                           self->profile, self->level,
                           cae_sup, vesa_sup, hh_sup,
                           self->latency, self->min_slice_size,

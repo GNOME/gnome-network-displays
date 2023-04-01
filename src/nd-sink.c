@@ -57,7 +57,7 @@ nd_sink_default_init (NdSinkIface *iface)
   g_object_interface_install_property (iface,
                                        g_param_spec_int ("priority",
                                                          "Sink Priority",
-                                                         "The priority of this sink for de-duplication pruposes (a higher priority will be the prefered method).",
+                                                         "The priority of this sink for de-duplication purposes (a higher priority will be the preferred method).",
                                                          G_MININT,
                                                          G_MAXINT,
                                                          0,

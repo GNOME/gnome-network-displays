@@ -130,7 +130,7 @@ on_pa_nd_sink_got_info (pa_context         *c,
        */
 
       /* Cancel the operation as we would be called a second time for
-       * the list end which would cause am immediate successfull return. */
+       * the list end which would cause an immediate successful return. */
       pa_operation_cancel (self->operation);
       g_clear_pointer (&self->operation, pa_operation_unref);
 
@@ -276,7 +276,7 @@ nd_pulseaudio_finalize (GObject *object)
       g_task_return_new_error (self->init_task,
                                G_IO_ERROR,
                                G_IO_ERROR_CANCELLED,
-                               "Object finalised, async init was cancelled.");
+                               "Object finalized, async init was cancelled.");
       g_clear_object (&self->init_task);
     }
 
