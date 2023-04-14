@@ -429,7 +429,7 @@ nd_screencast_portal_init_async_cb (GObject      *source_object,
     {
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         {
-          g_warning ("Error initting screencast portal: %s", error->message);
+          g_warning ("Error initializing screencast portal: %s", error->message);
 
           window = ND_WINDOW (user_data);
 
