@@ -19,6 +19,7 @@
 #include "gnome-network-displays-config.h"
 #include "nd-dummy-provider.h"
 #include "nd-dummy-wfd-sink.h"
+#include "nd-dummy-cc-sink.h"
 
 struct _NdDummyProvider
 {
@@ -113,6 +114,7 @@ nd_dummy_provider_init (NdDummyProvider *dummy_provider)
   dummy_provider->sinks = g_ptr_array_new_with_free_func (g_object_unref);
 
   g_ptr_array_add (dummy_provider->sinks, nd_dummy_wfd_sink_new ());
+  g_ptr_array_add (dummy_provider->sinks, nd_dummy_cc_sink_new ());
 }
 
 /******************************************************************

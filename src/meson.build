@@ -22,6 +22,7 @@ gnome_nd_sources = [
   'nd-nm-device-registry.c',
   'nd-dummy-provider.c',
   'nd-dummy-wfd-sink.c',
+  'nd-dummy-cc-sink.c',
   'nd-screencast-portal.c',
   'nd-pulseaudio.c',
 ]

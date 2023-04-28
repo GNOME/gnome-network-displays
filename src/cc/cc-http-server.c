@@ -337,7 +337,8 @@ server_callback (SoupServer        *server,
   remote_address = g_inet_address_to_string (inet_addr);
 
   /* only allow connections from the connected Chromecast */
-  if (g_strcmp0 (self->remote_address, remote_address) != 0)
+  /* allow access to all the devices through the dummy sink */
+  if (g_strcmp0 (self->remote_address, remote_address) != 0 && g_strcmp0 (self->remote_address, "dummy-sink") != 0)
     {
       soup_server_message_set_status (msg, SOUP_STATUS_FORBIDDEN, NULL); /* 403 */
       g_clear_pointer (&remote_address, g_free);
