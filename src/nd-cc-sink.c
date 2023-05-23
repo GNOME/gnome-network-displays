@@ -324,10 +324,30 @@ static NdSink *
 nd_cc_sink_sink_start_stream (NdSink *sink)
 {
   NdCCSink *self = ND_CC_SINK (sink);
+  gboolean have_basic_codecs;
+  GStrv missing_video, missing_audio;
 
   g_autoptr(GError) error = NULL;
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
+
+  // TODO: use the cc version of this function
+  have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
+
+  g_clear_pointer (&self->missing_video_codec, g_strfreev);
+  g_clear_pointer (&self->missing_audio_codec, g_strfreev);
+
+  self->missing_video_codec = g_strdupv (missing_video);
+  self->missing_audio_codec = g_strdupv (missing_audio);
+
+  g_object_notify (G_OBJECT (self), "missing-video-codec");
+  g_object_notify (G_OBJECT (self), "missing-audio-codec");
+
+  if (!have_basic_codecs)
+    {
+      g_warning ("NdCCSink: Basic codecs missing");
+      goto error;
+    }
 
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
@@ -340,12 +360,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   if (!cc_ctrl_connection_init (&self->ctrl, self->remote_address))
     {
       g_warning ("NdCCSink: Failed to init cc-ctrl");
-      if (self->state != ND_SINK_STATE_ERROR)
-        {
-          self->state = ND_SINK_STATE_ERROR;
-          g_object_notify (G_OBJECT (self), "state");
-        }
-      return NULL;
+      goto error;
     }
 
   self->http_server = cc_http_server_new ();
@@ -379,6 +394,13 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
                            G_CONNECT_SWAPPED);
 
   return g_object_ref (sink);
+
+error:
+  g_warning ("Error starting stream!");
+  self->state = ND_SINK_STATE_ERROR;
+  g_object_notify (G_OBJECT (self), "state");
+
+  return NULL;
 }
 
 /******************************************************************
