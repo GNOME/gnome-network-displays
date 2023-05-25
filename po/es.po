@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues\n"
-"POT-Creation-Date: 2020-06-21 09:09+0000\n"
+"POT-Creation-Date: 2022-07-08 10:18+0000\n"
 "PO-Revision-Date: 2020-07-02 12:50+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
@@ -57,17 +57,17 @@ msgstr "Codificador de vídeo VA-API H264 de GStreamer (%s)"
 #: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
-msgstr "Codificador de vídeo FDK AAC de GStreamer (%s)"
+msgstr "Codificador de sonido FDK AAC de GStreamer (%s)"
 
 #: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
-msgstr "Codificador de vídeo libav AAC de GStreamer (%s)"
+msgstr "Codificador de sonido libav AAC de GStreamer (%s)"
 
 #: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
-msgstr "Codificador de vídeo Free AAC de GStreamer (%s)"
+msgstr "Codificador de sonido Free AAC de GStreamer (%s)"
 
 #: src/nd-codec-install.c:66
 #, c-format
@@ -80,19 +80,19 @@ msgstr ""
 "Instale uno de los siguientes complementos de GStreamer pulsando a "
 "continuación"
 
-#: src/nd-window.c:158
+#: src/nd-window.c:162
 msgid "Checking and installing required firewall zones."
-msgstr "comprobar e instalar zonas de cortafuegos requeridos."
+msgstr "Comprobar e instalar zonas de cortafuegos requeridos."
 
-#: src/nd-window.c:165
+#: src/nd-window.c:169
 msgid "Making P2P connection"
 msgstr "Crear conexiones P2P"
 
-#: src/nd-window.c:172
+#: src/nd-window.c:176
 msgid "Establishing connection to sink"
-msgstr "Estableciendo conexión al sumidero"
+msgstr "Estableciendo conexión al dispositivo"
 
-#: src/nd-window.c:179
+#: src/nd-window.c:183
 msgid "Starting to stream"
 msgstr "Empezar a emitir"
 
@@ -112,7 +112,7 @@ msgstr ""
 
 #: src/nd-window.ui:176
 msgid "Available Video Sinks"
-msgstr "Sumideros de vídeo disponibles"
+msgstr "Dispositivos de vídeo disponibles"
 
 #: src/nd-window.ui:337
 msgid "Connecting"
