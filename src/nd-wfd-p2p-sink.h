@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
 #include <NetworkManager.h>
 #include "nd-sink.h"
 
