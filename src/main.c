@@ -66,7 +66,7 @@ main (int   argc,
    * application windows, integration with the window manager/compositor, and
    * desktop features such as file opening and single-instance applications.
    */
-  app = gtk_application_new ("org.gnome.NetworkDisplays", G_APPLICATION_FLAGS_NONE);
+  app = gtk_application_new ("org.gnome.NetworkDisplays", G_APPLICATION_DEFAULT_FLAGS);
 
   /*
    * We connect to the activate signal to create a window when the application
