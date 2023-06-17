@@ -92,8 +92,8 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
   else
     {
       meta_sink = nd_meta_sink_new (sink);
-      g_signal_emit_by_name (meta_provider, "sink-added", meta_sink);
       g_ptr_array_add (meta_provider->sinks, meta_sink);
+      g_signal_emit_by_name (meta_provider, "sink-added", meta_sink);
     }
 }
 
