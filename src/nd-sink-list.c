@@ -162,7 +162,7 @@ nd_sink_list_get_provider (NdSinkList *sink_list)
  * nd_sink_list_set_provider
  * @sink_list: a #NdSinkList
  *
- * Retrieve the sink provider that is used to populate the sink list.
+ * Set the sink provider that is used to populate the sink list.
  */
 void
 nd_sink_list_set_provider (NdSinkList *sink_list,
