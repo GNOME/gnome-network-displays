@@ -487,7 +487,7 @@ stream_stop_clicked_cb (NdWindow *self)
 }
 
 static void
-on_meta_provider_has_provider_changed_cb (NdWindow *self, NdSinkRow *row, NdSinkList *sink_list)
+on_meta_provider_has_provider_changed_cb (NdWindow *self, GParamSpec *pspec, NdMetaProvider *provider)
 {
   gboolean has_providers;
 
