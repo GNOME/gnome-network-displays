@@ -489,7 +489,7 @@ firewall_ready (GObject      *source_object,
                 NULL);
 
   /* We do not need IPv6 */
-  ipv6_setting = nm_setting_ip4_config_new ();
+  ipv6_setting = nm_setting_ip6_config_new ();
   nm_connection_add_setting (connection, ipv6_setting);
   g_object_set (ipv6_setting,
                 NM_SETTING_IP_CONFIG_METHOD, NM_SETTING_IP6_CONFIG_METHOD_AUTO,
