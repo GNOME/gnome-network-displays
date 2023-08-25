@@ -306,7 +306,7 @@ cc_ctrl_handle_get_app_availability (CcCtrl *ctrl, JsonReader *reader)
           if (g_strcmp0 (available, "APP_AVAILABLE") == 0)
             {
               /* launch the app now */
-              if (!cc_ctrl_send_launch_app (ctrl, CC_APP_ID))
+              if (cc_ctrl_send_launch_app (ctrl, CC_APP_ID))
                 return;
             }
 
@@ -403,7 +403,7 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
                 }
 
               /* some other app is open, check if `CC_APP_ID` is available */
-              if (!cc_ctrl_send_get_app_availability (ctrl, CC_APP_ID, CC_DEFAULT_RECEIVER_ID))
+              if (!cc_ctrl_send_get_app_availability (ctrl, CC_DEFAULT_RECEIVER_ID, CC_APP_ID))
                 return;
             }
         }
