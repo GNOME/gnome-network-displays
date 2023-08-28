@@ -643,12 +643,15 @@ cc_media_factory_lookup_encoders (CcMediaFactory *self,
   /* check for base video+audio and only video profiles on app launch,
    * any one of these present results in a truthy return value
    */
+  /* TODO: debugging vp8 */
+#if 0
   /* PROFILE_BASE_H264 */
   if ((selected_profile = cc_gst_profile_present (PROFILE_BASE_H264)) != -1)
     {
       self->selected_profile = selected_profile;
       return TRUE;
     }
+#endif
 
   /* PROFILE_BASE_VP8 */
   if ((selected_profile = cc_gst_profile_present (PROFILE_BASE_VP8)) != -1)
