@@ -214,6 +214,9 @@ cc_ctrl_send_close_app (CcCtrl *ctrl, gchar *sessionId)
 static gboolean
 cc_ctrl_send_load (CcCtrl *ctrl, gchar *sessionId)
 {
+  guint port;
+  CcMediaFactory *factory;
+
   GArray *tracks = g_array_new (FALSE, FALSE, sizeof (JsonNode *));
   JsonNode *track_node = cc_json_helper_build_node (
     "trackContentType", CC_JSON_TYPE_STRING, "video/mp2t",
@@ -223,14 +226,17 @@ cc_ctrl_send_load (CcCtrl *ctrl, gchar *sessionId)
 
   g_array_append_val (tracks, track_node);
 
+  g_object_get (ctrl->http_server, "port", &port, NULL);
+  factory = (CcMediaFactory *) ctrl->http_server;
+
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "LOAD",
     "media", CC_JSON_TYPE_OBJECT, cc_json_helper_build_node (
       "contentUrl", CC_JSON_TYPE_STRING, g_strdup_printf ("http://%s:%d/",
                                                           ctrl->comm.local_address,
-                                                          cc_http_server_get_port (ctrl->http_server)),
+                                                          port),
       "streamType", CC_JSON_TYPE_STRING, "LIVE",
-      "contentType", CC_JSON_TYPE_STRING, "video/x-matroska",
+      "contentType", CC_JSON_TYPE_STRING, content_types[cc_media_profiles[factory->selected_profile].muxer],
       NULL),
     "requestId", CC_JSON_TYPE_INT, ctrl->request_id++,
     NULL);

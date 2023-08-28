@@ -54,6 +54,7 @@ nd_codec_install_finalize (GObject *object)
 static gchar *
 get_description (const gchar *codec)
 {
+  /* TODO: update it once all elements are final */
   /* video encoders */
   if (g_strcmp0 (codec, "openh264enc") == 0)
     return g_strdup_printf (_("GStreamer OpenH264 video encoder (%s)"), codec);
@@ -82,7 +83,7 @@ get_description (const gchar *codec)
   else if (g_strcmp0 (codec, "matroskamux") == 0)
     return g_strdup_printf (_("GStreamer Matroska muxer (%s)"), codec);
   else if (g_strcmp0 (codec, "mpegtsmux") == 0)
-    return g_strdup_printf (_("GStreamer MPEG Transport Stream muxer (%s)"), codec);
+    return g_strdup_printf (_("GStreamer MPEG Transport Stream Muxer (%s)"), codec);
 
   return g_strdup_printf (_("GStreamer Element “%s”"), codec);
 }

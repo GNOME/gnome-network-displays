@@ -22,24 +22,27 @@
 #include <libsoup/soup.h>
 #include <glib/gstdio.h>
 
-#include "../wfd/wfd-media-factory.h"
+#include "cc-media-factory.h"
 
 G_BEGIN_DECLS
+
+extern const gchar *content_types[ELEMENT_NONE];
 
 #define CC_TYPE_HTTP_SERVER (cc_http_server_get_type ())
 G_DECLARE_FINAL_TYPE (CcHttpServer, cc_http_server, CC, HTTP_SERVER, GObject)
 
-CcHttpServer * cc_http_server_new (void);
+CcHttpServer * cc_http_server_new (gchar * remote_address);
+
+gboolean cc_http_server_lookup_encoders (CcHttpServer  *self,
+                                         CcMediaProfile profile,
+                                         GStrv         *missing_video,
+                                         GStrv         *missing_audio);
 
 void cc_http_server_set_pipeline_state (CcHttpServer *self,
                                         GstState      state);
 
-guint cc_http_server_get_port (CcHttpServer *self);
-void cc_http_server_set_remote_address (CcHttpServer *self,
-                                        gchar        *remote_address);
-
 gboolean cc_http_server_start_server (CcHttpServer *self,
                                       GError      **error);
-void cc_http_server_finalize (CcHttpServer *self);
+void cc_http_server_finalize (GObject *object);
 
 G_END_DECLS
