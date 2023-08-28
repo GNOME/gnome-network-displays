@@ -323,7 +323,6 @@ cc_comm_tls_send (CcComm  * comm,
                                         "Failed to write bytes in the stream: %s",
                                         err ? err->message : "none");
           g_warning ("CcComm: %s", error_->message);
-          cc_comm_close_connection (comm, error_);
           return FALSE;
         }
 

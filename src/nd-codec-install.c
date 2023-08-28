@@ -54,18 +54,35 @@ nd_codec_install_finalize (GObject *object)
 static gchar *
 get_description (const gchar *codec)
 {
+  /* video encoders */
   if (g_strcmp0 (codec, "openh264enc") == 0)
     return g_strdup_printf (_("GStreamer OpenH264 video encoder (%s)"), codec);
   else if (g_strcmp0 (codec, "x264enc") == 0)
     return g_strdup_printf (_("GStreamer x264 video encoder (%s)"), codec);
   else if (g_strcmp0 (codec, "vaapih264enc") == 0)
     return g_strdup_printf (_("GStreamer VA-API H264 video encoder (%s)"), codec);
+  else if (g_strcmp0 (codec, "vp8enc") == 0)
+    return g_strdup_printf (_("GStreamer On2 VP8 video encoder (%s)"), codec);
+  else if (g_strcmp0 (codec, "vp9enc") == 0)
+    return g_strdup_printf (_("GStreamer On2 VP9 video encoder (%s)"), codec);
+  /* audio encoders */
   else if (g_strcmp0 (codec, "fdkaacenc") == 0)
     return g_strdup_printf (_("GStreamer FDK AAC audio encoder (%s)"), codec);
   else if (g_strcmp0 (codec, "avenc_aac") == 0)
     return g_strdup_printf (_("GStreamer libav AAC audio encoder (%s)"), codec);
   else if (g_strcmp0 (codec, "faac") == 0)
     return g_strdup_printf (_("GStreamer Free AAC audio encoder (%s)"), codec);
+  else if (g_strcmp0 (codec, "vorbisenc") == 0)
+    return g_strdup_printf (_("GStreamer Vorbis audio encoder (%s)"), codec);
+  else if (g_strcmp0 (codec, "opusenc") == 0)
+    return g_strdup_printf (_("GStreamer Opus audio encoder (%s)"), codec);
+  /* muxers */
+  else if (g_strcmp0 (codec, "webmmux") == 0)
+    return g_strdup_printf (_("GStreamer WebM muxer (%s)"), codec);
+  else if (g_strcmp0 (codec, "matroskamux") == 0)
+    return g_strdup_printf (_("GStreamer Matroska muxer (%s)"), codec);
+  else if (g_strcmp0 (codec, "mpegtsmux") == 0)
+    return g_strdup_printf (_("GStreamer MPEG Transport Stream Muxer (%s)"), codec);
 
   return g_strdup_printf (_("GStreamer Element “%s”"), codec);
 }

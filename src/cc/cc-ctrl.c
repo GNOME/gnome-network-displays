@@ -328,23 +328,25 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
 {
   g_autoptr(JsonNode) app_status = NULL;
   g_autoptr(JsonPath) path = json_path_new ();
-  json_path_compile (path, "$.status.applications[0]", NULL);
+
+  gchar *parsed_payload;
+
+  json_path_compile (path, "$.status.applications", NULL);
   app_status = json_path_match (path, json_parser_get_root (parser));
 
   g_autoptr(JsonGenerator) generator = json_generator_new ();
   json_generator_set_root (generator, app_status);
-  gsize size;
 
-  json_generator_to_data (generator, &size);
+  parsed_payload = json_generator_to_data (generator, NULL);
 
-  if (size == 2) /* empty array [] */
+  /* applications key not found = []
+   * applications key found but empty = [[]]
+   */
+  if (g_str_equal (parsed_payload, "[]") || g_str_equal (parsed_payload, "[[]]"))
     {
       g_debug ("CcCtrl: No apps open");
-      if (ctrl->state == CC_CTRL_STATE_LAUNCH_SENT)
+      if (ctrl->state >= CC_CTRL_STATE_LAUNCH_SENT)
         return;
-
-      if (ctrl->state >= CC_CTRL_STATE_APP_OPEN) /* app closed unexpectedly */
-        g_debug ("CcCtrl: App closed unexpectedly");
 
       if (!cc_ctrl_send_launch_app (ctrl, CC_APP_ID))
         return;
@@ -356,7 +358,7 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
   /* one or more apps is/are open */
   g_autoptr(JsonReader) reader = json_reader_new (app_status);
 
-  if (json_reader_read_element (reader, 0))
+  if (json_reader_read_element (reader, 0) && json_reader_read_element (reader, 0))
     {
       if (json_reader_read_member (reader, "appId"))
         {
@@ -379,22 +381,15 @@ cc_ctrl_handle_receiver_status (CcCtrl *ctrl, JsonParser *parser)
 
                   if (!cc_ctrl_app_init (ctrl, &error))
                     {
-                      GError *error_;
-                      if (error)
+                      if (!error)
                         {
-                          error_ = g_error_new (CC_ERROR,
-                                                CC_ERROR_HTTP_SERVER_LISTEN_FAILED,
-                                                "Failed to start the HTTP server");
+                          error = g_error_new (CC_ERROR,
+                                               CC_ERROR_APP_COMMUNICATION_FAILED,
+                                               "Could not initialize \"%s\" app",
+                                               CC_APP_ID);
                         }
-                      else
-                        {
-                          error_ = g_error_new (CC_ERROR,
-                                                CC_ERROR_APP_COMMUNICATION_FAILED,
-                                                "Could not initialize \"%s\" app",
-                                                CC_APP_ID);
-                        }
-                      g_warning ("CcCtrl: %s", error_->message);
-                      cc_ctrl_close_connection (ctrl, error_);
+                      g_warning ("CcCtrl: %s", error->message);
+                      cc_ctrl_close_connection (ctrl, error);
                       return;
                     }
 
@@ -446,6 +441,13 @@ cc_ctrl_handle_received_msg (gpointer                    userdata,
   g_autoptr(JsonReader) reader = NULL;
   CcReceivedMessageTypeEnum type;
 
+  if (message->payload_utf8 == NULL)
+    {
+      g_warning ("CcCtrl: Received message with no payload");
+      cc_json_helper_dump_message (message, TRUE);
+      return;
+    }
+
   parser = json_parser_new ();
   if (!json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
     {
@@ -458,7 +460,7 @@ cc_ctrl_handle_received_msg (gpointer                    userdata,
   reader = json_reader_new (json_parser_get_root (parser));
   type = cc_json_helper_get_message_type (message, reader);
 
-  if (!(type == CC_REC_MSG_TYPE_PING || type == CC_REC_MSG_TYPE_PONG || type == -1))
+  if (!(type == CC_REC_MSG_TYPE_PING || type == CC_REC_MSG_TYPE_PONG))
     {
       g_debug ("CcComm: Received message:");
       cc_json_helper_dump_message (message, FALSE);
@@ -624,7 +626,3 @@ cc_ctrl_finish (CcCtrl *ctrl)
 
   ctrl->state = CC_CTRL_STATE_DISCONNECTED;
 }
-
-/* TODO: don't forget to update the state at proper places, at least check once
- * and implement all the checks wherever necessary
- */

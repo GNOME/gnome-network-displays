@@ -22,7 +22,9 @@
 
 G_BEGIN_DECLS
 
-/* TODO:*/
+/* TODO: reimplement the timeout for when no message is received
+ * from the other device.
+ */
 /* #define CC_MAX_MESSAGE_TIMEOUT (20) */ /* 20 seconds */
 
 #define CC_MAX_MSG_SIZE (64 * 1024) /* 64KB */
@@ -37,6 +39,8 @@ G_BEGIN_DECLS
 #define CC_NAMESPACE_RECEIVER "urn:x-cast:com.google.cast.receiver"
 #define CC_NAMESPACE_MEDIA "urn:x-cast:com.google.cast.media"
 
+#define CC_ERROR 1
+
 typedef enum {
   CC_ERROR_TLS_READ_FAILED = 2,
   CC_ERROR_HANDSHAKE_FAILED,
@@ -44,6 +48,7 @@ typedef enum {
   CC_ERROR_TLS_WRITE_FAILED,
 
   CC_ERROR_GST_PIPELINE_FAULT,
+  CC_ERROR_GST_PIPELINE_CREATION_FAILED,
   CC_ERROR_GST_PIPELINE_SET_STATE_FAILED,
 
   CC_ERROR_MESSAGE_SEND_FAILED,
@@ -55,8 +60,6 @@ typedef enum {
   CC_ERROR_ERROR_MSG_RECEIVED,
   CC_ERROR_LOAD_FAILED_MSG_RECEIVED,
 } CcError;
-
-#define CC_ERROR 1
 
 typedef enum {
   CC_REC_MSG_TYPE_GET_APP_AVAILABILITY, /* key is `responseType` */

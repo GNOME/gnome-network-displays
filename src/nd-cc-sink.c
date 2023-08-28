@@ -396,7 +396,7 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   return g_object_ref (sink);
 
 error:
-  g_warning ("Error starting stream!");
+  g_warning ("NdCCSink: Error starting screencast!");
   self->state = ND_SINK_STATE_ERROR;
   g_object_notify (G_OBJECT (self), "state");
 

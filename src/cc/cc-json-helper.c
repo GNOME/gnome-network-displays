@@ -210,35 +210,30 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
 void
 cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borked)
 {
+  JsonParser *parser = json_parser_new ();
   JsonNode *payload_utf8_node;
   gchar *output;
-  JsonParser *parser = json_parser_new ();
 
-  g_autoptr(GError) error = NULL;
-
-  if (borked || !json_parser_load_from_data (parser, message->payload_utf8, -1, &error))
+  if (borked || !json_parser_load_from_data (parser, message->payload_utf8, -1, NULL))
     {
-      if (error)
-        g_warning ("CcJsonHelper: Error parsing received JSON payload: %s", error->message);
-      else
-        g_warning ("CcJsonHelper: Error parsing received JSON payload");
+      output = cc_json_helper_build_string (
+        "source_id", CC_JSON_TYPE_STRING, message->source_id,
+        "destination_id", CC_JSON_TYPE_STRING, message->destination_id,
+        "namespace", CC_JSON_TYPE_STRING, message->namespace_,
+        "payload_utf8", CC_JSON_TYPE_STRING, g_strdup (message->payload_utf8),
+        NULL);
+    }
+  else
+    {
+      payload_utf8_node = json_parser_get_root (parser);
 
-      g_debug ("{ source_id: %s, destination_id: %s, namespace_: %s, payload_utf8: %s }",
-               message->source_id,
-               message->destination_id,
-               message->namespace_,
-               message->payload_utf8);
-      return;
+      output = cc_json_helper_build_string (
+        "source_id", CC_JSON_TYPE_STRING, message->source_id,
+        "destination_id", CC_JSON_TYPE_STRING, message->destination_id,
+        "namespace", CC_JSON_TYPE_STRING, message->namespace_,
+        "payload_utf8", CC_JSON_TYPE_OBJECT, payload_utf8_node,
+        NULL);
     }
 
-  payload_utf8_node = json_parser_get_root (parser);
-
-  output = cc_json_helper_build_string (
-    "source_id", CC_JSON_TYPE_STRING, message->source_id,
-    "destination_id", CC_JSON_TYPE_STRING, message->destination_id,
-    "namespace", CC_JSON_TYPE_STRING, message->namespace_,
-    "payload_utf8", CC_JSON_TYPE_OBJECT, payload_utf8_node,
-    NULL);
-
-  g_debug ("%s", output);
+  g_debug (output);
 }
