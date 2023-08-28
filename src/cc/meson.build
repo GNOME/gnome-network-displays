@@ -5,6 +5,7 @@ cc_sources = [
   'cc-ctrl.c',
   'cc-json-helper.c',
   'cc-http-server.c',
+  'cc-media-factory.c',
 ]
 
 #enum_headers = files()

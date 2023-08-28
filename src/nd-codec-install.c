@@ -54,6 +54,7 @@ nd_codec_install_finalize (GObject *object)
 static gchar *
 get_description (const gchar *codec)
 {
+  /* TODO: update it once all elements are final */
   /* video encoders */
   if (g_strcmp0 (codec, "openh264enc") == 0)
     return g_strdup_printf (_("GStreamer OpenH264 video encoder (%s)"), codec);

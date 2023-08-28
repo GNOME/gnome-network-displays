@@ -261,7 +261,7 @@ cc_comm_make_connection (CcComm *comm, gchar *remote_address, GError **error)
 
   comm->con = G_IO_STREAM (tls_conn);
 
-  g_debug ("CcComm: Connecting to %s", remote_address);
+  g_debug ("CcComm: Connecting to: %s", remote_address);
 
   g_tls_connection_handshake_async (G_TLS_CONNECTION (tls_conn),
                                     G_PRIORITY_DEFAULT,

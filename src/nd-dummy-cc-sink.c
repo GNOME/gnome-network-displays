@@ -21,6 +21,7 @@
 #include "wfd/wfd-media-factory.h"
 #include "gnome-network-displays-config.h"
 #include "nd-dummy-cc-sink.h"
+#include "cc/cc-http-server.h"
 
 struct _NdDummyCCSink
 {
@@ -201,6 +202,7 @@ static gboolean
 start_server (NdDummyCCSink *self)
 {
   g_autoptr(GError) error = NULL;
+  guint port;
 
   if (!cc_http_server_start_server (self->http_server, &error))
     {
@@ -209,8 +211,8 @@ start_server (NdDummyCCSink *self)
       g_object_notify (G_OBJECT (self), "state");
     }
 
-  g_message ("NdDummyCCSink: You should now be able to connect to http://localhost:%d/",
-             cc_http_server_get_port (self->http_server));
+  g_object_get (self->http_server, "port", &port, NULL);
+  g_message ("NdDummyCCSink: You should now be able to connect to http://localhost:%d/", port);
 
   return G_SOURCE_REMOVE;
 }
@@ -220,26 +222,11 @@ nd_dummy_cc_sink_sink_start_stream (NdSink *sink)
 {
   NdDummyCCSink *self = ND_DUMMY_CC_SINK (sink);
   gboolean have_basic_codecs;
-  GStrv missing_video, missing_audio;
+  GStrv missing_video = NULL, missing_audio = NULL;
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
-  have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
-
-  g_clear_object (&self->missing_video_codec);
-  g_clear_object (&self->missing_audio_codec);
-
-  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
-  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
-
-  g_object_notify (G_OBJECT (self), "missing-video-codec");
-  g_object_notify (G_OBJECT (self), "missing-audio-codec");
-
-  if (!have_basic_codecs)
-    goto error;
-
-  self->http_server = cc_http_server_new ();
-  cc_http_server_set_remote_address (self->http_server, "dummy-sink");
+  self->http_server = cc_http_server_new ("dummy-sink");
 
   g_signal_connect_object (self->http_server,
                            "create-source",
@@ -265,10 +252,27 @@ nd_dummy_cc_sink_sink_start_stream (NdSink *sink)
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_idle_add (G_SOURCE_FUNC (start_server), self);
+  have_basic_codecs = cc_http_server_lookup_encoders (self->http_server,
+                                                      PROFILE_LAST,
+                                                      &missing_video,
+                                                      &missing_audio);
+
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
+
+  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
+  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
+
+  g_object_notify (G_OBJECT (self), "missing-video-codec");
+  g_object_notify (G_OBJECT (self), "missing-audio-codec");
+
+  if (!have_basic_codecs)
+    goto error;
 
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
+
+  g_idle_add (G_SOURCE_FUNC (start_server), self);
 
   return g_object_ref (sink);
 
@@ -287,7 +291,7 @@ nd_dummy_cc_sink_sink_stop_stream (NdSink *sink)
 
   if (self->http_server)
     {
-      cc_http_server_finalize (self->http_server);
+      cc_http_server_finalize (G_OBJECT (self->http_server));
       self->http_server = NULL;
     }
 

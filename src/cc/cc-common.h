@@ -22,8 +22,8 @@
 
 G_BEGIN_DECLS
 
-/* TODO: reimplement the timeout for when no message is received
- * from the other device.
+/* TODO: reimplement the timeout for when no message is received from the other
+ * device. Now that read is truly async, this should work without any hiccups
  */
 /* #define CC_MAX_MESSAGE_TIMEOUT (20) */ /* 20 seconds */
 
