@@ -329,7 +329,7 @@ void
 nd_meta_sink_add_sink (NdMetaSink *meta_sink,
                        NdSink     *sink)
 {
-  g_assert (!g_ptr_array_find (meta_sink->sinks, sink, NULL));
+  g_assert (!nd_meta_sink_has_sink(meta_sink, sink));
 
   g_ptr_array_add (meta_sink->sinks, g_object_ref (sink));
 
