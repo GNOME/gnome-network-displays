@@ -242,9 +242,12 @@ portal_create_session_response_received (GDBusConnection *connection,
   NdScreencastPortal *self = g_task_get_source_object (task);
 
   g_autoptr(GVariant) ret = NULL;
+  g_autoptr (GVariant) available_cursor_modes_variant = NULL;
+
   guint32 response;
 
   g_auto(GVariantBuilder) builder = G_VARIANT_BUILDER_INIT (G_VARIANT_TYPE ("(oa{sv})"));
+
   g_autofree gchar *token = NULL;
   g_autofree gchar *handle = NULL;
 
@@ -287,6 +290,25 @@ portal_create_session_response_received (GDBusConnection *connection,
   g_variant_builder_open (&builder, G_VARIANT_TYPE_VARDICT);
   g_variant_builder_add (&builder, "{sv}", "handle_token", g_variant_new_string (token));
   g_variant_builder_add (&builder, "{sv}", "types", g_variant_new_uint32 (0x5));
+
+  available_cursor_modes_variant = g_dbus_proxy_get_cached_property (self->screencast, "AvailableCursorModes");
+
+  if (g_variant_is_of_type(available_cursor_modes_variant, G_VARIANT_TYPE_UINT32))
+    {
+      ScreenCastCursorMode available_cursor_modes;
+      available_cursor_modes = g_variant_get_uint32 (available_cursor_modes_variant);
+
+      if (!available_cursor_modes)
+        g_warning ("NdScreencastPortal: No available cursor modes were found, cursor will be hidden");
+
+      /* Embed cursor in screencast stream, if available */
+      if (available_cursor_modes & SCREEN_CAST_CURSOR_MODE_EMBEDDED)
+        g_variant_builder_add (&builder, "{sv}", "cursor_mode", g_variant_new_uint32 (SCREEN_CAST_CURSOR_MODE_EMBEDDED));
+    }
+  else
+    g_warning ("NdScreencastPortal: \"AvailableCursorModes\" is typed incorrectly by portal implementation");
+
+
   g_variant_builder_close (&builder);
 
   g_dbus_proxy_call (self->screencast,
@@ -436,7 +458,7 @@ nd_screencast_portal_async_initable_init_async (GAsyncInitable     *initable,
     }
 
   g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
-                            G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                            G_DBUS_PROXY_FLAGS_NONE,
                             NULL,
                             "org.freedesktop.portal.Desktop",
                             "/org/freedesktop/portal/desktop",
