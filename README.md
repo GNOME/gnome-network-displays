@@ -17,11 +17,13 @@ Build
 
 To build it locally:
 
-- Clone the repository
-- Install build dependencies (e.g. on Fedora with `dnf build-dep gnome-network-displays`, on Ubuntu based system with `apt install libgstrtspserver-1.0-dev libgstreamer-plugins-base1.0-dev libavahi-client-dev libavahi-gobject-dev libgtk-3-dev libnm-dev libpulse-dev`)
+- Install build dependencies (e.g. on Fedora with `dnf build-dep gnome-network-displays`, on Ubuntu based system with `apt install libgstrtspserver-1.0-dev libgstreamer-plugins-base1.0-dev libavahi-client-dev libavahi-gobject-dev libgtk-3-dev libnm-dev libpulse-dev libprotobuf-c-dev libjson-glib-dev libsoup-3.0-dev`)
 - Install `meson`
-- Run `meson build` on the cloned repository
-- Run `meson install` on the `build` folder created by meson
+- Clone the repository
+- `cd gnome-network-displays`
+- `meson build`
+- `cd build`
+- `meson install`
 
 Devices
 =======
