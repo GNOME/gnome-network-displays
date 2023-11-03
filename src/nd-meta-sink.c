@@ -23,6 +23,7 @@ struct _NdMetaSink
 {
   GObject    parent_instance;
 
+  gchar     *uuid;
   NdSink    *current_sink;
   GPtrArray *sinks;
 };
@@ -31,6 +32,7 @@ enum {
   PROP_SINK = 1,
   PROP_SINKS,
 
+  PROP_UUID,
   PROP_DISPLAY_NAME,
   PROP_MATCHES,
   PROP_PRIORITY,
@@ -39,7 +41,7 @@ enum {
   PROP_MISSING_AUDIO_CODEC,
   PROP_MISSING_FIREWALL_ZONE,
 
-  PROP_LAST = PROP_DISPLAY_NAME,
+  PROP_LAST = PROP_UUID,
 };
 
 static void nd_meta_sink_sink_iface_init (NdSinkIface *iface);
@@ -131,6 +133,10 @@ nd_meta_sink_get_property (GObject    *object,
 
     case PROP_SINKS:
       g_value_set_boxed (value, meta_sink->sinks);
+      break;
+
+    case PROP_UUID:
+      g_value_set_string (value, meta_sink->uuid);
       break;
 
     case PROP_DISPLAY_NAME:
@@ -255,6 +261,7 @@ nd_meta_sink_class_init (NdMetaSinkClass *klass)
 
   g_object_class_install_properties (object_class, PROP_LAST, props);
 
+  g_object_class_override_property (object_class, PROP_UUID, "uuid");
   g_object_class_override_property (object_class, PROP_DISPLAY_NAME, "display-name");
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
@@ -267,6 +274,7 @@ nd_meta_sink_class_init (NdMetaSinkClass *klass)
 static void
 nd_meta_sink_init (NdMetaSink *meta_sink)
 {
+  meta_sink->uuid = g_uuid_string_random ();
   meta_sink->sinks = g_ptr_array_new_with_free_func (g_object_unref);
 }
 

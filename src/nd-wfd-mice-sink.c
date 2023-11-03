@@ -33,6 +33,7 @@ struct _NdWFDMiceSink
   GtkStringList     *missing_audio_codec;
   char              *missing_firewall_zone;
 
+  gchar             *uuid;
   gchar             *name;
   gchar             *ip;
   gchar             *p2p_mac;
@@ -49,6 +50,7 @@ enum {
   PROP_NAME,
   PROP_IP,
   PROP_P2P_MAC,
+  PROP_UUID,
   PROP_DISPLAY_NAME,
   PROP_MATCHES,
   PROP_PRIORITY,
@@ -57,7 +59,7 @@ enum {
   PROP_MISSING_AUDIO_CODEC,
   PROP_MISSING_FIREWALL_ZONE,
 
-  PROP_LAST = PROP_DISPLAY_NAME,
+  PROP_LAST = PROP_UUID,
 };
 
 static void nd_wfd_mice_sink_sink_iface_init (NdSinkIface *iface);
@@ -120,6 +122,10 @@ nd_wfd_mice_sink_get_property (GObject    *object,
 
     case PROP_P2P_MAC:
       g_value_set_string (value, sink->p2p_mac);
+      break;
+
+    case PROP_UUID:
+      g_value_set_string (value, sink->uuid);
       break;
 
     case PROP_DISPLAY_NAME:
@@ -263,6 +269,7 @@ nd_wfd_mice_sink_class_init (NdWFDMiceSinkClass *klass)
 
   g_object_class_install_properties (object_class, PROP_LAST, props);
 
+  g_object_class_override_property (object_class, PROP_UUID, "uuid");
   g_object_class_override_property (object_class, PROP_DISPLAY_NAME, "display-name");
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
@@ -275,6 +282,7 @@ nd_wfd_mice_sink_class_init (NdWFDMiceSinkClass *klass)
 static void
 nd_wfd_mice_sink_init (NdWFDMiceSink *sink)
 {
+  sink->uuid = g_uuid_string_random ();
   sink->state = ND_SINK_STATE_DISCONNECTED;
   sink->cancellable = g_cancellable_new ();
   sink->signalling_client = g_socket_client_new ();

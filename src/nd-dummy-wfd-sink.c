@@ -27,6 +27,8 @@ struct _NdDummyWFDSink
 
   NdSinkState    state;
 
+  gchar         *uuid;
+
   GtkStringList *missing_video_codec;
   GtkStringList *missing_audio_codec;
 
@@ -39,6 +41,7 @@ enum {
   PROP_DEVICE,
   PROP_PEER,
 
+  PROP_UUID,
   PROP_DISPLAY_NAME,
   PROP_MATCHES,
   PROP_PRIORITY,
@@ -47,7 +50,7 @@ enum {
   PROP_MISSING_AUDIO_CODEC,
   PROP_MISSING_FIREWALL_ZONE,
 
-  PROP_LAST = PROP_DISPLAY_NAME,
+  PROP_LAST = PROP_UUID,
 };
 
 static void nd_dummy_wfd_sink_sink_iface_init (NdSinkIface *iface);
@@ -70,6 +73,10 @@ nd_dummy_wfd_sink_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_UUID:
+      g_value_set_string (value, sink->uuid);
+      break;
+
     case PROP_DISPLAY_NAME:
       g_value_set_string (value, "Dummy WFD Sink");
       break;
@@ -132,6 +139,7 @@ nd_dummy_wfd_sink_class_init (NdDummyWFDSinkClass *klass)
   object_class->get_property = nd_dummy_wfd_sink_get_property;
   object_class->finalize = nd_dummy_wfd_sink_finalize;
 
+  g_object_class_override_property (object_class, PROP_UUID, "uuid");
   g_object_class_override_property (object_class, PROP_DISPLAY_NAME, "display-name");
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
@@ -144,6 +152,7 @@ nd_dummy_wfd_sink_class_init (NdDummyWFDSinkClass *klass)
 static void
 nd_dummy_wfd_sink_init (NdDummyWFDSink *sink)
 {
+  sink->uuid = g_uuid_string_random ();
   sink->state = ND_SINK_STATE_DISCONNECTED;
 }
 

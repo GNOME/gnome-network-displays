@@ -42,6 +42,13 @@ nd_sink_default_init (NdSinkIface *iface)
                 GST_TYPE_ELEMENT, 0);
 
   g_object_interface_install_property (iface,
+                                       g_param_spec_string ("uuid",
+                                                            "UUID",
+                                                            "UUID (universally unique identifier) of the sink",
+                                                            NULL,
+                                                            G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
                                        g_param_spec_string ("display-name",
                                                             "Display Name",
                                                             "The name of the sink to display to the user",

@@ -35,6 +35,7 @@ struct _NdCCSink
   GtkStringList *missing_audio_codec;
   char          *missing_firewall_zone;
 
+  gchar         *uuid;
   gchar         *ip;
   gchar         *name;
 
@@ -49,6 +50,7 @@ enum {
   PROP_NAME,
   PROP_IP,
 
+  PROP_UUID,
   PROP_DISPLAY_NAME,
   PROP_MATCHES,
   PROP_PRIORITY,
@@ -57,7 +59,7 @@ enum {
   PROP_MISSING_AUDIO_CODEC,
   PROP_MISSING_FIREWALL_ZONE,
 
-  PROP_LAST = PROP_DISPLAY_NAME,
+  PROP_LAST = PROP_UUID,
 };
 
 /* interface related functions */
@@ -94,6 +96,10 @@ nd_cc_sink_get_property (GObject    * object,
 
     case PROP_IP:
       g_value_set_string (value, self->ip);
+      break;
+
+    case PROP_UUID:
+      g_value_set_string (value, self->uuid);
       break;
 
     case PROP_DISPLAY_NAME:
@@ -263,6 +269,7 @@ nd_cc_sink_class_init (NdCCSinkClass *klass)
 
   g_object_class_install_properties (object_class, PROP_LAST, props);
 
+  g_object_class_override_property (object_class, PROP_UUID, "uuid");
   g_object_class_override_property (object_class, PROP_DISPLAY_NAME, "display-name");
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
@@ -277,6 +284,7 @@ nd_cc_sink_init (NdCCSink *self)
 {
   CcCtrlClosure *closure;
 
+  self->uuid = g_uuid_string_random ();
   self->state = ND_SINK_STATE_DISCONNECTED;
   self->ctrl.state = CC_CTRL_STATE_DISCONNECTED;
 
