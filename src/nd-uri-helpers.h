@@ -1,7 +1,6 @@
-/* nd-cc-sink.h
+/* nd-uri-helpers.h
  *
- * Copyright 2022 Christian Glombek <lorbus@fedoraproject.org>
- * Copyright 2022 Anupam Kumar <kyteinsky@gmail.com>
+ * Copyright 2023 Pedro Sader Azevedo <pedro.saderazevedo@proton.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +18,8 @@
 
 #pragma once
 
-#include <gio/gio.h>
-#include "nd-sink.h"
+#include <glib-object.h>
 
-G_BEGIN_DECLS
+gchar * nd_uri_helpers_generate_uri (GHashTable *params);
 
-#define ND_TYPE_CC_SINK (nd_cc_sink_get_type ())
-G_DECLARE_FINAL_TYPE (NdCCSink, nd_cc_sink, ND, CC_SINK, GObject)
-
-NdCCSink * nd_cc_sink_new (GSocketClient * client,
-                           gchar         * name,
-                           gchar         * ip);
-
-NdSinkState nd_cc_sink_get_state (NdCCSink *sink);
-NdCCSink * nd_cc_sink_from_uri (gchar *uri);
-
-G_END_DECLS
+GHashTable * nd_uri_helpers_parse_uri (gchar *uri);

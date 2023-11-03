@@ -24,6 +24,7 @@ gnome_nd_sources = [
   'nd-dummy-wfd-sink.c',
   'nd-dummy-cc-sink.c',
   'nd-pulseaudio.c',
+  'nd-uri-helpers.c',
 ]
 
 enum_headers = files('nd-sink.h')

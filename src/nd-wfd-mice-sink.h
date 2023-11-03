@@ -34,4 +34,6 @@ NdSinkState nd_wfd_mice_sink_get_state (NdWFDMiceSink *sink);
 
 GSocketClient *  nd_wfd_mice_sink_get_signalling_client (NdWFDMiceSink *sink);
 
+NdWFDMiceSink * nd_wfd_mice_sink_from_uri (gchar *uri);
+
 G_END_DECLS

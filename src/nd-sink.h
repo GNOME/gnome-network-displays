@@ -68,12 +68,14 @@ struct _NdSinkIface
   /*< public >*/
   NdSink * (* start_stream) (NdSink *sink);
   void     (* stop_stream)  (NdSink *sink);
+  gchar  * (* to_uri)       (NdSink *sink);
 };
 
 GType nd_sink_get_type (void) G_GNUC_CONST;
 
 NdSink *nd_sink_start_stream (NdSink *sink);
-void            nd_sink_stop_stream (NdSink *sink);
+void    nd_sink_stop_stream (NdSink *sink);
+gchar  *nd_sink_to_uri (NdSink *sink);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (NdSink, g_object_unref)
 

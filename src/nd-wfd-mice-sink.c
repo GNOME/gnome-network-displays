@@ -17,9 +17,11 @@
  */
 
 #include "gnome-network-displays-config.h"
+#include "nd-enum-types.h"
+#include "nd-uri-helpers.h"
+#include "nd-wfd-mice-sink.h"
 #include "wfd/wfd-client.h"
 #include "wfd/wfd-server.h"
-#include "nd-wfd-mice-sink.h"
 
 struct _NdWFDMiceSink
 {
@@ -68,6 +70,7 @@ const static NdSinkProtocol protocol = ND_SINK_PROTOCOL_WFD_MICE;
 static void nd_wfd_mice_sink_sink_iface_init (NdSinkIface *iface);
 static NdSink * nd_wfd_mice_sink_sink_start_stream (NdSink *sink);
 static void nd_wfd_mice_sink_sink_stop_stream (NdSink *sink);
+static gchar * nd_wfd_mice_sink_sink_to_uri (NdSink *sink);
 
 static void nd_wfd_mice_sink_sink_stop_stream_int (NdWFDMiceSink *self);
 
@@ -296,6 +299,25 @@ nd_wfd_mice_sink_init (NdWFDMiceSink *sink)
   sink->signalling_client = g_socket_client_new ();
 }
 
+static gchar *
+nd_wfd_mice_sink_sink_to_uri (NdSink *sink)
+{
+  NdWFDMiceSink *self = ND_WFD_MICE_SINK (sink);
+  GHashTable *params = g_hash_table_new (g_str_hash, g_str_equal);
+
+  /* protocol */
+  g_hash_table_insert (params, "protocol", (gpointer *) g_strdup_printf ("%d", protocol));
+
+  /* remote name */
+  g_hash_table_insert (params, "name", (gpointer *) g_strdup (self->name));
+
+  /* remote ip */
+  g_hash_table_insert (params, "ip", (gpointer *) g_strdup (self->ip));
+
+  return nd_uri_helpers_generate_uri (params);
+}
+
+
 /******************************************************************
 * NdSink interface implementation
 ******************************************************************/
@@ -305,6 +327,7 @@ nd_wfd_mice_sink_sink_iface_init (NdSinkIface *iface)
 {
   iface->start_stream = nd_wfd_mice_sink_sink_start_stream;
   iface->stop_stream = nd_wfd_mice_sink_sink_stop_stream;
+  iface->to_uri = nd_wfd_mice_sink_sink_to_uri;
 }
 
 static void
@@ -631,6 +654,55 @@ nd_wfd_mice_sink_new (gchar *name,
                        "ip", ip,
                        "p2p-mac", p2p_mac,
                        NULL);
+}
+
+/**
+ * nd_wfd_mice_sink_from_uri
+ * @uri: a URI string
+ *
+ * Construct a #NdWFDMiceSink using the information encoded in the URI string
+ *
+ * Returns: The newly constructed #NdWFDMiceSink
+ */
+NdWFDMiceSink *
+nd_wfd_mice_sink_from_uri (gchar *uri)
+{
+  GHashTable *params = nd_uri_helpers_parse_uri (uri);
+
+  /* protocol */
+  const gchar *protocol_in_uri_str = g_hash_table_lookup (params, "protocol");
+
+  ;
+  NdSinkProtocol protocol_in_uri = g_ascii_strtoll (protocol_in_uri_str, NULL, 10);
+  if (protocol != protocol_in_uri)
+    {
+      g_warning ("NdWFDMiceSink: Attempted to create sink whose protocol (%s) doesn't match the URI (%s)",
+                 g_enum_to_string (ND_TYPE_SINK_PROTOCOL, protocol),
+                 g_enum_to_string (ND_TYPE_SINK_PROTOCOL, protocol_in_uri));
+      return NULL;
+    }
+
+  /* remote name */
+  gchar *name = g_hash_table_lookup (params, "name");
+  if (!name)
+    {
+      g_warning ("NdWFDMiceSink: Failed to find remote name in the URI %s", uri);
+      return NULL;
+    }
+
+  /* remote ip */
+  gchar *ip = g_hash_table_lookup (params, "ip");
+  if (!ip)
+    {
+      g_warning ("NdWFDMiceSink: Failed to find remote IP address in the URI %s", uri);
+      return NULL;
+    }
+
+  /* optional remote p2p mac */
+  gchar *p2p_mac = NULL;
+  p2p_mac = g_hash_table_lookup (params, "p2p-mac");
+
+  return nd_wfd_mice_sink_new (name, ip, p2p_mac);
 }
 
 NdSinkState

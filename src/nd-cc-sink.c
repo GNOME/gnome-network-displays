@@ -17,11 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gnome-network-displays-config.h"
-#include "nd-cc-sink.h"
 #include "cc/cc-ctrl.h"
 #include "cc/cc-common.h"
 #include "cc/cc-http-server.h"
+#include "gnome-network-displays-config.h"
+#include "nd-cc-sink.h"
+#include "nd-enum-types.h"
+#include "nd-uri-helpers.h"
 
 struct _NdCCSink
 {
@@ -69,6 +71,7 @@ const static NdSinkProtocol protocol = ND_SINK_PROTOCOL_CC;
 static void nd_cc_sink_sink_iface_init (NdSinkIface *iface);
 static NdSink * nd_cc_sink_sink_start_stream (NdSink *sink);
 static void nd_cc_sink_sink_stop_stream (NdSink *sink);
+static gchar * nd_cc_sink_sink_to_uri (NdSink *sink);
 
 static void nd_cc_sink_sink_stop_stream_int (NdCCSink *self);
 
@@ -304,6 +307,24 @@ nd_cc_sink_init (NdCCSink *self)
   srand (time (NULL));
 }
 
+static gchar *
+nd_cc_sink_sink_to_uri (NdSink *sink)
+{
+  NdCCSink *self = ND_CC_SINK (sink);
+  GHashTable *params = g_hash_table_new (g_str_hash, g_str_equal);
+
+  /* protocol */
+  g_hash_table_insert (params, "protocol", (gpointer *) g_strdup_printf ("%d", protocol));
+
+  /* remote name */
+  g_hash_table_insert (params, "name", (gpointer *) g_strdup (self->name));
+
+  /* remote address */
+  g_hash_table_insert (params, "ip", (gpointer *) g_strdup (self->ip));
+
+  return nd_uri_helpers_generate_uri (params);
+}
+
 /******************************************************************
 * NdSink interface implementation
 ******************************************************************/
@@ -313,6 +334,7 @@ nd_cc_sink_sink_iface_init (NdSinkIface *iface)
 {
   iface->start_stream = nd_cc_sink_sink_start_stream;
   iface->stop_stream = nd_cc_sink_sink_stop_stream;
+  iface->to_uri = nd_cc_sink_sink_to_uri;
 }
 
 static GstElement *
@@ -434,6 +456,59 @@ nd_cc_sink_new (GSocketClient *client,
                        "name", name,
                        "ip", ip,
                        NULL);
+}
+
+/**
+ * nd_cc_sink_from_uri
+ * @uri: a URI string
+ *
+ * Construct a #NdCCSink using the information encoded in the URI string
+ *
+ * Returns: The newly constructed #NdCCSink or #NULL if failed
+ */
+NdCCSink *
+nd_cc_sink_from_uri (gchar *uri)
+{
+  GHashTable *params = nd_uri_helpers_parse_uri (uri);
+
+  /* protocol */
+  const gchar *protocol_in_uri_str = g_hash_table_lookup (params, "protocol");
+
+  ;
+  NdSinkProtocol protocol_in_uri = g_ascii_strtoll (protocol_in_uri_str, NULL, 10);
+  if (protocol != protocol_in_uri)
+    {
+      g_warning ("NdCCSink: Attempted to create sink whose protocol (%s) doesn't match the URI (%s)",
+                 g_enum_to_string (ND_TYPE_SINK_PROTOCOL, protocol),
+                 g_enum_to_string (ND_TYPE_SINK_PROTOCOL, protocol_in_uri));
+      return NULL;
+    }
+
+  /* client */
+  GSocketClient *client = g_socket_client_new ();
+  if (!client)
+    {
+      g_warning ("NdCCSink: Failed to instantiate GSocketClient");
+      return NULL;
+    }
+
+  /* remote name */
+  gchar *name = g_hash_table_lookup (params, "name");
+  if (!name)
+    {
+      g_warning ("NdCCSink: Failed to find remote name in the URI %s", uri);
+      return NULL;
+    }
+
+  /* remote ip */
+  gchar *ip = g_hash_table_lookup (params, "ip");
+  if (!ip)
+    {
+      g_warning ("NdCCSink: Failed to find remote IP address in the URI %s", uri);
+      return NULL;
+    }
+
+  return nd_cc_sink_new (client, name, ip);
 }
 
 NdSinkState

@@ -9,5 +9,6 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (NdDummyWFDSink, nd_dummy_wfd_sink, ND, DUMMY_WFD_SINK, GObject)
 
 NdDummyWFDSink * nd_dummy_wfd_sink_new (void);
+NdDummyWFDSink * nd_dummy_wfd_sink_from_uri (gchar *uri);
 
 G_END_DECLS

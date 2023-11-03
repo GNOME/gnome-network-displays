@@ -16,10 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "wfd/wfd-client.h"
-#include "wfd/wfd-server.h"
 #include "gnome-network-displays-config.h"
 #include "nd-dummy-wfd-sink.h"
+#include "nd-enum-types.h"
+#include "nd-uri-helpers.h"
+#include "wfd/wfd-client.h"
+#include "wfd/wfd-media-factory.h"
+#include "wfd/wfd-server.h"
 
 struct _NdDummyWFDSink
 {
@@ -59,6 +62,7 @@ const static NdSinkProtocol protocol = ND_SINK_PROTOCOL_DUMMY_WFD_P2P;
 static void nd_dummy_wfd_sink_sink_iface_init (NdSinkIface *iface);
 static NdSink * nd_dummy_wfd_sink_sink_start_stream (NdSink *sink);
 static void nd_dummy_wfd_sink_sink_stop_stream (NdSink *sink);
+static gchar * nd_dummy_wfd_sink_sink_to_uri (NdSink *sink);
 
 G_DEFINE_TYPE_EXTENDED (NdDummyWFDSink, nd_dummy_wfd_sink, G_TYPE_OBJECT, 0,
                         G_IMPLEMENT_INTERFACE (ND_TYPE_SINK,
@@ -164,6 +168,17 @@ nd_dummy_wfd_sink_init (NdDummyWFDSink *sink)
   sink->state = ND_SINK_STATE_DISCONNECTED;
 }
 
+static gchar *
+nd_dummy_wfd_sink_sink_to_uri (NdSink *sink)
+{
+  GHashTable *params = g_hash_table_new (g_str_hash, g_str_equal);
+
+  /* protocol */
+  g_hash_table_insert (params, "protocol", (gpointer *) g_strdup_printf ("%d", protocol));
+
+  return nd_uri_helpers_generate_uri (params);
+}
+
 /******************************************************************
 * NdSink interface implementation
 ******************************************************************/
@@ -173,6 +188,7 @@ nd_dummy_wfd_sink_sink_iface_init (NdSinkIface *iface)
 {
   iface->start_stream = nd_dummy_wfd_sink_sink_start_stream;
   iface->stop_stream = nd_dummy_wfd_sink_sink_stop_stream;
+  iface->to_uri = nd_dummy_wfd_sink_sink_to_uri;
 }
 
 static void
@@ -336,4 +352,33 @@ nd_dummy_wfd_sink_new (void)
 {
   return g_object_new (ND_TYPE_DUMMY_WFD_SINK,
                        NULL);
+}
+
+/**
+ * nd_dummy_wfd_sink_from_uri
+ * @uri: a URI string
+ *
+ * Construct a #NdDummyWFDSink using the information encoded in the URI string
+ *
+ * Returns: The newly constructed #NdDummyWFDSink
+ */
+NdDummyWFDSink *
+nd_dummy_wfd_sink_from_uri (gchar *uri)
+{
+  GHashTable *params = nd_uri_helpers_parse_uri (uri);
+
+  /* protocol */
+  const gchar *protocol_in_uri_str = g_hash_table_lookup (params, "protocol");
+
+  ;
+  NdSinkProtocol protocol_in_uri = g_ascii_strtoll (protocol_in_uri_str, NULL, 10);
+  if (protocol != protocol_in_uri)
+    {
+      g_warning ("NdDummyWFDSink: Attempted to create sink whose protocol (%s) doesn't match the URI (%s)",
+                 g_enum_to_string (ND_TYPE_SINK_PROTOCOL, protocol),
+                 g_enum_to_string (ND_TYPE_SINK_PROTOCOL, protocol_in_uri));
+      return NULL;
+    }
+
+  return nd_dummy_wfd_sink_new ();
 }

@@ -18,8 +18,9 @@
 
 #include <gio/gio.h>
 #include <gst/gst.h>
-#include "nd-sink.h"
 #include "gnome-network-displays-config.h"
+#include "nd-sink.h"
+#include "nd-enum-types.h"
 
 typedef NdSinkIface NdSinkInterface;
 G_DEFINE_INTERFACE (NdSink, nd_sink, G_TYPE_OBJECT);
@@ -140,4 +141,18 @@ nd_sink_stop_stream (NdSink *sink)
   NdSinkIface *iface = ND_SINK_GET_IFACE (sink);
 
   iface->stop_stream (sink);
+}
+
+/**
+ * nd_sink_to_uri
+ * @sink: the #NdSink
+ *
+ * Create a URI string for the given sink
+ */
+gchar *
+nd_sink_to_uri (NdSink *sink)
+{
+  NdSinkIface *iface = ND_SINK_GET_IFACE (sink);
+
+  return iface->to_uri (sink);
 }
