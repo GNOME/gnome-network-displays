@@ -37,12 +37,15 @@ enum {
   PROP_MATCHES,
   PROP_PRIORITY,
   PROP_STATE,
+  PROP_PROTOCOL,
   PROP_MISSING_VIDEO_CODEC,
   PROP_MISSING_AUDIO_CODEC,
   PROP_MISSING_FIREWALL_ZONE,
 
   PROP_LAST = PROP_UUID,
 };
+
+const static NdSinkProtocol protocol = ND_SINK_PROTOCOL_META;
 
 static void nd_meta_sink_sink_iface_init (NdSinkIface *iface);
 static NdSink * nd_meta_sink_sink_start_stream (NdSink *sink);
@@ -112,6 +115,7 @@ nd_meta_sink_update (NdMetaSink *meta_sink)
   g_object_notify (G_OBJECT (meta_sink), "display-name");
   g_object_notify (G_OBJECT (meta_sink), "priority");
   g_object_notify (G_OBJECT (meta_sink), "state");
+  g_object_notify (G_OBJECT (meta_sink), "protocol");
   g_object_notify (G_OBJECT (meta_sink), "missing-video-codec");
   g_object_notify (G_OBJECT (meta_sink), "missing-audio-codec");
   g_object_notify (G_OBJECT (meta_sink), "missing-firewall-zone");
@@ -180,6 +184,10 @@ nd_meta_sink_get_property (GObject    *object,
         g_object_get_property (G_OBJECT (meta_sink->current_sink), pspec->name, value);
       else
         g_value_set_enum (value, ND_SINK_STATE_DISCONNECTED);
+      break;
+
+    case PROP_PROTOCOL:
+      g_value_set_enum (value, protocol);
       break;
 
     case PROP_MISSING_VIDEO_CODEC:
@@ -266,6 +274,7 @@ nd_meta_sink_class_init (NdMetaSinkClass *klass)
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
   g_object_class_override_property (object_class, PROP_STATE, "state");
+  g_object_class_override_property (object_class, PROP_PROTOCOL, "protocol");
   g_object_class_override_property (object_class, PROP_MISSING_VIDEO_CODEC, "missing-video-codec");
   g_object_class_override_property (object_class, PROP_MISSING_AUDIO_CODEC, "missing-audio-codec");
   g_object_class_override_property (object_class, PROP_MISSING_FIREWALL_ZONE, "missing-firewall-zone");

@@ -55,12 +55,15 @@ enum {
   PROP_MATCHES,
   PROP_PRIORITY,
   PROP_STATE,
+  PROP_PROTOCOL,
   PROP_MISSING_VIDEO_CODEC,
   PROP_MISSING_AUDIO_CODEC,
   PROP_MISSING_FIREWALL_ZONE,
 
   PROP_LAST = PROP_UUID,
 };
+
+const static NdSinkProtocol protocol = ND_SINK_PROTOCOL_CC;
 
 /* interface related functions */
 static void nd_cc_sink_sink_iface_init (NdSinkIface *iface);
@@ -127,6 +130,10 @@ nd_cc_sink_get_property (GObject    * object,
 
     case PROP_STATE:
       g_value_set_enum (value, self->state);
+      break;
+
+    case PROP_PROTOCOL:
+      g_value_set_enum (value, protocol);
       break;
 
     case PROP_MISSING_VIDEO_CODEC:
@@ -274,6 +281,7 @@ nd_cc_sink_class_init (NdCCSinkClass *klass)
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
   g_object_class_override_property (object_class, PROP_STATE, "state");
+  g_object_class_override_property (object_class, PROP_PROTOCOL, "protocol");
   g_object_class_override_property (object_class, PROP_MISSING_VIDEO_CODEC, "missing-video-codec");
   g_object_class_override_property (object_class, PROP_MISSING_AUDIO_CODEC, "missing-audio-codec");
   g_object_class_override_property (object_class, PROP_MISSING_FIREWALL_ZONE, "missing-firewall-zone");

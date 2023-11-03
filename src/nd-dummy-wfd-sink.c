@@ -46,12 +46,15 @@ enum {
   PROP_MATCHES,
   PROP_PRIORITY,
   PROP_STATE,
+  PROP_PROTOCOL,
   PROP_MISSING_VIDEO_CODEC,
   PROP_MISSING_AUDIO_CODEC,
   PROP_MISSING_FIREWALL_ZONE,
 
   PROP_LAST = PROP_UUID,
 };
+
+const static NdSinkProtocol protocol = ND_SINK_PROTOCOL_DUMMY_WFD_P2P;
 
 static void nd_dummy_wfd_sink_sink_iface_init (NdSinkIface *iface);
 static NdSink * nd_dummy_wfd_sink_sink_start_stream (NdSink *sink);
@@ -100,6 +103,10 @@ nd_dummy_wfd_sink_get_property (GObject    *object,
       g_value_set_enum (value, sink->state);
       break;
 
+    case PROP_PROTOCOL:
+      g_value_set_enum (value, protocol);
+      break;
+
     case PROP_MISSING_VIDEO_CODEC:
       g_value_set_object (value, sink->missing_video_codec);
       break;
@@ -144,6 +151,7 @@ nd_dummy_wfd_sink_class_init (NdDummyWFDSinkClass *klass)
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
   g_object_class_override_property (object_class, PROP_STATE, "state");
+  g_object_class_override_property (object_class, PROP_PROTOCOL, "protocol");
   g_object_class_override_property (object_class, PROP_MISSING_VIDEO_CODEC, "missing-video-codec");
   g_object_class_override_property (object_class, PROP_MISSING_AUDIO_CODEC, "missing-audio-codec");
   g_object_class_override_property (object_class, PROP_MISSING_FIREWALL_ZONE, "missing-firewall-zone");

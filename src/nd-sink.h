@@ -48,6 +48,18 @@ typedef enum {
   ND_SCREEN_CAST_SOURCE_TYPE_VIRTUAL = 4,
 } NdScreenCastSourceType;
 
+typedef enum {
+  /* internal protocols */
+  ND_SINK_PROTOCOL_META,
+  ND_SINK_PROTOCOL_DUMMY_WFD_P2P,
+  ND_SINK_PROTOCOL_DUMMY_CC,
+
+  /* real protocols */
+  ND_SINK_PROTOCOL_WFD_P2P,
+  ND_SINK_PROTOCOL_WFD_MICE,
+  ND_SINK_PROTOCOL_CC,
+} NdSinkProtocol;
+
 struct _NdSinkIface
 {
   /*< private >*/

@@ -80,6 +80,14 @@ nd_sink_default_init (NdSinkIface *iface)
                                                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
+                                       g_param_spec_enum ("protocol",
+                                                          "Protocol",
+                                                          "The protocol used by the sink",
+                                                          ND_TYPE_SINK_PROTOCOL,
+                                                          ND_SINK_PROTOCOL_META,
+                                                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
                                        g_param_spec_object ("missing-video-codec",
                                                             "Missing Video Codec",
                                                             "One of the video codecs elements in the list is required.",
