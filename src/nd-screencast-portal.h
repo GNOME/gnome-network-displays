@@ -7,11 +7,9 @@
 G_BEGIN_DECLS
 
 #define ND_TYPE_SCREENCAST_PORTAL (nd_screencast_portal_get_type ())
-
 G_DECLARE_FINAL_TYPE (NdScreencastPortal, nd_screencast_portal, ND, SCREENCAST_PORTAL, GObject)
 
-typedef enum _ScreenCastCursorMode
-{
+typedef enum _ScreenCastCursorMode {
   SCREEN_CAST_CURSOR_MODE_NONE     = 0,
   SCREEN_CAST_CURSOR_MODE_HIDDEN   = 1 << 0,
   SCREEN_CAST_CURSOR_MODE_EMBEDDED = 1 << 1,

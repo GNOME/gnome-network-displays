@@ -126,8 +126,8 @@ struct  Cast__Channel__CastMessage
   uint32_t           remaining_length;
 };
 #define CAST__CHANNEL__CAST_MESSAGE__INIT \
-  { PROTOBUF_C_MESSAGE_INIT (&cast__channel__cast_message__descriptor) \
-    , CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0, NULL, NULL, NULL, CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING, NULL, 0, {0, NULL}, 0, 0, 0, 0 }
+        { PROTOBUF_C_MESSAGE_INIT (&cast__channel__cast_message__descriptor) \
+          , CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_0, NULL, NULL, NULL, CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__STRING, NULL, 0, {0, NULL}, 0, 0, 0, 0 }
 
 
 /*
@@ -144,8 +144,8 @@ struct  Cast__Channel__AuthChallenge
   Cast__Channel__HashAlgorithm      hash_algorithm;
 };
 #define CAST__CHANNEL__AUTH_CHALLENGE__INIT \
-  { PROTOBUF_C_MESSAGE_INIT (&cast__channel__auth_challenge__descriptor) \
-    , 0, CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PKCS1v15, 0, {0, NULL}, 0, CAST__CHANNEL__HASH_ALGORITHM__SHA1 }
+        { PROTOBUF_C_MESSAGE_INIT (&cast__channel__auth_challenge__descriptor) \
+          , 0, CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PKCS1v15, 0, {0, NULL}, 0, CAST__CHANNEL__HASH_ALGORITHM__SHA1 }
 
 
 struct  Cast__Channel__AuthResponse
@@ -165,8 +165,8 @@ struct  Cast__Channel__AuthResponse
   ProtobufCBinaryData               crl;
 };
 #define CAST__CHANNEL__AUTH_RESPONSE__INIT \
-  { PROTOBUF_C_MESSAGE_INIT (&cast__channel__auth_response__descriptor) \
-    , {0, NULL}, {0, NULL}, 0, NULL, 0, CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PKCS1v15, 0, {0, NULL}, 0, CAST__CHANNEL__HASH_ALGORITHM__SHA1, 0, {0, NULL} }
+        { PROTOBUF_C_MESSAGE_INIT (&cast__channel__auth_response__descriptor) \
+          , {0, NULL}, {0, NULL}, 0, NULL, 0, CAST__CHANNEL__SIGNATURE_ALGORITHM__RSASSA_PKCS1v15, 0, {0, NULL}, 0, CAST__CHANNEL__HASH_ALGORITHM__SHA1, 0, {0, NULL} }
 
 
 struct  Cast__Channel__AuthError
@@ -175,8 +175,8 @@ struct  Cast__Channel__AuthError
   Cast__Channel__AuthError__ErrorType error_type;
 };
 #define CAST__CHANNEL__AUTH_ERROR__INIT \
-  { PROTOBUF_C_MESSAGE_INIT (&cast__channel__auth_error__descriptor) \
-    , CAST__CHANNEL__AUTH_ERROR__ERROR_TYPE__INTERNAL_ERROR }
+        { PROTOBUF_C_MESSAGE_INIT (&cast__channel__auth_error__descriptor) \
+          , CAST__CHANNEL__AUTH_ERROR__ERROR_TYPE__INTERNAL_ERROR }
 
 
 struct  Cast__Channel__DeviceAuthMessage
@@ -193,8 +193,8 @@ struct  Cast__Channel__DeviceAuthMessage
   Cast__Channel__AuthError    *error;
 };
 #define CAST__CHANNEL__DEVICE_AUTH_MESSAGE__INIT \
-  { PROTOBUF_C_MESSAGE_INIT (&cast__channel__device_auth_message__descriptor) \
-    , NULL, NULL, NULL }
+        { PROTOBUF_C_MESSAGE_INIT (&cast__channel__device_auth_message__descriptor) \
+          , NULL, NULL, NULL }
 
 
 /* Cast__Channel__CastMessage methods */

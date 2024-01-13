@@ -112,9 +112,7 @@ resolution_table_lookup (gint table, guint offset)
       length = G_N_ELEMENTS (vesa_resolutions);
     }
   else
-    {
-      g_return_val_if_reached (NULL);
-    }
+    g_return_val_if_reached (NULL);
 
   if (offset < length)
     return &resolutions[offset];
@@ -144,9 +142,7 @@ sup_for_resolution (gint table, const WfdResolution *resolution)
       length = G_N_ELEMENTS (vesa_resolutions);
     }
   else
-    {
-      g_return_val_if_reached (0);
-    }
+    g_return_val_if_reached (0);
 
   for (gint i = 0; i < length; i++)
     {

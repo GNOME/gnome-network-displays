@@ -242,7 +242,7 @@ portal_create_session_response_received (GDBusConnection *connection,
   NdScreencastPortal *self = g_task_get_source_object (task);
 
   g_autoptr(GVariant) ret = NULL;
-  g_autoptr (GVariant) available_cursor_modes_variant = NULL;
+  g_autoptr(GVariant) available_cursor_modes_variant = NULL;
 
   guint32 response;
 
@@ -293,7 +293,7 @@ portal_create_session_response_received (GDBusConnection *connection,
 
   available_cursor_modes_variant = g_dbus_proxy_get_cached_property (self->screencast, "AvailableCursorModes");
 
-  if (g_variant_is_of_type(available_cursor_modes_variant, G_VARIANT_TYPE_UINT32))
+  if (g_variant_is_of_type (available_cursor_modes_variant, G_VARIANT_TYPE_UINT32))
     {
       ScreenCastCursorMode available_cursor_modes;
       available_cursor_modes = g_variant_get_uint32 (available_cursor_modes_variant);

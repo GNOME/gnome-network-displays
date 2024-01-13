@@ -141,9 +141,7 @@ wfd_client_select_codec_and_resolution (WfdClient *self, WfdH264ProfileFlags pro
 #if 0
   /* The native resolution reported by some devices is just useless */
   if (codec->native)
-    {
-      self->params->selected_resolution = wfd_resolution_copy (codec->native);
-    }
+    self->params->selected_resolution = wfd_resolution_copy (codec->native);
   else
     {
       /* Find a good resolution. */
@@ -154,9 +152,7 @@ wfd_client_select_codec_and_resolution (WfdClient *self, WfdH264ProfileFlags pro
       resolutions = g_list_sort (resolutions, compare_resolutions);
       last = g_list_last (resolutions);
       if (last)
-        {
-          self->params->selected_resolution = wfd_resolution_copy ((WfdResolution *) last->data);
-        }
+        self->params->selected_resolution = wfd_resolution_copy ((WfdResolution *) last->data);
       else
         {
 #endif
@@ -364,9 +360,7 @@ wfd_client_make_path_from_uri (GstRTSPClient * client, const GstRTSPUrl * uri)
         return g_strdup (uri->abspath);
     }
   else
-    {
-      return GST_RTSP_CLIENT_CLASS (wfd_client_parent_class)->make_path_from_uri (client, uri);
-    }
+    return GST_RTSP_CLIENT_CLASS (wfd_client_parent_class)->make_path_from_uri (client, uri);
 }
 
 GstRTSPFilterResult
@@ -452,9 +446,7 @@ wfd_client_params_set (GstRTSPClient *client, GstRTSPContext *ctx)
         {
           /* Force a key unit event. */
           if (self->media_quirks & WFD_QUIRK_NO_IDR)
-            {
-              g_debug ("Cannot force key frame as the pipeline doesn't support it!");
-            }
+            g_debug ("Cannot force key frame as the pipeline doesn't support it!");
           else if (self->media)
             {
               GstRTSPStream *stream;
@@ -472,14 +464,10 @@ wfd_client_params_set (GstRTSPClient *client, GstRTSPContext *ctx)
               gst_pad_send_event (srcpad, g_steal_pointer (&event));
             }
           else
-            {
-              g_debug ("Cannot force key frame currently, no media!");
-            }
+            g_debug ("Cannot force key frame currently, no media!");
         }
       else
-        {
-          g_debug ("Ignoring unknown parameter %s", option);
-        }
+        g_debug ("Ignoring unknown parameter %s", option);
     }
 
   return GST_RTSP_OK;
@@ -535,9 +523,7 @@ wfd_client_pre_options_request (GstRTSPClient *client, GstRTSPContext *ctx)
           self->init_state = INIT_STATE_DONE;
         }
       else
-        {
-          g_idle_add (wfd_client_idle_wfd_query_params, g_object_ref (client));
-        }
+        g_idle_add (wfd_client_idle_wfd_query_params, g_object_ref (client));
     }
 
   return GST_RTSP_STS_OK;

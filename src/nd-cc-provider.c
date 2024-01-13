@@ -159,10 +159,10 @@ resolver_found_cb (GaServiceResolver  *resolver,
   AvahiStringList *cc_name, *cc_model;
 
   /* chromecast has pretty name and model in txt */
-  cc_name = avahi_string_list_find(txt, "fn");
-  cc_model = avahi_string_list_find(txt, "md");
+  cc_name = avahi_string_list_find (txt, "fn");
+  cc_model = avahi_string_list_find (txt, "md");
   if(cc_name && cc_model)
-      name = g_strdup_printf("%s - %s", cc_name->text + 3, cc_model->text + 3);
+    name = g_strdup_printf ("%s - %s", cc_name->text + 3, cc_model->text + 3);
 
   g_debug ("NdCCProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
 

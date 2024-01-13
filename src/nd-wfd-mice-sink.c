@@ -398,10 +398,10 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   g_autoptr(GError) error = NULL;
   const gchar *hostname = NULL;
   g_autofree gunichar2 *hostname_utf16 = NULL;
-  gchar hostname_truncated[3 + 4*MICE_HOSTNAME_MAX_UTF8_LEN+1] = { 0xEF, 0xBB, 0xBF };
+  gchar hostname_truncated[3 + 4 * MICE_HOSTNAME_MAX_UTF8_LEN + 1] = { 0xEF, 0xBB, 0xBF };
   glong hostname_items_written = 0;
   g_autofree gchar *rendered_msg_source_ready = NULL;
-  uint rendered_msg_source_ready_len = sizeof(msg_source_ready);
+  uint rendered_msg_source_ready_len = sizeof (msg_source_ready);
   uint hostname_bytelen = 0;
 
   NdWFDMiceSink *self = ND_WFD_MICE_SINK (sink);
@@ -437,9 +437,7 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
 
   if (self->server_source_id == 0 || self->remote_address == NULL)
-    {
-      goto fail;
-    }
+    goto fail;
 
   g_signal_connect_object (self->server,
                            "client-connected",
@@ -462,16 +460,17 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
 
-  hostname = g_get_host_name();
+  hostname = g_get_host_name ();
 
-  if (hostname == NULL){
-    g_warning ("Couldn't resolve the hostname. Defaulting to legacy device name \"GNOME\"");
-    hostname = "GNOME";
-  }
+  if (hostname == NULL)
+    {
+      g_warning ("Couldn't resolve the hostname. Defaulting to legacy device name \"GNOME\"");
+      hostname = "GNOME";
+    }
 
   g_debug ("NdWFDMiceSink: device name is %s", hostname);
 
-  g_utf8_strncpy(hostname_truncated + 3, hostname, MICE_HOSTNAME_MAX_UTF8_LEN);
+  g_utf8_strncpy (hostname_truncated + 3, hostname, MICE_HOSTNAME_MAX_UTF8_LEN);
   hostname_utf16 = g_utf8_to_utf16 (hostname_truncated, -1, NULL, &hostname_items_written, &error);
 
   hostname_bytelen = hostname_items_written * 2;
@@ -488,13 +487,14 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   // Copy the footer
   memcpy (rendered_msg_source_ready + MICE_HOSTNAME_BUFFER_OFFSET + hostname_bytelen,
           msg_source_ready + MICE_HOSTNAME_BUFFER_OFFSET,
-          sizeof(msg_source_ready) - MICE_HOSTNAME_BUFFER_OFFSET);
+          sizeof (msg_source_ready) - MICE_HOSTNAME_BUFFER_OFFSET);
 
 
-  if (error != NULL || hostname_utf16 == NULL) {
-    g_warning ("NdWFDMiceSink: Unable to convert the device name '%s' to UTF-16: %s", hostname_truncated, error->message);
-    goto fail;
-  }
+  if (error != NULL || hostname_utf16 == NULL)
+    {
+      g_warning ("NdWFDMiceSink: Unable to convert the device name '%s' to UTF-16: %s", hostname_truncated, error->message);
+      goto fail;
+    }
 
   // Copy the friendly device name, its size and update the total message length
   memcpy (rendered_msg_source_ready + MICE_HOSTNAME_BUFFER_OFFSET, hostname_utf16, hostname_bytelen);

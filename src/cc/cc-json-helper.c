@@ -184,16 +184,12 @@ cc_json_helper_get_message_type (Cast__Channel__CastMessage *message,
   const gchar *message_type;
 
   if (json_reader_read_member (reader, "type"))
-    {
-      message_type = json_reader_get_string_value (reader);
-    }
+    message_type = json_reader_get_string_value (reader);
   else
     {
       json_reader_end_member (reader);
       if (json_reader_read_member (reader, "responseType"))
-        {
-          message_type = json_reader_get_string_value (reader);
-        }
+        message_type = json_reader_get_string_value (reader);
       else
         {
           g_warning ("CcJsonHelper: Error parsing received message JSON: no type or responseType keys");

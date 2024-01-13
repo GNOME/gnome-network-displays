@@ -109,9 +109,7 @@ on_read_bytes (GPollableInputStream *istream, CcComm *comm)
   io_bytes = g_pollable_input_stream_read_nonblocking (istream, &header_buffer, 4, comm->cancellable, &err);
 
   if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-    {
-      return FALSE;
-    }
+    return FALSE;
   else if (io_bytes == 4)
     {
       guint32 message_size = GINT_FROM_BE (header_buffer);
@@ -125,14 +123,10 @@ on_read_bytes (GPollableInputStream *istream, CcComm *comm)
       while (io_bytes > 0 && (message_size -= io_bytes) > 0);
     }
   else
-    {
-      return FALSE;
-    }
+    return FALSE;
 
   if (data->len == 0 || g_error_matches (err, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-    {
-      return FALSE;
-    }
+    return FALSE;
   else if (data->len > 0 || g_error_matches (err, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
     {
       /* no more data to read */
