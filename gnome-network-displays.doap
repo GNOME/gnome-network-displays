@@ -23,4 +23,12 @@
       <gnome:userid>bberg</gnome:userid>
     </foaf:Person>
   </maintainer>
+
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Christian Glombek</foaf:name>
+      <foaf:mbox rdf:resource="mailto:lorbus@fedoraproject.org" />
+      <gnome:userid>cglombek</gnome:userid>
+    </foaf:Person>
+  </maintainer>
 </Project>
