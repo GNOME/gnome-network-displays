@@ -14,13 +14,14 @@
 	</screenshots>
 	<description>
 		<p>
-		GNOME Network Displays allows you to cast your desktop to a remote display. Currently
-		implemented is support for casting to Wi-Fi Display capable devices (a.k.a. Miracast).
+		GNOME Network Displays allows you to cast your desktop to a remote display.
+		Supports the Miracast and Chromecast protocols.
 		</p>
 	</description>
 	<update_contact>bberg@gnome.org</update_contact>
 	<content_rating type="oars-1.1"/>
 	<releases>
+		<release version="0.91.0" date="2024-01-18"/>
 		<release version="0.90.5" date="2021-04-27"/>
 		<release version="0.90.4" date="2020-06-22"/>
 		<release version="0.90.3" date="2020-04-29"/>

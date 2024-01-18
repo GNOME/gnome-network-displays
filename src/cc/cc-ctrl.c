@@ -50,7 +50,7 @@ cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id)
 {
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "CONNECT",
-    "userAgent", CC_JSON_TYPE_STRING, "GND/0.90.5  (X11; Linux x86_64)",
+    "userAgent", CC_JSON_TYPE_STRING, "GND/0.91.0  (X11; Linux x86_64)",
     "connType", CC_JSON_TYPE_INT, 0,
     "origin", CC_JSON_TYPE_OBJECT, cc_json_helper_build_node (NULL),
     "senderInfo", CC_JSON_TYPE_OBJECT, cc_json_helper_build_node (

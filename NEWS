@@ -1,7 +1,15 @@
+GNOME Network Displays 0.91.0
+=============================
+* Add support for Miracast over Infrastructure (MICE) protocol (@lorbus)
+* Add support for Chromecast protocol (@kyteinsky)
+* Add support for casting a virtual screen (@NaheemSays)
+* Fix various issues
+* Add/update various translations
+
 GNOME Network Displays 0.90.5
 =============================
 
-Notet hat there is a known issue with some versions of openh264enc. See
+Note that there is a known issue with some versions of openh264enc. See
 https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/issues/1576
 
  * Multiple fixes in P2P peer/sink handling
