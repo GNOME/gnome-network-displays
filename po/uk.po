@@ -2,13 +2,14 @@
 # Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2020.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-23 10:26+0200\n"
-"PO-Revision-Date: 2020-06-18 09:09+0300\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/i"
+"ssues/\n"
+"POT-Creation-Date: 2024-01-18 15:19+0000\n"
+"PO-Revision-Date: 2024-01-18 19:52+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 20.07.70\n"
+"X-Generator: Lokalize 23.04.1\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:6
@@ -26,18 +27,21 @@ msgstr "Мережеві дисплеї GNOME"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7
 msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Потокове мовлення стільниці на пристрої дисплеїв із можливостями Wi-Fi"
+msgstr ""
+"Потокове мовлення стільниці на пристрої дисплеїв із можливостями Wi-Fi"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#| msgid ""
+#| "GNOME Network Displays allows you to cast your desktop to a remote "
+#| "display. Currently implemented is support for casting to Wi-Fi Display "
+#| "capable devices (a.k.a. Miracast)."
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
-"Currently implemented is support for casting to Wi-Fi Display capable "
-"devices (a.k.a. Miracast)."
+"Supports the Miracast and Chromecast protocols."
 msgstr ""
 "«Мережеві дисплеї GNOME» надають вам змогу транслювати зображення і звук з "
-"вашої стільниці на віддалену стільницю. У поточній версії реалізовано "
-"підтримку трансляції на пристрої із можливостями отримання даних дисплея Wi-"
-"Fi (тобто Miracast)."
+"вашої стільниці на віддалену стільницю. Реалізовано підтримку протоколів"
+" Miracast і Chromecast."
 
 #: src/nd-codec-install.c:54
 #, c-format
@@ -75,24 +79,25 @@ msgid "GStreamer Element “%s”"
 msgstr "Елемент GStreamer «%s»"
 
 #: src/nd-codec-install.c:170
-msgid "Please install one of the following GStreamer plugins by clicking below"
+msgid ""
+"Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Будь ласка, встановіть один із вказаних нижче додатків GStreamer натисканням "
 "відповідної кнопки"
 
-#: src/nd-window.c:158
+#: src/nd-window.c:163
 msgid "Checking and installing required firewall zones."
 msgstr "Перевіряємо і встановлюємо потрібні зони брандмауера."
 
-#: src/nd-window.c:165
+#: src/nd-window.c:170
 msgid "Making P2P connection"
 msgstr "Створюємо з'єднання P2P"
 
-#: src/nd-window.c:172
+#: src/nd-window.c:177
 msgid "Establishing connection to sink"
 msgstr "Встановлено з'єднання із приймачем"
 
-#: src/nd-window.c:179
+#: src/nd-window.c:184
 msgid "Starting to stream"
 msgstr "Починаємо потокове мовлення"
 
