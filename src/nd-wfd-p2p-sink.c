@@ -472,7 +472,7 @@ firewall_ready (GObject      *source_object,
   connection = nm_simple_connection_new ();
 
   general_setting = nm_setting_connection_new ();
-  nm_setting_connection_add_permission (general_setting, "user", g_get_user_name (), NULL);
+  nm_setting_connection_add_permission ((NMSettingConnection *) general_setting, "user", g_get_user_name (), NULL);
   nm_connection_add_setting (connection, general_setting);
   g_object_set (general_setting, NM_SETTING_CONNECTION_ZONE, ND_WFD_ZONE, NULL);
 
@@ -581,7 +581,7 @@ nd_wfd_p2p_sink_sink_stop_stream_int (NdWFDP2PSink *self)
    * nm_ac will be unset if something else destroyed the connection already */
   if (self->nm_ac)
     {
-      nm_device_disconnect (self->nm_device, NULL, NULL);
+      nm_device_disconnect_async (self->nm_device, NULL, NULL, NULL);
       g_clear_object (&self->nm_ac);
     }
 }

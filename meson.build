@@ -18,7 +18,7 @@ configure_file(
   configuration: config_h,
 )
 add_project_arguments([
-  '-I' + meson.build_root(),
+  '-I' + meson.current_build_dir(),
   '-DG_LOG_DOMAIN="Gnd"',
 ], language: 'c')
 
