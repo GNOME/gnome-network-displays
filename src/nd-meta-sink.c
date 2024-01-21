@@ -376,6 +376,9 @@ gboolean
 nd_meta_sink_has_sink (NdMetaSink *meta_sink,
                        NdSink     *sink)
 {
+  if (!meta_sink->sinks)
+    return FALSE;
+
   return g_ptr_array_find (meta_sink->sinks, sink, NULL);
 }
 
