@@ -1,23 +1,23 @@
-# SOME DESCRIPTIVE TITLE.
+# Georgian translation for gnome-network-displays.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Ekaterine Papava <papava.e@gtu.ge>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues\n"
-"POT-Creation-Date: 2022-02-14 14:41+0000\n"
-"PO-Revision-Date: 2022-04-23 21:20+0200\n"
-"Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
-"Language-Team: \n"
+"issues/\n"
+"POT-Creation-Date: 2024-01-18 15:19+0000\n"
+"PO-Revision-Date: 2024-01-23 22:32+0100\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:6
@@ -32,12 +32,10 @@ msgstr ""
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:16
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
-"Currently implemented is support for casting to Wi-Fi Display capable "
-"devices (a.k.a. Miracast)."
+"Supports the Miracast and Chromecast protocols."
 msgstr ""
 "GNOME Network Displays საშუალებას გაძლევთ თქვენი სამუშაო მაგიდა დაშორებულ "
-"ეკრანზე აჩვენოთ. ამჟამად განხორციელებული მოწყობილობებია WiFi Display (ანუ "
-"Miracast)."
+"ეკრანზე აჩვენოთ. ამჟამად მხარდაჭერილი პროტოკოლებია Miracast და Chromecast."
 
 #: src/nd-codec-install.c:54
 #, c-format
@@ -78,19 +76,19 @@ msgstr "GStreamer Element “%s”"
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "დააყენეთ GStreamer-ის დამატებები ქვემოთ დაწკაპუნებით"
 
-#: src/nd-window.c:158
+#: src/nd-window.c:163
 msgid "Checking and installing required firewall zones."
 msgstr "ბრანდმაუერის ზონების შემოწმება და დაყენება."
 
-#: src/nd-window.c:165
+#: src/nd-window.c:170
 msgid "Making P2P connection"
 msgstr "P2P შეერთების შექმნა"
 
-#: src/nd-window.c:172
+#: src/nd-window.c:177
 msgid "Establishing connection to sink"
 msgstr "ეკრანთან შეერთების შექმნა"
 
-#: src/nd-window.c:179
+#: src/nd-window.c:184
 msgid "Starting to stream"
 msgstr "გადაცემის დაწყება"
 
