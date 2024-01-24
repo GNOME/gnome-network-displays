@@ -239,15 +239,10 @@ service_removed_cb (GaServiceBrowser   *browser,
           state == ND_SINK_STATE_STREAMING)
         continue;
 
-      gchar * remote_name = NULL;
-      g_object_get (sink, "name", &remote_name, NULL);
-      if (remote_name == name)
-        {
-          g_debug ("NdWFDMiceProvider: Removing sink");
-          g_ptr_array_remove_index (provider->sinks, i);
-          g_signal_emit_by_name (provider, "sink-removed", sink);
-          break;
-        }
+      g_debug ("NdWFDMiceProvider: Removing sink");
+      g_ptr_array_remove_index (provider->sinks, i);
+      g_signal_emit_by_name (provider, "sink-removed", sink);
+      break;
     }
 }
 

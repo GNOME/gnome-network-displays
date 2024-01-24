@@ -115,9 +115,13 @@ peer_removed_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *devi
     {
       g_autoptr(NdWFDP2PSink) sink = g_object_ref (g_ptr_array_index (provider->sinks, i));
 
-      if (nd_wfd_p2p_provider_get_device (provider) != device)
+      NdSinkState state = nd_wfd_p2p_sink_get_state (sink);
+      if (nd_wfd_p2p_provider_get_device (provider) != device ||
+          state == ND_SINK_STATE_WAIT_STREAMING ||
+          state == ND_SINK_STATE_STREAMING)
         continue;
 
+      g_debug ("NdWFDP2PProvider: Removing sink");
       g_ptr_array_remove_index (provider->sinks, i);
       g_signal_emit_by_name (provider, "sink-removed", sink);
       break;
