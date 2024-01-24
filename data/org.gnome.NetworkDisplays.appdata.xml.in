@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop">
+<!-- Copyright 2024 Benjamin Berg, Christian Glombek -->
+<component type="desktop-application">
 	<id>org.gnome.NetworkDisplays.desktop</id>
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0-or-later</project_license>
 	<name>GNOME Network Displays</name>
 	<summary>Stream the desktop to Wi-Fi Display capable devices</summary>
 	<url type="homepage">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
+	<url type="bugtracker">https://gitlab.gnome.org/GNOME/gnome-network-displays/-/issues</url>
+	<url type="vcs-browser">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
+	<url type="translate">https://l10n.gnome.org/module/gnome-network-displays/</url>
+	<!-- developer_name tag deprecated with Appstream 1.0 -->
+	<developer_name translatable="no">Benjamin Berg, Christian Glombek</developer_name>
+	<developer id="gnome.org">
+		<name translatable="no">Benjamin Berg</name>
+		<name translatable="no">Christian Glombek</name>
+	</developer>
 	<translation type="gettext">gnome-network-displays</translation>
+	<launchable type="desktop-id">org.gnome.NetworkDisplays.desktop</launchable>
 	<screenshots>
-		<screenshot>
+		<screenshot type="default">
 			<image>https://gitlab.gnome.org/GNOME/gnome-network-displays/-/raw/master/data/appdata/device-list.png</image>
 		</screenshot>
 	</screenshots>
