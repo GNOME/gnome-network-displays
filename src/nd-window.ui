@@ -114,56 +114,52 @@
                             <property name="child">
                               <object class="GtkBox">
                                 <property name="valign">start</property>                  
+                                <property name="hexpand">True</property>
+                                <property name="orientation">vertical</property>
+                                <property name="margin-top">32</property>
+                                <property name="margin-bottom">32</property>
+                                <property name="margin-start">32</property>
+                                <property name="margin-end">32</property>
+                                <property name="spacing">16</property>                   
                                 <child>
-                                  <object class="GtkBox" id="box1">
+                                  <object class="GtkBox" id="connect_header">
+                                    <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="margin-top">32</property>
-                                    <property name="margin-bottom">32</property>
-                                    <property name="margin-start">32</property>
-                                    <property name="margin-end">32</property>
-                                    <property name="spacing">16</property>                   
+                                    <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkBox" id="connect_header">
-                                        <property name="halign">start</property>
+                                      <object class="GtkSpinner" id="connect_spinner">
                                         <property name="hexpand">True</property>
-                                        <property name="spacing">6</property>
-                                        <child>
-                                          <object class="GtkSpinner" id="connect_spinner">
-                                            <property name="hexpand">True</property>
-                                            <property name="spinning">True</property>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="GtkLabel" id="connect">
-                                            <property name="label" translatable="yes">Connecting</property>
-                                            <property name="xalign">0</property>
-                                            <attributes>
-                                              <attribute name="weight" value="bold"></attribute>
-                                            </attributes>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="GtkLabel" id="connect_state_label"/>
-                                        </child>
+                                        <property name="spinning">True</property>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkFrame">
-                                        <child>
-                                          <object class="GtkListBox" id="connect_sink_list"/>
-                                        </child>
+                                      <object class="GtkLabel" id="connect">
+                                        <property name="label" translatable="yes">Connecting</property>
+                                        <property name="xalign">0</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"></attribute>
+                                        </attributes>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkBox">
-                                        <child>
-                                          <object class="GtkButton" id="connect_cancel">
-                                            <property name="label" translatable="yes">Cancel</property>
-                                            <property name="focusable">True</property>
-                                            <property name="receives-default">True</property>
-                                          </object>
-                                        </child>
+                                      <object class="GtkLabel" id="connect_state_label"/>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkFrame">
+                                    <child>
+                                      <object class="GtkListBox" id="connect_sink_list"/>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <child>
+                                      <object class="GtkButton" id="connect_cancel">
+                                        <property name="label" translatable="yes">Cancel</property>
+                                        <property name="focusable">True</property>
+                                        <property name="receives-default">True</property>
                                       </object>
                                     </child>
                                   </object>
@@ -192,53 +188,49 @@
                             <property name="child">
                               <object class="GtkBox">
                                 <property name="valign">start</property>
+                                <property name="hexpand">True</property>
+                                <property name="orientation">vertical</property>
+                                <property name="margin-top">32</property>
+                                <property name="margin-bottom">32</property>
+                                <property name="margin-start">32</property>
+                                <property name="margin-end">32</property>
+                                <property name="spacing">16</property>
                                 <child>
-                                  <object class="GtkBox" id="box2">
+                                  <object class="GtkBox">
+                                    <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="margin-top">32</property>
-                                    <property name="margin-bottom">32</property>
-                                    <property name="margin-start">32</property>
-                                    <property name="margin-end">32</property>
-                                    <property name="spacing">16</property>
+                                    <property name="spacing">6</property>
                                     <child>
-                                      <object class="GtkBox">
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="spacing">6</property>
-                                        <child>
-                                          <object class="GtkLabel" id="stream_label">
-                                            <property name="label" translatable="yes">Streaming</property>
-                                            <property name="xalign">0</property>
-                                            <attributes>
-                                              <attribute name="weight" value="bold"></attribute>
-                                            </attributes>
-                                          </object>
-                                        </child>
-                                        <child>
-                                          <object class="GtkLabel" id="stream_state_label"/>
-                                        </child>
+                                      <object class="GtkLabel" id="stream_label">
+                                        <property name="label" translatable="yes">Streaming</property>
+                                        <property name="xalign">0</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"></attribute>
+                                        </attributes>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkFrame">
-                                        <child>
-                                          <object class="GtkListBox" id="stream_sink_list"/>
-                                        </child>
-                                      </object>
+                                      <object class="GtkLabel" id="stream_state_label"/>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkFrame">
+                                    <child>
+                                      <object class="GtkListBox" id="stream_sink_list"/>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
-                                      <object class="GtkBox">
-                                        <child>
-                                          <placeholder/>
-                                        </child>
-                                        <child>
-                                          <object class="GtkButton" id="stream_cancel">
-                                            <property name="label" translatable="yes">Cancel</property>
-                                            <property name="focusable">True</property>
-                                            <property name="receives-default">True</property>
-                                          </object>
-                                        </child>
+                                      <object class="GtkButton" id="stream_cancel">
+                                        <property name="label" translatable="yes">Cancel</property>
+                                        <property name="focusable">True</property>
+                                        <property name="receives-default">True</property>
                                       </object>
                                     </child>
                                   </object>
@@ -267,80 +259,76 @@
                             <property name="child">
                               <object class="GtkBox">
                                 <property name="valign">start</property>
+                                <property name="hexpand">True</property>
+                                <property name="orientation">vertical</property>
+                                <property name="margin-top">32</property>
+                                <property name="margin-bottom">32</property>
+                                <property name="margin-start">32</property>
+                                <property name="margin-end">32</property>
+                                <property name="spacing">16</property>
                                 <child>
-                                  <object class="GtkBox" id="box3">
+                                  <object class="GtkBox">
+                                    <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="margin-top">32</property>
-                                    <property name="margin-bottom">32</property>
-                                    <property name="margin-start">32</property>
-                                    <property name="margin-end">32</property>
-                                    <property name="spacing">16</property>
+                                    <property name="spacing">6</property>
                                     <child>
+                                      <object class="GtkLabel">
+                                        <property name="label" translatable="yes">Error</property>
+                                        <property name="xalign">0</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"></attribute>
+                                        </attributes>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkFrame">
+                                    <child>
+                                      <object class="GtkListBox" id="error_sink_list"/>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="error_return">
+                                        <property name="label" translatable="yes">Return</property>
+                                        <property name="focusable">True</property>
+                                        <property name="receives-default">True</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="NdCodecInstall" id="codec_install_audio">
+                                    <property name="title" translatable="yes">One of the following codec plugins is required for audio support.
+Clicking will start the installation process.</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="NdCodecInstall" id="codec_install_video">
+                                    <property name="title" translatable="yes">One of the following codec plugins is required for video support.
+Clicking will start the installation process.</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRevealer" id="error_firewall_zone">
+                                    <property name="child">
                                       <object class="GtkBox">
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="spacing">6</property>
+                                        <property name="orientation">vertical</property>
                                         <child>
                                           <object class="GtkLabel">
-                                            <property name="label" translatable="yes">Error</property>
-                                            <property name="xalign">0</property>
-                                            <attributes>
-                                              <attribute name="weight" value="bold"></attribute>
-                                            </attributes>
+                                            <property name="wrap">True</property>
+                                            <property name="xalign">0.0</property>
+                                            <property name="label" translatable="yes">A required firewall zone is not available and could not be installed. Please try again and enter the password when prompted or contact a system administrator.</property>
                                           </object>
                                         </child>
                                       </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkFrame">
-                                        <child>
-                                          <object class="GtkListBox" id="error_sink_list"/>
-                                        </child>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkBox">
-                                        <child>
-                                          <placeholder/>
-                                        </child>
-                                        <child>
-                                          <object class="GtkButton" id="error_return">
-                                            <property name="label" translatable="yes">Return</property>
-                                            <property name="focusable">True</property>
-                                            <property name="receives-default">True</property>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="NdCodecInstall" id="codec_install_audio">
-                                        <property name="title" translatable="yes">One of the following codec plugins is required for audio support.
-Clicking will start the installation process.</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="NdCodecInstall" id="codec_install_video">
-                                        <property name="title" translatable="yes">One of the following codec plugins is required for video support.
-Clicking will start the installation process.</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkRevealer" id="error_firewall_zone">
-                                        <property name="child">
-                                          <object class="GtkBox">
-                                            <property name="orientation">vertical</property>
-                                            <child>
-                                              <object class="GtkLabel">
-                                                <property name="wrap">True</property>
-                                                <property name="xalign">0.0</property>
-                                                <property name="label" translatable="yes">A required firewall zone is not available and could not be installed. Please try again and enter the password when prompted or contact a system administrator.</property>
-                                              </object>
-                                            </child>
-                                          </object>
-                                        </property>
-                                      </object>
-                                    </child>
+                                    </property>
                                   </object>
                                 </child>
                               </object>
@@ -358,11 +346,4 @@ Clicking will start the installation process.</property>
       </object>
     </property>
   </template>
-  <object class="GtkSizeGroup">
-    <widgets>
-      <widget name="box1"/>
-      <widget name="box2"/>
-      <widget name="box3"/>
-    </widgets>
-  </object>
 </interface>
