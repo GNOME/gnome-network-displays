@@ -26,8 +26,9 @@ G_BEGIN_DECLS
 #define ND_TYPE_WFD_MICE_SINK (nd_wfd_mice_sink_get_type ())
 G_DECLARE_FINAL_TYPE (NdWFDMiceSink, nd_wfd_mice_sink, ND, WFD_MICE_SINK, GObject)
 
-NdWFDMiceSink * nd_wfd_mice_sink_new (gchar *    name,
-                                      gchar *    remote_address);
+NdWFDMiceSink * nd_wfd_mice_sink_new (gchar * name,
+                                      gchar * ip,
+                                      gchar * p2p_mac);
 
 NdSinkState nd_wfd_mice_sink_get_state (NdWFDMiceSink *sink);
 

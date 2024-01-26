@@ -19,6 +19,7 @@
 #include <avahi-gobject/ga-service-browser.h>
 #include <avahi-gobject/ga-service-resolver.h>
 #include <avahi-common/address.h>
+#include <avahi-common/malloc.h>
 #include "gnome-network-displays-config.h"
 #include "nd-wfd-mice-provider.h"
 #include "nd-sink.h"
@@ -152,7 +153,9 @@ resolver_found_cb (GaServiceResolver  *resolver,
                    NdWFDMiceProvider  *provider)
 {
   NdWFDMiceSink * sink = NULL;
+  AvahiStringList *l;
   gchar address[AVAHI_ADDRESS_STR_MAX];
+  gchar *p2p_mac = NULL;
 
   g_debug ("NdWFDMiceProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
 
@@ -161,7 +164,22 @@ resolver_found_cb (GaServiceResolver  *resolver,
 
   g_debug ("NdWFDMiceProvider: Resolved %s to %s", hostname, address);
 
-  sink = nd_wfd_mice_sink_new (name, address);
+  for (l = txt; l; l = l->next)
+    {
+      char *key, *value;
+
+      if (avahi_string_list_get_pair (l, &key, &value, NULL) != 0)
+        break;
+
+      if (g_str_equal (key, "p2pMAC"))
+        p2p_mac = g_strdup (value);
+
+      avahi_free (key);
+      avahi_free (value);
+    }
+
+  /* TODO it might be more convenient to pass the whole AvahiStringList */
+  sink = nd_wfd_mice_sink_new (name, address, p2p_mac);
 
   g_object_unref (resolver);
 

@@ -139,7 +139,11 @@ nd_wfd_p2p_sink_get_property (GObject    *object,
          * object is not valid anymore. */
         hw_addr = nm_wifi_p2p_peer_get_hw_address (sink->nm_peer);
         if (hw_addr)
-          g_ptr_array_add (res, g_strdup (hw_addr));
+          {
+            gchar *addr = g_utf8_strup (hw_addr, -1);
+            g_debug ("NdWFDP2PSink: Adding P2P MAC %s to match list", addr);
+            g_ptr_array_add (res, addr);
+          }
 
         g_value_take_boxed (value, g_steal_pointer (&res));
         break;
