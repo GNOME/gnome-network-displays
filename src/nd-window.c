@@ -19,7 +19,9 @@
 #include <avahi-gobject/ga-client.h>
 #include <avahi-gobject/ga-service-browser.h>
 #include <glib/gi18n.h>
+#include <gst/base/base.h>
 #include <gst/gst.h>
+#include <libportal-gtk4/portal-gtk4.h>
 #include "gnome-network-displays-config.h"
 #include "nd-cc-provider.h"
 #include "nd-codec-install.h"
@@ -27,7 +29,6 @@
 #include "nd-meta-provider.h"
 #include "nd-nm-device-registry.h"
 #include "nd-pulseaudio.h"
-#include "nd-screencast-portal.h"
 #include "nd-sink-list-model.h"
 #include "nd-sink-row.h"
 #include "nd-wfd-mice-provider.h"
@@ -41,7 +42,8 @@ struct _NdWindow
   NdMetaProvider      *meta_provider;
   NdNMDeviceRegistry  *nm_device_registry;
 
-  NdScreencastPortal  *portal;
+  XdpPortal           *portal;
+  XdpSession          *session;
   gboolean             use_x11;
 
   NdPulseaudio        *pulse;
@@ -83,6 +85,46 @@ struct _NdWindow
 G_DEFINE_TYPE (NdWindow, gnome_nd_window, ADW_TYPE_APPLICATION_WINDOW)
 
 static GstElement *
+nd_window_screencast_get_source (NdWindow * self)
+{
+  g_autoptr(GstElement) src = NULL;
+  GVariant *streams = NULL;
+  const gchar *stream_type;
+  gsize stream_count;
+  guint32 node_id;
+
+  src = gst_element_factory_make ("pipewiresrc", "portal-pipewire-source");
+  if (src == NULL)
+    g_error ("GStreamer element \"pipewiresrc\" could not be created!");
+
+  streams = xdp_session_get_streams (self->session);
+  if (streams == NULL)
+    g_error ("XDP session streams not found!");
+
+  stream_type = g_variant_get_type_string (streams);
+  if (0 != strcmp (stream_type, "a(ua{sv})"))
+    g_error ("Unexpected XDP session type '%s'", stream_type);
+
+  stream_count = g_variant_n_children (streams);
+  if (stream_count == 0)
+    g_error ("Did not find any usable streams!");
+
+  g_variant_get_child (streams, 0, "(ua{sv})", &node_id, NULL);
+
+  g_debug ("Got a stream with node ID: %d", node_id);
+
+  g_object_set (src,
+                "fd", xdp_session_open_pipewire_remote (self->session),
+                "path", g_strdup_printf ("%u", node_id),
+                "do-timestamp", TRUE,
+                NULL);
+  
+  gst_base_src_set_live (GST_BASE_SRC (src), TRUE);
+
+  return g_steal_pointer (&src);
+}
+
+static GstElement *
 sink_create_source_cb (NdWindow * self, NdSink * sink)
 {
   GstBin *bin;
@@ -93,7 +135,7 @@ sink_create_source_cb (NdWindow * self, NdSink * sink)
   if (self->use_x11)
     src = gst_element_factory_make ("ximagesrc", "X11 screencast source");
   else
-    src = nd_screencast_portal_get_source (self->portal);
+    src = nd_window_screencast_get_source (self);
 
   if (!src)
     g_error ("Error creating video source element, likely a missing dependency!");
@@ -408,21 +450,20 @@ gnome_nd_window_class_init (NdWindowClass *klass)
 }
 
 static void
-nd_screencast_portal_init_async_cb (GObject      *source_object,
-                                    GAsyncResult *res,
-                                    gpointer      user_data)
+nd_screencast_started_cb (GObject      *source_object,
+                          GAsyncResult *result,
+                          gpointer      user_data)
 {
-  NdWindow *window;
-
   g_autoptr(GError) error = NULL;
+  XdpSession *session = (XdpSession *) source_object;
+  NdWindow *window = ND_WINDOW (user_data);
 
-  if (!g_async_initable_init_finish (G_ASYNC_INITABLE (source_object), res, &error))
+  window->session = session;
+  if (!xdp_session_start_finish (window->session, result, &error))
     {
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         {
           g_warning ("Error initializing screencast portal: %s", error->message);
-
-          window = ND_WINDOW (user_data);
 
           /* Unknown method means the portal does not exist, give a slightly
            * more specific warning then.
@@ -434,12 +475,35 @@ nd_screencast_portal_init_async_cb (GObject      *source_object,
           window->use_x11 = TRUE;
         }
 
-      g_object_unref (source_object);
+      g_warning ("Failed to start screencast session: %s", error->message);
+      g_clear_object (&window->session);
+      return;
+    }
+  g_debug ("Created screencast session");
+}
+
+static void
+nd_screencast_init_cb (GObject      *source_object,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+  g_autoptr(GError) error = NULL;
+  XdpPortal *portal = XDP_PORTAL (source_object);
+  NdWindow *window = ND_WINDOW (user_data);
+  XdpParent *parent = NULL;
+
+  window->portal = portal;
+  window->session = xdp_portal_create_screencast_session_finish (window->portal, result, &error);
+  if (window->session == NULL)
+    {
+      g_warning ("Failed to create screencast session: %s", error->message);
+      window->use_x11 = TRUE;
       return;
     }
 
-  window = ND_WINDOW (user_data);
-  window->portal = ND_SCREENCAST_PORTAL (source_object);
+  parent = xdp_parent_new_gtk (GTK_WINDOW (window));
+  xdp_session_start (window->session, parent, NULL, nd_screencast_started_cb, window);
+  xdp_parent_free (parent);
 }
 
 static void
@@ -488,7 +552,7 @@ on_meta_provider_has_provider_changed_cb (NdWindow *self, GParamSpec *pspec, NdM
 static void
 gnome_nd_window_init (NdWindow *self)
 {
-  NdScreencastPortal *portal;
+  g_autoptr(GError) error = NULL;
   NdPulseaudio *pulse;
 
   gtk_widget_init_template (GTK_WIDGET (self));
@@ -556,12 +620,24 @@ gnome_nd_window_init (NdWindow *self)
                            self,
                            G_CONNECT_SWAPPED);
 
-  portal = nd_screencast_portal_new ();
-  g_async_initable_init_async (G_ASYNC_INITABLE (portal),
-                               G_PRIORITY_LOW,
-                               self->cancellable,
-                               nd_screencast_portal_init_async_cb,
-                               self);
+  self->portal = xdp_portal_initable_new (&error);
+  if (error)
+    {
+      g_warning ("Failed to create screencast portal: %s", error->message);
+      self->use_x11 = TRUE;
+      g_clear_object (&self->portal);
+    }
+
+  if (self->portal)
+    xdp_portal_create_screencast_session (self->portal,
+                                          XDP_OUTPUT_MONITOR | XDP_OUTPUT_VIRTUAL,
+                                          XDP_SCREENCAST_FLAG_NONE,
+                                          XDP_CURSOR_MODE_EMBEDDED,
+                                          XDP_PERSIST_MODE_NONE,
+                                          NULL,
+                                          self->cancellable,
+                                          nd_screencast_init_cb,
+                                          self);
 
   pulse = nd_pulseaudio_new ();
   g_async_initable_init_async (G_ASYNC_INITABLE (pulse),

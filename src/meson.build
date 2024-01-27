@@ -23,7 +23,6 @@ gnome_nd_sources = [
   'nd-dummy-provider.c',
   'nd-dummy-wfd-sink.c',
   'nd-dummy-cc-sink.c',
-  'nd-screencast-portal.c',
   'nd-pulseaudio.c',
 ]
 
@@ -44,6 +43,7 @@ gnome_nd_deps = [
   dependency('gstreamer-rtsp-server-1.0'),
   dependency('gtk4'),
   dependency('libnm', version: '>= 1.15'),
+  dependency('libportal-gtk4', version: '>= 0.7'),
   dependency('libpulse-mainloop-glib'),
   dependency('libadwaita-1', version: '>= 1.0.0'),
 ]
