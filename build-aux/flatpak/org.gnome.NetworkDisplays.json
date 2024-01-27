@@ -5,6 +5,7 @@
     "sdk": "org.gnome.Sdk",
     "command": "gnome-network-displays",
     "finish-args": [
+        "--device=dri",
         "--share=ipc",
         "--share=network",
         "--socket=pulseaudio",
