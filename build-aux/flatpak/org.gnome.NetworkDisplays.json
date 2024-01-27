@@ -1,7 +1,7 @@
 {
     "id": "org.gnome.NetworkDisplays",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "42",
+    "runtime-version": "master",
     "sdk": "org.gnome.Sdk",
     "command": "gnome-network-displays",
     "finish-args": [
@@ -31,8 +31,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.4.1/protobuf-c-1.4.1.tar.gz",
-                    "sha256": "4cc4facd508172f3e0a4d3a8736225d472418aee35b4ad053384b137b220339f",
+                    "url": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.5.0/protobuf-c-1.5.0.tar.gz",
+                    "sha256": "7b404c63361ed35b3667aec75cc37b54298d56dd2bcf369de3373212cc06fd98",
                     "x-checker-data": {
                         "type": "json",
                         "url": "https://api.github.com/repos/protobuf-c/protobuf-c/releases/latest",
@@ -62,6 +62,7 @@
             "buildsystem": "meson",
             "builddir": true,
             "config-opts": [
+                "-Ddoc=disabled",
                 "-Dexamples=disabled",
                 "-Dtests=disabled",
                 "-Dintrospection=disabled"
@@ -73,11 +74,11 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-1.18.6.tar.xz",
-                    "sha256": "826f32afbcf94b823541efcac4a0dacdb62f6145ef58f363095749f440262be9",
+                    "url": "https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-1.22.9.tar.xz",
+                    "sha256": "808af148f89404ff74850f8ca5272bed4bfe67f9620231dc4514fd07eb26d0a4",
                     "x-checker-data": {
                         "type": "json",
-                        "url": "https://gitlab.freedesktop.org/api/v4/projects/1362/repository/tags?search=^1.18.",
+                        "url": "https://gitlab.freedesktop.org/api/v4/projects/1357/repository/tags?search=^1.22.",
                         "version-query": ".[0].name",
                         "url-query": "\"https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-\" + $version + \".tar.xz\""
                     }
@@ -208,8 +209,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://github.com/firewalld/firewalld/releases/download/v1.1.1/firewalld-1.1.1.tar.gz",
-                    "sha256": "1dcd314ff836b2ce69f15f60fc7d50bd77ed359d784f9b3c07f2d394ea570e4c",
+                    "url": "https://github.com/firewalld/firewalld/releases/download/v2.1.0/firewalld-2.1.0.tar.bz2",
+                    "sha256": "22e3c700c2e4867796e9c22cf929cba4b2c143c8884240cfb9f3ef731366ff71",
                     "x-checker-data": {
                         "type": "anitya",
                         "project-id": 9989,
@@ -263,8 +264,8 @@
                 {
                     "type": "git",
                     "url": "https://gitlab.freedesktop.org/NetworkManager/NetworkManager.git",
-                    "tag": "1.38.2",
-                    "commit": "abfd2d6ea729926bff0ddafa1367a54f6d6f4230",
+                    "tag": "1.44.2",
+                    "commit": "8bee6ef894a27ffc8a464df3b32b03e811e1a15d",
                     "x-checker-data": {
                         "type": "git",
                         "tag-pattern": "^([\\d.]+)$"
