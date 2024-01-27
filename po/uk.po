@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/i"
 "ssues/\n"
-"POT-Creation-Date: 2024-01-18 15:19+0000\n"
-"PO-Revision-Date: 2024-01-18 19:52+0200\n"
+"POT-Creation-Date: 2024-01-26 23:59+0000\n"
+"PO-Revision-Date: 2024-01-27 09:15+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -21,91 +21,93 @@ msgstr ""
 "X-Generator: Lokalize 23.04.1\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Мережеві дисплеї GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Stream the desktop to Wi-Fi Display capable devices"
 msgstr ""
 "Потокове мовлення стільниці на пристрої дисплеїв із можливостями Wi-Fi"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
-#| msgid ""
-#| "GNOME Network Displays allows you to cast your desktop to a remote "
-#| "display. Currently implemented is support for casting to Wi-Fi Display "
-#| "capable devices (a.k.a. Miracast)."
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:27
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
 msgstr ""
 "«Мережеві дисплеї GNOME» надають вам змогу транслювати зображення і звук з "
-"вашої стільниці на віддалену стільницю. Реалізовано підтримку протоколів"
-" Miracast і Chromecast."
+"вашої стільниці на віддалену стільницю. Реалізовано підтримку протоколів "
+"Miracast і Chromecast."
 
-#: src/nd-codec-install.c:54
+#: src/nd-codec-install.c:58
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "Відеокодувальник OpenH264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "Відеокодувальник x264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Відеокодувальник H264 VA-API GStreamer (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "Звуковий кодувальник GStreamer AAC з FDK (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "Звуковий кодувальник GStreamer AAC з libav (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Вільний звуковий кодувальник GStreamer AAC (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "Елемент GStreamer «%s»"
 
-#: src/nd-codec-install.c:170
+#: src/nd-codec-install.c:176
 msgid ""
 "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Будь ласка, встановіть один із вказаних нижче додатків GStreamer натисканням "
 "відповідної кнопки"
 
-#: src/nd-window.c:163
+#: src/nd-window.c:159
 msgid "Checking and installing required firewall zones."
 msgstr "Перевіряємо і встановлюємо потрібні зони брандмауера."
 
-#: src/nd-window.c:170
+#: src/nd-window.c:166
 msgid "Making P2P connection"
 msgstr "Створюємо з'єднання P2P"
 
-#: src/nd-window.c:177
+#: src/nd-window.c:173
 msgid "Establishing connection to sink"
 msgstr "Встановлено з'єднання із приймачем"
 
-#: src/nd-window.c:184
+#: src/nd-window.c:180
 msgid "Starting to stream"
 msgstr "Починаємо потокове мовлення"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
+#: src/nd-window.ui:6
+#| msgid "GNOME Network Displays"
+msgid "Network Displays"
+msgstr "Мережеві дисплеї"
+
+#: src/nd-window.ui:28
+#| msgid "No Wi‑Fi P2P adapters found"
+msgid "No Wi‑Fi P2P Adapter Found"
 msgstr "Адаптерів P2P Wi‑Fi не виявлено"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -115,49 +117,55 @@ msgstr ""
 "перевірте, чи увімкнено Wi‑Fi і дії P2P Wi‑Fi доступні у NetworkManager і "
 "wpa_supplicant."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Доступні відеоприймачі"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "З'єднання"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Потокове мовлення"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Для забезпечення працездатності слід встановити один із вказаних нижче "
-"додатків відеокодеків.\n"
-"Натискання призведе до запуску процедури встановлення."
-
-#: src/nd-window.ui:603 src/nd-window.ui:802
-msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Для забезпечення підтримки роботи зі звуком слід встановити один із вказаних "
-"нижче додатків звукових кодеків.\n"
-"Натискання призведе до запуску процедури встановлення."
-
-#: src/nd-window.ui:700
+#: src/nd-window.ui:276
 msgid "Error"
 msgstr "Помилка"
 
-#: src/nd-window.ui:762
+#: src/nd-window.ui:299
 msgid "Return"
 msgstr "Повернутися"
 
-#: src/nd-window.ui:830
+#: src/nd-window.ui:308
+#| msgid ""
+#| "One of the following audio codec plugins is required for audio support.\n"
+#| "Clicking will start the installation process."
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Для забезпечення підтримки роботи зі звуком слід встановити один із вказаних "
+"нижче додатків кодеків.\n"
+"Натискання призведе до запуску процедури встановлення."
+
+#: src/nd-window.ui:314
+#| msgid ""
+#| "One of the following audio codec plugins is required for audio support.\n"
+#| "Clicking will start the installation process."
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Для забезпечення підтримки роботи з відео слід встановити один із вказаних "
+"нижче додатків кодеків.\n"
+"Натискання призведе до запуску процедури встановлення."
+
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -166,3 +174,11 @@ msgstr ""
 "Потрібна зона брандмауера є недоступною, її не може бути встановлено. Будь "
 "ласка, повторіть і введіть пароль у відповідь на запит або зв'яжіться із "
 "адміністратором системи."
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Для забезпечення працездатності слід встановити один із вказаних нижче "
+#~ "додатків відеокодеків.\n"
+#~ "Натискання призведе до запуску процедури встановлення."
