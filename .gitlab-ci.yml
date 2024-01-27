@@ -1,0 +1,24 @@
+include:
+  - project: 'gnome/citemplates'
+    file: 'flatpak/flatpak_ci_initiative.yml'
+
+variables:
+  APP_ID: "org.gnome.NetworkDisplays"
+  BUNDLE: "gnome-network-displays-dev.flatpak"
+  RUNTIME_REPO: "https://nightly.gnome.org/gnome-nightly.flatpakrepo"
+  MANIFEST_PATH: "build-aux/flatpak/org.gnome.NetworkDisplays.json"
+  FLATPAK_MODULE: "gnome-network-displays"
+
+stages:
+  - lint
+  - build
+  - deploy
+
+build-flatpak:
+  extends: '.flatpak@x86_64'
+  stage: build
+  before_script: []
+
+nightly:
+  extends: '.publish_nightly'
+  needs: ['build-flatpak']
