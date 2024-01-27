@@ -5,13 +5,11 @@
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>GPL-3.0-or-later</project_license>
 	<name>GNOME Network Displays</name>
-	<summary>Stream the desktop to Wi-Fi Display capable devices</summary>
+	<summary>Screencasting for GNOME</summary>
 	<url type="homepage">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
 	<url type="bugtracker">https://gitlab.gnome.org/GNOME/gnome-network-displays/-/issues</url>
 	<url type="vcs-browser">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
 	<url type="translate">https://l10n.gnome.org/module/gnome-network-displays/</url>
-	<!-- developer_name tag deprecated with Appstream 1.0 -->
-	<developer_name translatable="no">Benjamin Berg, Christian Glombek</developer_name>
 	<developer id="gnome.org">
 		<name translatable="no">Benjamin Berg</name>
 		<name translatable="no">Christian Glombek</name>
