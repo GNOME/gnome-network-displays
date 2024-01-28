@@ -49,11 +49,11 @@ cc_ctrl_send_auth (CcCtrl *ctrl)
 static gboolean
 cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id)
 {
-#ifdef __aarch64__    
+#ifdef __aarch64__
   gchar *platform = "Wayland; Linux aarch64";
 #else
   gchar *platform = "Wayland; Linux x86_64";
-#endif    
+#endif
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "CONNECT",
     "userAgent", CC_JSON_TYPE_STRING, g_strdup_printf ("GND/%s (%s)", PACKAGE_VERSION, platform),

@@ -118,7 +118,7 @@ nd_window_screencast_get_source (NdWindow * self)
                 "path", g_strdup_printf ("%u", node_id),
                 "do-timestamp", TRUE,
                 NULL);
-  
+
   gst_base_src_set_live (GST_BASE_SRC (src), TRUE);
 
   return g_steal_pointer (&src);
