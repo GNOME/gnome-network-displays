@@ -235,5 +235,5 @@ cc_json_helper_dump_message (Cast__Channel__CastMessage *message, gboolean borke
         NULL);
     }
 
-  g_debug (output);
+    g_debug ("%s", output);
 }
