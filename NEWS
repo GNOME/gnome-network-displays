@@ -1,3 +1,7 @@
+GNOME Network Displays 0.92.1
+=============================
+* Fix compilation in Fedora Koji
+
 GNOME Network Displays 0.92.0
 =============================
 * Migrate to gtk4 (@feliwir @lorbus)
