@@ -1,3 +1,12 @@
+GNOME Network Displays 0.92.0
+=============================
+* Migrate to gtk4 (@feliwir @lorbus)
+* Use libportal to acquire screencast portal (@lorbus @feliwir)
+* Upstream Flatpak appdata updated and CI added (@bilelmoussaoui)
+* Dedupe sinks based on IP and P2P MAC instead of name (@lorbus)
+* Fix various issues
+* Update various translations
+
 GNOME Network Displays 0.91.0
 =============================
 * Add support for Miracast over Infrastructure (MICE) protocol (@lorbus)
