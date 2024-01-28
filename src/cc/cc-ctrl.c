@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gnome-network-displays-config.h"
 #include "cc-ctrl.h"
 #include "cc-comm.h"
 
@@ -48,15 +49,20 @@ cc_ctrl_send_auth (CcCtrl *ctrl)
 static gboolean
 cc_ctrl_send_connect (CcCtrl *ctrl, gchar *destination_id)
 {
+#ifdef __aarch64__    
+  gchar *platform = "Wayland; Linux aarch64";
+#else
+  gchar *platform = "Wayland; Linux x86_64";
+#endif    
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "CONNECT",
-    "userAgent", CC_JSON_TYPE_STRING, "GND/0.91.0  (X11; Linux x86_64)",
+    "userAgent", CC_JSON_TYPE_STRING, g_strdup_printf ("GND/%s (%s)", PACKAGE_VERSION, platform),
     "connType", CC_JSON_TYPE_INT, 0,
     "origin", CC_JSON_TYPE_OBJECT, cc_json_helper_build_node (NULL),
     "senderInfo", CC_JSON_TYPE_OBJECT, cc_json_helper_build_node (
       "sdkType", CC_JSON_TYPE_INT, 2,
-      "version", CC_JSON_TYPE_STRING, "X11; Linux x86_64",
-      "browserVersion", CC_JSON_TYPE_STRING, "X11; Linux x86_64",
+      "version", CC_JSON_TYPE_STRING, platform,
+      "browserVersion", CC_JSON_TYPE_STRING, platform,
       "platform", CC_JSON_TYPE_INT, 6,
       "connectionType", CC_JSON_TYPE_INT, 1,
       NULL),
