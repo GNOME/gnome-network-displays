@@ -630,7 +630,7 @@ gnome_nd_window_init (NdWindow *self)
 
   if (self->portal)
     xdp_portal_create_screencast_session (self->portal,
-                                          XDP_OUTPUT_MONITOR | XDP_OUTPUT_VIRTUAL,
+                                          XDP_OUTPUT_MONITOR | XDP_OUTPUT_WINDOW | XDP_OUTPUT_VIRTUAL,
                                           XDP_SCREENCAST_FLAG_NONE,
                                           XDP_CURSOR_MODE_EMBEDDED,
                                           XDP_PERSIST_MODE_NONE,
