@@ -82,7 +82,7 @@ get_description (const gchar *codec)
   else if (g_strcmp0 (codec, "matroskamux") == 0)
     return g_strdup_printf (_("GStreamer Matroska muxer (%s)"), codec);
   else if (g_strcmp0 (codec, "mpegtsmux") == 0)
-    return g_strdup_printf (_("GStreamer MPEG Transport Stream Muxer (%s)"), codec);
+    return g_strdup_printf (_("GStreamer MPEG Transport Stream muxer (%s)"), codec);
 
   return g_strdup_printf (_("GStreamer Element “%s”"), codec);
 }
