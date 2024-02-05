@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues/\n"
-"POT-Creation-Date: 2024-01-18 15:19+0000\n"
-"PO-Revision-Date: 2024-01-18 22:41+0300\n"
+"POT-Creation-Date: 2024-01-30 19:30+0000\n"
+"PO-Revision-Date: 2024-02-02 13:25+0300\n"
 "Last-Translator: Artur So <arturios2005@mail.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "Language: ru\n"
@@ -21,17 +21,15 @@ msgstr ""
 "X-Generator: Poedit 3.4.2\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Сетевые дисплеи GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
-msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr ""
-"Потоковая передача рабочего стола на устройства с поддержкой функции «Wi-Fi "
-"Display»"
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Трансляция экрана для GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:25
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -39,68 +37,107 @@ msgstr ""
 "Приложение «Сетевые дисплеи GNOME» позволяет транслировать ваш рабочий стол "
 "на удаленный дисплей. Поддерживаются протоколы Miracast и Chromecast."
 
-#: src/nd-codec-install.c:54
+#: src/nd-codec-install.c:59
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "Видеокодировщик OpenH264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/nd-codec-install.c:61
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "Видеокодировщик x264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/nd-codec-install.c:63
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Видеокодировщик VA-API H264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/nd-codec-install.c:65
+#, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "Видеокодировщик GStreamer On2 VP8 (%s)"
+
+#: src/nd-codec-install.c:67
+#, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "Видеокодировщик GStreamer On2 VP9 (%s)"
+
+#: src/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "Аудиокодировщик FDK AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/nd-codec-install.c:72
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "Аудиокодировщик libav AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/nd-codec-install.c:74
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Аудиокодировщик Free AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/nd-codec-install.c:76
+#, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "Аудиокодировщик GStreamer Vorbis (%s)"
+
+#: src/nd-codec-install.c:78
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "Аудиокодировщик GStreamer Opus (%s)"
+
+#: src/nd-codec-install.c:81
+#, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "Мультиплексор GStreamer WebM (%s)"
+
+#: src/nd-codec-install.c:83
+#, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "Мультиплексор GStreamer Matroska (%s)"
+
+#: src/nd-codec-install.c:85
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "Мультиплексор GStreamer MPEG Transport Stream (%s)"
+
+#: src/nd-codec-install.c:87
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "Элемент GStreamer «%s»"
 
-#: src/nd-codec-install.c:170
+#: src/nd-codec-install.c:193
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Пожалуйста, установите один из следующих плагинов GStreamer, щёлкнув на "
 "соответствующий элемент"
 
-#: src/nd-window.c:163
+#: src/nd-window.c:201
 msgid "Checking and installing required firewall zones."
 msgstr "Проверка и установка необходимых зон брандмауэра."
 
-#: src/nd-window.c:170
+#: src/nd-window.c:208
 msgid "Making P2P connection"
 msgstr "Создание P2P-соединения"
 
-#: src/nd-window.c:177
+#: src/nd-window.c:215
 msgid "Establishing connection to sink"
 msgstr "Установка подключения к приёмнику"
 
-#: src/nd-window.c:184
+#: src/nd-window.c:222
 msgid "Starting to stream"
 msgstr "Начало потоковой передачи"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
-msgstr "Адаптеры Wi-Fi P2P не найдены"
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Сетевые дисплеи"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
+msgstr "Адаптер Wi-Fi P2P не найден"
+
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -109,47 +146,47 @@ msgstr ""
 "Подходящие беспроводные адаптеры не найдены. Убедитесь, что Wi‑Fi включен и "
 "операции P2P Wi‑Fi доступны как в NetworkManager, так и в wpa_supplicant."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Доступные видеоприемники"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "Подключение"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Потоковое вещание"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Требуется один из указанных ниже модулей видеокодека.\n"
-"Щелчок по выбранному модулю запустит процесс установки."
-
-#: src/nd-window.ui:603 src/nd-window.ui:802
-msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Для поддержки звука требуется один из указанных ниже модулей аудиокодека.\n"
-"Щелчок по выбранному модулю запустит процесс установки."
-
-#: src/nd-window.ui:700
+#: src/nd-window.ui:276
 msgid "Error"
 msgstr "Ошибка"
 
-#: src/nd-window.ui:762
+#: src/nd-window.ui:299
 msgid "Return"
 msgstr "Вернуться"
 
-#: src/nd-window.ui:830
+#: src/nd-window.ui:308
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Для поддержки звука требуется один из указанных ниже модулей кодека.\n"
+"Щелчок по выбранному модулю запустит процесс установки."
+
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Для поддержки видео требуется один из указанных ниже модулей кодека.\n"
+"Щелчок по выбранному модулю запустит процесс установки."
+
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -158,3 +195,15 @@ msgstr ""
 "Требуемая зона брандмауэра недоступна и не может быть установлена. Повторите "
 "попытку и введите пароль в ответ на запрос или обратитесь к системному "
 "администратору."
+
+#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
+#~ msgstr ""
+#~ "Потоковая передача рабочего стола на устройства с поддержкой функции «Wi-"
+#~ "Fi Display»"
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Требуется один из указанных ниже модулей видеокодека.\n"
+#~ "Щелчок по выбранному модулю запустит процесс установки."
