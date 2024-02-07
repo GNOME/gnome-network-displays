@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues/\n"
-"POT-Creation-Date: 2024-01-18 15:19+0000\n"
-"PO-Revision-Date: 2024-01-22 17:32+0100\n"
+"POT-Creation-Date: 2024-01-30 19:30+0000\n"
+"PO-Revision-Date: 2024-02-07 15:50+0100\n"
 "Last-Translator: Daniel Rusek <mail@asciiwolf.com>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -20,15 +20,15 @@ msgstr ""
 "X-Generator: Poedit 3.4.2\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Síťové displeje GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
-msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Vysílejte svoji plochu na zařízení s podporou displejů Wi-Fi"
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Vysílání obrazovky pro GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:25
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -36,68 +36,107 @@ msgstr ""
 "Síťové displeje GNOME vám umožní vysílat dění na vaší ploše na vzdálený "
 "displej. Podporuje protokoly Miracast a Chromecast."
 
-#: src/nd-codec-install.c:54
+#: src/nd-codec-install.c:59
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "Kodér videa OpenH264 z knihovny GStreamer (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/nd-codec-install.c:61
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "Kodér videa x264 z knihovny GStreamer (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/nd-codec-install.c:63
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Kodér videa VA-API H264 z knihovny GStreamer (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/nd-codec-install.c:65
+#, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "Kodér videa On2 VP8 z knihovny GStreamer (%s)"
+
+#: src/nd-codec-install.c:67
+#, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "Kodér videa On2 VP9 z knihovny GStreamer (%s)"
+
+#: src/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "Kodér zvuku FDK AAC z knihovny GStreamer (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/nd-codec-install.c:72
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "Kodér zvuku libav AAC z knihovny GStreamer (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/nd-codec-install.c:74
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Kodér zvuku Free AAC z knihovny GStreamer (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/nd-codec-install.c:76
+#, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "Kodér zvuku Vorbis z knihovny GStreamer (%s)"
+
+#: src/nd-codec-install.c:78
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "Kodér zvuku Opus z knihovny GStreamer (%s)"
+
+#: src/nd-codec-install.c:81
+#, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "Multiplexer WebM z knihovny GStreamer (%s)"
+
+#: src/nd-codec-install.c:83
+#, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "Multiplexer Matroska z knihovny GStreamer (%s)"
+
+#: src/nd-codec-install.c:85
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "Multiplexer přenosového proudu MPEG z knihovny GStreamer (%s)"
+
+#: src/nd-codec-install.c:87
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "Prvek GStreamer „%s“"
 
-#: src/nd-codec-install.c:170
+#: src/nd-codec-install.c:193
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Nainstalujte prosím kliknutím níže jeden z následujících zásuvných modulů "
 "GStreamer"
 
-#: src/nd-window.c:163
+#: src/nd-window.c:201
 msgid "Checking and installing required firewall zones."
 msgstr "Kontrolují se a instalují potřebné zónu firewallu."
 
-#: src/nd-window.c:170
+#: src/nd-window.c:208
 msgid "Making P2P connection"
 msgstr "Vytváří se spojení P2P"
 
-#: src/nd-window.c:177
+#: src/nd-window.c:215
 msgid "Establishing connection to sink"
 msgstr "Ustavuje se spojení k cíli"
 
-#: src/nd-window.c:184
+#: src/nd-window.c:222
 msgid "Starting to stream"
 msgstr "Spouští se vysílání"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Síťové displeje"
+
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
 msgstr "Nebyl nalezen žádný adaptér Wi-Fi P2P"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -107,48 +146,47 @@ msgstr ""
 "je Wi-Fi zapnuté a že operace Wi-Fi P2P uvádí jako dostupné NetworkManager i "
 "wpa_supplicant."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Dostupné cíle videa"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "Připojuje se"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Vysílá se"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Je vyžadován jeden z následujících zásuvných modulů s kodeky videa.\n"
-"Kliknutím spustíte instalaci."
-
-#: src/nd-window.ui:603 src/nd-window.ui:802
-msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Pro podporu zvuku je vyžadován jeden z následujících zásuvných modulů se "
-"zvukovými kodeky.\n"
-"Kliknutím spustíte instalaci."
-
-#: src/nd-window.ui:700
+#: src/nd-window.ui:276
 msgid "Error"
 msgstr "Chyba"
 
-#: src/nd-window.ui:762
+#: src/nd-window.ui:299
 msgid "Return"
 msgstr "Návrat"
 
-#: src/nd-window.ui:830
+#: src/nd-window.ui:308
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Pro podporu zvuku je vyžadován jeden z následujících zásuvných modulů.\n"
+"Kliknutím spustíte instalaci."
+
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Pro podporu videa je vyžadován jeden z následujících zásuvných modulů.\n"
+"Kliknutím spustíte instalaci."
+
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -157,3 +195,13 @@ msgstr ""
 "Požadovaná zóna firewallu není dostupná a nelze ji nainstalovat. Zkuste to "
 "prosím znovu a zadejte heslo, až budete vyzváni, nebo kontaktujte správce "
 "svého systému."
+
+#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
+#~ msgstr "Vysílejte svoji plochu na zařízení s podporou displejů Wi-Fi"
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Je vyžadován jeden z následujících zásuvných modulů s kodeky videa.\n"
+#~ "Kliknutím spustíte instalaci."
