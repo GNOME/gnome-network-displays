@@ -209,8 +209,8 @@ start_server (NdDummyCCSink *self)
       g_object_notify (G_OBJECT (self), "state");
     }
 
-  g_debug ("NdDummyCCSink: You should now be able to connect to http://localhost:%d/",
-           cc_http_server_get_port (self->http_server));
+  g_message ("NdDummyCCSink: You should now be able to connect to http://localhost:%d/",
+             cc_http_server_get_port (self->http_server));
 
   return G_SOURCE_REMOVE;
 }

@@ -248,7 +248,7 @@ nd_dummy_wfd_sink_sink_start_stream (NdSink *sink)
   if (self->server_source_id == 0)
     goto error;
 
-  g_debug ("NdDummyWFDSink: You should now be able to connect to rtsp://localhost:7236/wfd1.0");
+  g_message ("NdDummyWFDSink: You should now be able to connect to rtsp://localhost:7236/wfd1.0");
 
   g_signal_connect_object (self->server,
                            "client-connected",
