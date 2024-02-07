@@ -117,6 +117,7 @@ gst_bus_message_cb (GstBus *bus, GstMessage *msg, CcHttpServer *self)
             g_signal_emit_by_name (self->multisocketsink, "clear");
             cc_http_server_set_pipeline_state (self, GST_STATE_NULL);
             g_signal_emit_by_name (self, "end-stream", error_);
+            g_clear_error (&error_);
           }
 
         g_clear_error (&error);
@@ -400,6 +401,7 @@ cc_http_server_set_pipeline_state (CcHttpServer *self, GstState state)
                                     gst_element_state_get_name (state));
       g_warning ("CcHttpServer: %s", error_->message);
       g_signal_emit_by_name (self, "end-stream", error_);
+      g_clear_error(&error_);
     }
 }
 
@@ -530,7 +532,7 @@ cc_http_server_class_init (CcHttpServerClass *klass)
                   0,
                   NULL, NULL, NULL,
                   G_TYPE_NONE,
-                  1, G_TYPE_POINTER);
+                  1, G_TYPE_ERROR);
 }
 
 void

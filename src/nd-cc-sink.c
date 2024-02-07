@@ -208,7 +208,6 @@ static void
 end_stream_callback (gpointer userdata, GError *error)
 {
   g_debug ("NdCCSink: Error received: %s", error->message);
-  g_clear_error (&error);
 
   nd_cc_sink_sink_stop_stream (ND_SINK (userdata));
 }

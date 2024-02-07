@@ -173,7 +173,6 @@ static void
 end_stream_callback (gpointer userdata, GError *error)
 {
   g_debug ("NdDummyCCSink: Error received: %s", error->message);
-  g_clear_error (&error);
 
   nd_dummy_cc_sink_sink_stop_stream (ND_SINK (userdata));
 }
