@@ -11,8 +11,7 @@
 	<url type="vcs-browser">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
 	<url type="translate">https://l10n.gnome.org/module/gnome-network-displays/</url>
 	<developer id="gnome.org">
-		<name translatable="no">Benjamin Berg</name>
-		<name translatable="no">Christian Glombek</name>
+		<name translatable="no">Benjamin Berg, Christian Glombek</name>
 	</developer>
 	<translation type="gettext">gnome-network-displays</translation>
 	<launchable type="desktop-id">org.gnome.NetworkDisplays.desktop</launchable>
