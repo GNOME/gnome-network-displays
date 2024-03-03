@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues\n"
-"POT-Creation-Date: 2021-02-22 15:39+0000\n"
-"PO-Revision-Date: 2021-02-23 09:58+0200\n"
+"issues/\n"
+"POT-Creation-Date: 2024-01-30 19:30+0000\n"
+"PO-Revision-Date: 2024-03-03 21:42+0200\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos+l10n@iki.fi>\n"
 "Language-Team: Finnish <lokalisointi-lista@googlegroups.com>\n"
 "Language: fi\n"
@@ -17,87 +17,130 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Gnomen verkkonäytöt"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
-msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Suoratoista työpöytä Wi-Fi Display -yhteensopiville laitteille"
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Näyttöpeilausta Gnomelle"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:25
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
-"Currently implemented is support for casting to Wi-Fi Display capable "
-"devices (a.k.a. Miracast)."
+"Supports the Miracast and Chromecast protocols."
 msgstr ""
-"Gnome-verkkonäytöt mahdollistaa työpöydän suoratoistamisen etänäyttöön. Nyt "
-"toteutettuna on tuki Wi-Fi Display -yhteensopiville laitteille, jotka "
-"tunnetaan myös nimellä Miracast."
+"Gnome-verkkonäytöt mahdollistaa työpöydän suoratoistamisen etänäyttöön. "
+"Tukee Miracast- ja Chromecast-yhteyskäytäntöjä."
 
-#: src/nd-codec-install.c:54
+#: src/nd-codec-install.c:59
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "GStreamer OpenH264 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/nd-codec-install.c:61
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/nd-codec-install.c:63
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/nd-codec-install.c:65
+#, c-format
+#| msgid "GStreamer OpenH264 video encoder (%s)"
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "GStreamer On2 VP8 -videokooderi (%s)"
+
+#: src/nd-codec-install.c:67
+#, c-format
+#| msgid "GStreamer OpenH264 video encoder (%s)"
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "GStreamer On2 VP9 -äänikooderi (%s)"
+
+#: src/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "GStreamer FDK AAC -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/nd-codec-install.c:72
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "GStreamer libav AAC -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/nd-codec-install.c:74
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/nd-codec-install.c:76
+#, c-format
+#| msgid "GStreamer Free AAC audio encoder (%s)"
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "GStreamer Vorbis -äänikooderi (%s)"
+
+#: src/nd-codec-install.c:78
+#, c-format
+#| msgid "GStreamer FDK AAC audio encoder (%s)"
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "GStreamer Opus -äänikooderi (%s)"
+
+#: src/nd-codec-install.c:81
+#, c-format
+#| msgid "GStreamer x264 video encoder (%s)"
+msgid "GStreamer WebM muxer (%s)"
+msgstr "GStreamer WebM -mukseri (%s)"
+
+#: src/nd-codec-install.c:83
+#, c-format
+#| msgid "GStreamer FDK AAC audio encoder (%s)"
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "GStreamer Matroska -mukseri (%s)"
+
+#: src/nd-codec-install.c:85
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "GStreamer MPEG -kuljetusvirran mukseri (%s)"
+
+#: src/nd-codec-install.c:87
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer-elementti “%s”"
 
-#: src/nd-codec-install.c:170
+#: src/nd-codec-install.c:193
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Asenna yksi seuraavista GStreamer-liitännäisistä napsauttamalla alta"
 
-#: src/nd-window.c:158
+#: src/nd-window.c:201
 msgid "Checking and installing required firewall zones."
 msgstr "Tarkistetaan ja asennetaan vaadittuja palomuurin alueita."
 
-#: src/nd-window.c:165
+#: src/nd-window.c:208
 msgid "Making P2P connection"
 msgstr "Muodostetaan vertaisyhteys"
 
-#: src/nd-window.c:172
+#: src/nd-window.c:215
 msgid "Establishing connection to sink"
 msgstr "Muodostetaan yhteyttä kohteeseen"
 
-#: src/nd-window.c:179
+#: src/nd-window.c:222
 msgid "Starting to stream"
 msgstr "Käynnistetään suoratoistoa"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
-msgstr "Wi‑Fi P2P -sovittimia ei löytynyt"
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Verkkonäytöt"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
+msgstr "Wi‑Fi P2P -sovitinta ei löytynyt"
+
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -107,48 +150,49 @@ msgstr ""
 "on käytössä Wi-Fi P2P -toiminnot ovat käytettävissä sekä NetworkManagerin "
 "että wpa_supplicantin osalta."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Käytettävissä olevat videokohteet"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "Yhdistetään"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Peru"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Suoratoistetaan"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Jokin seuraavista videokooderiliitännäisistä vaaditaan.\n"
-"Napsauttaminen käynnistää asennuksen."
-
-#: src/nd-window.ui:603 src/nd-window.ui:802
-msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Jokin seuraavista äänikooderiliitännäisistä vaaditaan äänituen "
-"toteuttamiseksi.\n"
-"Napsauttaminen käynnistää asennuksen."
-
-#: src/nd-window.ui:700
+#: src/nd-window.ui:276
 msgid "Error"
 msgstr "Virhe"
 
-#: src/nd-window.ui:762
+#: src/nd-window.ui:299
 msgid "Return"
 msgstr "Palaa"
 
-#: src/nd-window.ui:830
+#: src/nd-window.ui:308
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Jokin seuraavista koodekkiliitännäisistä vaaditaan äänituen "
+"toteuttamiseksi.\n"
+"Napsauttaminen käynnistää asennuksen."
+
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Jokin seuraavista koodekkiliitännäisistä vaaditaan videotuen "
+"toteuttamiseksi.\n"
+"Napsauttaminen käynnistää asennuksen."
+
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -157,3 +201,13 @@ msgstr ""
 "Vaadittu palomuurin alue ei ole käytettävissä, eikä sitä voitu asentaa. "
 "Yritä uudelleen ja syötä salasana pyydettäessä, tai ole yhteydessä "
 "järjestelmän ylläpitäjään."
+
+#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
+#~ msgstr "Suoratoista työpöytä Wi-Fi Display -yhteensopiville laitteille"
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Jokin seuraavista videokooderiliitännäisistä vaaditaan.\n"
+#~ "Napsauttaminen käynnistää asennuksen."
