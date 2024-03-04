@@ -33,10 +33,9 @@ G_DECLARE_FINAL_TYPE (CcHttpServer, cc_http_server, CC, HTTP_SERVER, GObject)
 
 CcHttpServer * cc_http_server_new (gchar * remote_address);
 
-gboolean cc_http_server_lookup_encoders (CcHttpServer  *self,
-                                         CcMediaProfile profile,
-                                         GStrv         *missing_video,
-                                         GStrv         *missing_audio);
+gboolean cc_http_server_lookup_encoders (CcHttpServer *self,
+                                         GStrv        *missing_video,
+                                         GStrv        *missing_audio);
 
 void cc_http_server_set_pipeline_state (CcHttpServer *self,
                                         GstState      state);

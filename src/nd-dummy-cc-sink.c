@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cc/cc-http-server.h"
-#include "wfd/wfd-media-factory.h"
 #include "gnome-network-displays-config.h"
 #include "nd-dummy-cc-sink.h"
 #include "cc/cc-http-server.h"
@@ -221,12 +219,31 @@ static NdSink *
 nd_dummy_cc_sink_sink_start_stream (NdSink *sink)
 {
   NdDummyCCSink *self = ND_DUMMY_CC_SINK (sink);
-  gboolean have_basic_codecs;
+  gboolean have_cc_codecs;
   GStrv missing_video = NULL, missing_audio = NULL;
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
+  g_assert (self->http_server == NULL);
   self->http_server = cc_http_server_new ("dummy-sink");
+
+  have_cc_codecs = cc_http_server_lookup_encoders (self->http_server,
+                                                   &missing_video,
+                                                   &missing_audio);
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
+
+  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
+  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
+
+  g_object_notify (G_OBJECT (self), "missing-video-codec");
+  g_object_notify (G_OBJECT (self), "missing-audio-codec");
+
+  if (!have_cc_codecs)
+    {
+      g_warning ("NdDummyCCSink: Essential codecs are missing!");
+      goto error;
+    }
 
   g_signal_connect_object (self->http_server,
                            "create-source",
@@ -251,23 +268,6 @@ nd_dummy_cc_sink_sink_start_stream (NdSink *sink)
                            (GCallback) end_stream_callback,
                            self,
                            G_CONNECT_SWAPPED);
-
-  have_basic_codecs = cc_http_server_lookup_encoders (self->http_server,
-                                                      PROFILE_LAST,
-                                                      &missing_video,
-                                                      &missing_audio);
-
-  g_clear_object (&self->missing_video_codec);
-  g_clear_object (&self->missing_audio_codec);
-
-  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
-  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
-
-  g_object_notify (G_OBJECT (self), "missing-video-codec");
-  g_object_notify (G_OBJECT (self), "missing-audio-codec");
-
-  if (!have_basic_codecs)
-    goto error;
 
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");

@@ -236,7 +236,7 @@ cc_ctrl_send_load (CcCtrl *ctrl, gchar *sessionId)
                                                           ctrl->comm.local_address,
                                                           port),
       "streamType", CC_JSON_TYPE_STRING, "LIVE",
-      "contentType", CC_JSON_TYPE_STRING, content_types[cc_media_profiles[factory->selected_profile].muxer],
+      "contentType", CC_JSON_TYPE_STRING, content_types[cc_media_factory_profiles[factory->factory_profile].muxer],
       NULL),
     "requestId", CC_JSON_TYPE_INT, ctrl->request_id++,
     NULL);

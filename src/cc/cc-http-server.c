@@ -39,7 +39,6 @@ G_DEFINE_TYPE (CcHttpServer, cc_http_server, CC_TYPE_MEDIA_FACTORY)
 
 enum {
   PROP_PORT = 1,
-  PROP_SELECTED_PROFILE,
   NR_PROPS,
 };
 
@@ -64,10 +63,6 @@ cc_http_server_get_property (GObject    *object,
     {
     case PROP_PORT:
       g_value_set_uint (value, self->port);
-      break;
-
-    case PROP_SELECTED_PROFILE:
-      g_value_set_int (value, CC_MEDIA_FACTORY (self)->selected_profile);
       break;
 
     default:
@@ -182,7 +177,7 @@ server_callback (SoupServer        *server,
   soup_message_headers_set_encoding (soup_server_message_get_response_headers (msg),
                                      SOUP_ENCODING_EOF);
   soup_message_headers_set_content_type (soup_server_message_get_response_headers (msg),
-                                         content_types[cc_media_profiles[CC_MEDIA_FACTORY (self)->selected_profile].muxer],
+                                         content_types[cc_media_factory_profiles[CC_MEDIA_FACTORY (self)->factory_profile].muxer],
                                          NULL);
   soup_server_message_set_status (msg, SOUP_STATUS_OK, NULL);
 
@@ -274,13 +269,12 @@ cc_http_server_finalize (GObject *object)
 }
 
 gboolean
-cc_http_server_lookup_encoders (CcHttpServer  *self,
-                                CcMediaProfile profile,
-                                GStrv         *missing_video,
-                                GStrv         *missing_audio)
+cc_http_server_lookup_encoders (CcHttpServer *self,
+                                GStrv        *missing_video,
+                                GStrv        *missing_audio)
 {
   return cc_media_factory_lookup_encoders (CC_MEDIA_FACTORY (self),
-                                           profile,
+                                           PROFILE_LAST,
                                            missing_video,
                                            missing_audio);
 }
@@ -298,12 +292,6 @@ cc_http_server_class_init (CcHttpServerClass *klass)
                                         "Port number on which the HTTP server listens",
                                         0, G_MAXUINT, 0,
                                         G_PARAM_READABLE);
-
-  props[PROP_SELECTED_PROFILE] = g_param_spec_object ("selected-profile",
-                                                      "Selected Profile",
-                                                      "Media profile selected for the Chromecast device",
-                                                      CC_TYPE_MEDIA_FACTORY,
-                                                      G_PARAM_READABLE);
 
   g_object_class_install_properties (object_class, NR_PROPS, props);
 

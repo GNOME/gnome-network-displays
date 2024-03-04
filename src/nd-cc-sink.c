@@ -19,9 +19,9 @@
 
 #include "gnome-network-displays-config.h"
 #include "nd-cc-sink.h"
-#include "cc/cc-media-factory.h"
 #include "cc/cc-ctrl.h"
 #include "cc/cc-common.h"
+#include "cc/cc-http-server.h"
 
 struct _NdCCSink
 {
@@ -325,14 +325,32 @@ static NdSink *
 nd_cc_sink_sink_start_stream (NdSink *sink)
 {
   NdCCSink *self = ND_CC_SINK (sink);
-  gboolean have_basic_codecs;
-  GStrv missing_video, missing_audio;
-
-  g_autoptr(GError) error = NULL;
+  gboolean have_cc_codecs;
+  GStrv missing_video = NULL, missing_audio = NULL;
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
+  g_assert (self->http_server == NULL);
   self->http_server = cc_http_server_new (self->ip);
+
+  have_cc_codecs = cc_http_server_lookup_encoders (self->http_server,
+                                                   &missing_video,
+                                                   &missing_audio);
+
+  g_clear_object (&self->missing_video_codec);
+  g_clear_object (&self->missing_audio_codec);
+
+  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
+  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
+
+  g_object_notify (G_OBJECT (self), "missing-video-codec");
+  g_object_notify (G_OBJECT (self), "missing-audio-codec");
+
+  if (!have_cc_codecs)
+    {
+      g_warning ("NdCCSink: Essential codecs are missing!");
+      goto error;
+    }
 
   /* copy the pointer to ctrl */
   self->ctrl.http_server = self->http_server;
@@ -361,23 +379,6 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
                            self,
                            G_CONNECT_SWAPPED);
 
-  have_basic_codecs = cc_http_server_lookup_encoders (self->http_server,
-                                                      PROFILE_LAST,
-                                                      &missing_video,
-                                                      &missing_audio);
-
-  g_clear_object (&self->missing_video_codec);
-  g_clear_object (&self->missing_audio_codec);
-
-  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
-  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
-
-  g_object_notify (G_OBJECT (self), "missing-video-codec");
-  g_object_notify (G_OBJECT (self), "missing-audio-codec");
-
-  if (!have_basic_codecs)
-    goto error;
-
   self->state = ND_SINK_STATE_WAIT_SOCKET;
   g_object_notify (G_OBJECT (self), "state");
 
@@ -385,9 +386,12 @@ nd_cc_sink_sink_start_stream (NdSink *sink)
   self->ctrl.cancellable = self->cancellable;
   self->ctrl.comm.cancellable = self->cancellable;
 
-  g_debug ("NdCCSink: Attempting connection to Chromecast: %s", self->ip);
+  g_debug ("NdCCSink: Attempting connection to Chromecast %s at IP %s", self->name, self->ip);
   if (!cc_ctrl_connection_init (&self->ctrl, self->ip))
-    goto error;
+    {
+      g_warning ("NdCCSink: Failed to init cc-ctrl");
+      goto error;
+    }
 
   return g_object_ref (sink);
 
