@@ -356,7 +356,7 @@ wfd_video_codec_get_max_bitrate_kbit (WfdVideoCodec *self)
       g_warning ("WfdVideoCodec: Unknown level %i", self->level);
     }
 
-  if (self->profile == WFD_H264_PROFILE_HIGH || self->profile == WFD_H264_PROFILE_CHROMECAST)
+  if (self->profile == WFD_H264_PROFILE_HIGH)
     bitrate = bitrate * 1.25;
 
   return bitrate;

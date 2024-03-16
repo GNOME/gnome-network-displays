@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "wfd/wfd-client.h"
-#include "wfd/wfd-media-factory.h"
-#include "wfd/wfd-server.h"
 #include "gnome-network-displays-config.h"
+#include "wfd/wfd-client.h"
+#include "wfd/wfd-server.h"
 #include "nd-wfd-mice-sink.h"
 
 struct _NdWFDMiceSink
@@ -427,16 +426,18 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   g_autofree gchar *rendered_msg_source_ready = NULL;
   uint rendered_msg_source_ready_len = sizeof (msg_source_ready);
   uint hostname_bytelen = 0;
-
   NdWFDMiceSink *self = ND_WFD_MICE_SINK (sink);
-  gboolean have_basic_codecs, send_ok;
-  GStrv missing_video, missing_audio;
+  gboolean have_wfd_codecs, send_ok;
+  GStrv missing_video = NULL, missing_audio = NULL;
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
   g_assert (self->server == NULL);
+  self->server = wfd_server_new ();
 
-  have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
+  have_wfd_codecs = wfd_server_lookup_encoders (self->server,
+                                                &missing_video,
+                                                &missing_audio);
 
   g_clear_object (&self->missing_video_codec);
   g_clear_object (&self->missing_audio_codec);
@@ -447,18 +448,16 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   g_object_notify (G_OBJECT (self), "missing-video-codec");
   g_object_notify (G_OBJECT (self), "missing-audio-codec");
 
-  if (!have_basic_codecs)
+  if (!have_wfd_codecs)
     {
       g_warning ("NdWFDMiceSink: Essential codecs are missing!");
-      goto fail;
+      goto error;
     }
 
-  g_assert (self->server == NULL);
-  self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
 
   if (self->server_source_id == 0 || self->ip == NULL)
-    goto fail;
+    goto error;
 
   g_signal_connect_object (self->server,
                            "client-connected",
@@ -514,7 +513,7 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   if (error != NULL || hostname_utf16 == NULL)
     {
       g_warning ("NdWFDMiceSink: Unable to convert the device name '%s' to UTF-16: %s", hostname_truncated, error->message);
-      goto fail;
+      goto error;
     }
 
   // Copy the friendly device name, its size and update the total message length
@@ -536,12 +535,12 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
       else
         g_warning ("NdWFDMiceSink: Failed to create MICE client");
 
-      goto fail;
+      goto error;
     }
 
   return g_object_ref (sink);
 
-fail:
+error:
   self->state = ND_SINK_STATE_ERROR;
   g_object_notify (G_OBJECT (self), "state");
   g_clear_object (&self->server);

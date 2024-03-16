@@ -12,6 +12,9 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (WfdServer, wfd_server, WFD, SERVER, GstRTSPServer)
 
 WfdServer * wfd_server_new (void);
+gboolean wfd_server_lookup_encoders (WfdServer *self,
+                                     GStrv     *missing_video,
+                                     GStrv     *missing_audio);
 void wfd_server_purge (WfdServer *self);
 
 G_END_DECLS

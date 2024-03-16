@@ -17,10 +17,10 @@
  */
 
 #include "wfd/wfd-client.h"
-#include "wfd/wfd-media-factory.h"
 #include "wfd/wfd-server.h"
 #include "gnome-network-displays-config.h"
 #include "nd-dummy-wfd-sink.h"
+
 struct _NdDummyWFDSink
 {
   GObject        parent_instance;
@@ -221,14 +221,17 @@ static NdSink *
 nd_dummy_wfd_sink_sink_start_stream (NdSink *sink)
 {
   NdDummyWFDSink *self = ND_DUMMY_WFD_SINK (sink);
-  gboolean have_basic_codecs;
-  GStrv missing_video, missing_audio;
+  gboolean have_wfd_codecs;
+  GStrv missing_video = NULL, missing_audio = NULL;
 
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
 
   g_assert (self->server == NULL);
+  self->server = wfd_server_new ();
 
-  have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
+  have_wfd_codecs = wfd_server_lookup_encoders (self->server,
+                                                &missing_video,
+                                                &missing_audio);
 
   g_clear_object (&self->missing_video_codec);
   g_clear_object (&self->missing_audio_codec);
@@ -239,10 +242,12 @@ nd_dummy_wfd_sink_sink_start_stream (NdSink *sink)
   g_object_notify (G_OBJECT (self), "missing-video-codec");
   g_object_notify (G_OBJECT (self), "missing-audio-codec");
 
-  if (!have_basic_codecs)
-    goto error;
+  if (!have_wfd_codecs)
+    {
+      g_warning ("NdDummyWFDSink: Essential codecs are missing!");
+      goto error;
+    }
 
-  self->server = wfd_server_new ();
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
 
   if (self->server_source_id == 0)

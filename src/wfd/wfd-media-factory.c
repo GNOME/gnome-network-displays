@@ -2,41 +2,27 @@
 #include "wfd-media-factory.h"
 #include "wfd-media.h"
 
+static const gchar * wfd_gst_elements[ELEMENT_NONE + 1] = {
+  [ELEMENT_OPENH264] = "openh264enc",
+  [ELEMENT_X264] = "x264enc",
+  [ELEMENT_VAAPIH264] = "vaapih264enc",
+  [ELEMENT_VIDEO_NONE] = NULL,
 
-typedef enum {
-  ENCODER_OPENH264 = 0,
-  ENCODER_X264,
-  ENCODER_VAAPIH264,
-  ENCODER_NONE,
-} WfdH264Encoder;
+  [ELEMENT_AAC_FDK] = "fdkaacenc",
+  [ELEMENT_AAC_AVENC] = "avenc_aac",
+  [ELEMENT_AAC_FAAC] = "faac",
+  [ELEMENT_AUDIO_NONE] = NULL,
 
-static const gchar *h264_encoders[ENCODER_NONE + 1] = {
-  "openh264enc",
-  "x264enc",
-  "vaapih264enc",
-  NULL,
-};
+  [ELEMENT_MPEGTS] = "mpegtsmux",
 
-typedef enum {
-  ENCODER_AAC_FDK = 0,
-  ENCODER_AAC_AVENC,
-  ENCODER_AAC_FAAC,
-  ENCODER_AAC_NONE,
-} WfdAACEncoder;
-
-static const gchar *aac_encoders[ENCODER_AAC_NONE + 1] = {
-  "fdkaacenc",
-  "avenc_aac",
-  "faac",
-  NULL,
+  [ELEMENT_NONE] = NULL,
 };
 
 struct _WfdMediaFactory
 {
   GstRTSPMediaFactory parent_instance;
 
-  WfdH264Encoder      encoder;
-  WfdAACEncoder       aac_encoder;
+  gint                factory_profile;
 };
 
 G_DEFINE_TYPE (WfdMediaFactory, wfd_media_factory, GST_TYPE_RTSP_MEDIA_FACTORY)
@@ -188,9 +174,9 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
                 NULL);
   success &= gst_bin_add (bin, queue_pre_encoder);
 
-  switch (self->encoder)
+  switch (wfd_media_factory_profiles[self->factory_profile].video_encoder)
     {
-    case ENCODER_OPENH264:
+    case ELEMENT_OPENH264:
       encoder = gst_element_factory_make ("openh264enc", "wfd-encoder");
       encoder_elem = encoder;
       success &= gst_bin_add (bin, encoder);
@@ -217,7 +203,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
        *  - rate-control: 2, buffer*/
       break;
 
-    case ENCODER_X264:
+    case ELEMENT_X264:
       encoder = gst_element_factory_make ("x264enc", "wfd-encoder");
       encoder_elem = encoder;
       success &= gst_bin_add (bin, encoder);
@@ -225,7 +211,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
       gst_preset_load_preset (GST_PRESET (encoder), "Profile Baseline");
       break;
 
-    case ENCODER_VAAPIH264:
+    case ELEMENT_VAAPIH264:
       {
         GstElement *vaapi_encoder;
         GstElement *vaapi_convert;
@@ -270,7 +256,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
     default:
       g_assert_not_reached ();
     }
-  g_object_set_data (G_OBJECT (encoder_elem), "wfd-encoder-impl", GINT_TO_POINTER (self->encoder));
+  g_object_set_data (G_OBJECT (encoder_elem), "wfd-encoder-impl", GINT_TO_POINTER (wfd_media_factory_profiles[self->factory_profile].video_encoder));
 
   encoding_perf = gst_element_factory_make ("identity", "wfd-measure-encoder-realtime");
   success &= gst_bin_add (bin, encoding_perf);
@@ -338,7 +324,7 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self)
   g_autoptr(GstElement) audio_source = NULL;
   gboolean success = TRUE;
 
-  if (self->aac_encoder == ENCODER_AAC_NONE)
+  if (wfd_media_factory_profiles[self->factory_profile].audio_encoder == ELEMENT_AUDIO_NONE)
     return NULL;
 
   g_signal_emit (self, signals[SIGNAL_CREATE_AUDIO_SOURCE], 0, &audio_source);
@@ -367,17 +353,17 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self)
   audioconvert = gst_element_factory_make ("audioconvert", "wfd-audio-convert");
   success &= gst_bin_add (audio_pipeline, audioconvert);
 
-  switch (self->aac_encoder)
+  switch (wfd_media_factory_profiles[self->factory_profile].audio_encoder)
     {
-    case ENCODER_AAC_FDK:
+    case ELEMENT_AAC_FDK:
       audioencoder = gst_element_factory_make ("fdkaacenc", "wfd-audio-aac-enc");
       break;
 
-    case ENCODER_AAC_FAAC:
+    case ELEMENT_AAC_FAAC:
       audioencoder = gst_element_factory_make ("faac", "wfd-audio-aac-enc");
       break;
 
-    case ENCODER_AAC_AVENC:
+    case ELEMENT_AAC_AVENC:
       audioencoder = gst_element_factory_make ("avenc_aac", "wfd-audio-aac-enc");
       break;
 
@@ -521,7 +507,7 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
   WfdMediaQuirks quirks = 0;
   WfdVideoCodec *codec = params->selected_codec;
   WfdResolution *resolution = params->selected_resolution;
-  WfdH264Encoder encoder_impl;
+  WfdGstElement encoder_impl;
   WfdH264ProfileFlags profile;
   guint gop_size = resolution->refresh_rate;
   guint bitrate_kbit = wfd_video_codec_get_max_bitrate_kbit (codec);
@@ -537,7 +523,7 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
   encoder = gst_bin_get_by_name (bin, "wfd-encoder");
   encoder_impl = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (encoder), "wfd-encoder-impl"));
 
-  if (encoder_impl == ENCODER_VAAPIH264)
+  if (encoder_impl == ELEMENT_VAAPIH264)
     quirks = WFD_QUIRK_NO_IDR;
 
   /* Decrease the number of keyframes if the device is able to request
@@ -559,7 +545,7 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
 
   switch (encoder_impl)
     {
-    case ENCODER_OPENH264:
+    case ELEMENT_OPENH264:
       /* We could set multi-thread/num-slices to codec->max_slice_num; but not sure
        * if that works realiably, and simply using one slice is on the safe side
        */
@@ -571,8 +557,8 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
                     NULL);
       break;
 
-    case ENCODER_X264:
-      if (codec->profile == WFD_H264_PROFILE_HIGH || codec->profile == WFD_H264_PROFILE_CHROMECAST)
+    case ELEMENT_X264:
+      if (codec->profile == WFD_H264_PROFILE_HIGH)
         {
           profile = codec->profile;
           gst_preset_load_preset (GST_PRESET (encoder), "Profile High");
@@ -607,11 +593,9 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
       break;
 
 
-    case ENCODER_VAAPIH264:
+    case ELEMENT_VAAPIH264:
       if (codec->profile == WFD_H264_PROFILE_HIGH)
         profile = WFD_H264_PROFILE_HIGH;
-      if (codec->profile == WFD_H264_PROFILE_CHROMECAST)
-        profile = WFD_H264_PROFILE_CHROMECAST;
       else
         profile = WFD_H264_PROFILE_BASE;
 
@@ -627,8 +611,6 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
 
   if (profile == WFD_H264_PROFILE_HIGH)
     caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=high");
-  if (profile == WFD_H264_PROFILE_CHROMECAST)
-    caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=avc,alignment=au,profile=high");
   else
     {
       /* Permit both constrained-baseline and baseline. Would constrained-baseline be sufficient? */
@@ -732,74 +714,154 @@ wfd_media_factory_class_init (WfdMediaFactoryClass *klass)
 }
 
 static gboolean
+wfd_gst_element_present (WfdGstElement element)
+{
+  g_autoptr(GstElementFactory) encoder_factory = NULL;
+
+  /* -1 = not found
+   *  0 = not checked
+   *  1 = found
+   */
+  static gint8 found_elements[ELEMENT_NONE] = {0};
+
+  if (element == ELEMENT_VIDEO_NONE || element == ELEMENT_AUDIO_NONE)
+    return TRUE; /* is "nothing" found? yes! */
+
+  if (found_elements[element] != 0)
+    return found_elements[element] == 1;
+
+  encoder_factory = gst_element_factory_find (wfd_gst_elements[element]);
+
+  if (encoder_factory != NULL)
+    {
+      g_debug ("WfdMediaFactory: Found %s gst element.", wfd_gst_elements[element]);
+      found_elements[element] = 1;
+      return TRUE;
+    }
+
+  found_elements[element] = -1;
+  return FALSE;
+}
+
+static gint
+wfd_gst_media_profile_present (WfdMediaProfile media_profile)
+{
+  gint factory_profile;
+
+  g_debug ("WfdMediaFactory: Checking profile: %d", media_profile);
+
+  if (media_profile < 0 || media_profile >= PROFILE_LAST)
+    return -1;
+
+  for (factory_profile = 0; factory_profile < (sizeof (wfd_media_factory_profiles) / sizeof (wfd_media_factory_profiles[0])); ++factory_profile)
+    {
+      if (wfd_media_factory_profiles[factory_profile].media_profile == media_profile &&
+          wfd_gst_element_present (wfd_media_factory_profiles[factory_profile].video_encoder) &&
+          wfd_gst_element_present (wfd_media_factory_profiles[factory_profile].audio_encoder) &&
+          wfd_gst_element_present (wfd_media_factory_profiles[factory_profile].muxer))
+        {
+          g_debug ("WfdMediaFactory: Found elements for media profile: %d", media_profile);
+          return factory_profile;
+        }
+    }
+
+  return -1;
+}
+
+gboolean
 wfd_media_factory_lookup_encoders (WfdMediaFactory *self,
+                                   WfdMediaProfile  media_profile,
                                    GStrv           *missing_video,
                                    GStrv           *missing_audio)
 {
-  WfdH264Encoder h264_encoder, h264_selected;
-  WfdAACEncoder aac_encoder, aac_selected;
+  gint factory_profile;
 
-  /* Default to openh264 and assume it is usable, prefer x264enc when available. */
-  h264_selected = ENCODER_NONE;
+  *missing_video = NULL;
+  *missing_audio = NULL;
 
-  for (h264_encoder = ENCODER_OPENH264; h264_encoder < ENCODER_NONE; h264_encoder++)
+  /* check for particular profile */
+  if (media_profile != PROFILE_LAST)
     {
-      g_autoptr(GstElementFactory) encoder_factory = NULL;
+      factory_profile = wfd_gst_media_profile_present (media_profile);
+      if (factory_profile == -1)
+        goto missing_elements;
 
-      encoder_factory = gst_element_factory_find (h264_encoders[h264_encoder]);
-      if (encoder_factory)
+      self->factory_profile = factory_profile;
+      return TRUE;
+    }
+
+  /* PROFILE_HIGH_H264 */
+  if ((factory_profile = wfd_gst_media_profile_present (PROFILE_HIGH_H264)) != -1)
+    {
+      self->factory_profile = factory_profile;
+      return TRUE;
+    }
+
+  /* PROFILE_BASE_H264 */
+  if ((factory_profile = wfd_gst_media_profile_present (PROFILE_BASE_H264)) != -1)
+    {
+      self->factory_profile = factory_profile;
+      return TRUE;
+    }
+
+missing_elements:
+  switch (media_profile)
+    {
+    case PROFILE_LAST:
+    case PROFILE_BASE_H264:
+      if  (!wfd_gst_element_present (ELEMENT_OPENH264) &&
+           !wfd_gst_element_present (ELEMENT_X264) &&
+           !wfd_gst_element_present (ELEMENT_VAAPIH264))
         {
-          g_debug ("Found %s for video encoding.", h264_encoders[h264_encoder]);
-          h264_selected = h264_encoder;
-
-          /* Don't continue searching if the user specified this encoder. */
-          if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_H264_ENC"), h264_encoders[h264_encoder]) == 0)
-            break;
+          gchar *missing[4] = { (gchar *) wfd_gst_elements[ELEMENT_OPENH264],
+                                (gchar *) wfd_gst_elements[ELEMENT_X264],
+                                (gchar *) wfd_gst_elements[ELEMENT_VAAPIH264],
+                                NULL };
+          *missing_video = (GStrv) g_strdupv (missing);
         }
-    }
-
-  if (h264_selected == ENCODER_NONE)
-    {
-      g_debug ("WFD: Did not find any usable H264 video encoder, missing dependencies!");
-
-      if (missing_video)
-        *missing_video = (GStrv) h264_encoders;
-    }
-
-  aac_selected = ENCODER_AAC_NONE;
-
-  for (aac_encoder = ENCODER_AAC_FDK; aac_encoder < ENCODER_AAC_NONE; aac_encoder++)
-    {
-      g_autoptr(GstElementFactory) encoder_factory = NULL;
-
-      encoder_factory = gst_element_factory_find (aac_encoders[aac_encoder]);
-      if (encoder_factory)
+      /* use missing_video for muxer as well (legacy reasons) */
+      else if (!wfd_gst_element_present (ELEMENT_MPEGTS))
         {
-          g_debug ("Found %s for audio encoding.", aac_encoders[aac_encoder]);
-          aac_selected = aac_encoder;
-
-          /* Don't continue searching if the user specified this encoder. */
-          if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_AAC_ENC"), aac_encoders[aac_encoder]) == 0)
-            break;
+          gchar *missing[2] = { (gchar *) wfd_gst_elements[ELEMENT_MPEGTS], NULL };
+          *missing_video = (GStrv) g_strdupv (missing);
         }
+
+      break;
+
+    case PROFILE_HIGH_H264:
+      if (!wfd_gst_element_present (ELEMENT_X264) &&
+          !wfd_gst_element_present (ELEMENT_VAAPIH264))
+        {
+          gchar *missing[3] = { (gchar *) wfd_gst_elements[ELEMENT_X264],
+                                (gchar *) wfd_gst_elements[ELEMENT_VAAPIH264],
+                                NULL };
+          *missing_video = (GStrv) g_strdupv (missing);
+        }
+      /* use missing_video for muxer as well (legacy reasons) */
+      else if (!wfd_gst_element_present (ELEMENT_MPEGTS))
+        {
+          gchar *missing[2] = { (gchar *) wfd_gst_elements[ELEMENT_MPEGTS], NULL };
+          *missing_video = (GStrv) g_strdupv (missing);
+        }
+
+      break;
+
+    default:
+      break;
     }
 
-  if (aac_selected == ENCODER_AAC_NONE)
+  if (!wfd_gst_element_present (ELEMENT_AAC_FDK) &&
+      !wfd_gst_element_present (ELEMENT_AAC_AVENC) &&
+      !wfd_gst_element_present (ELEMENT_AAC_FAAC))
     {
-      g_debug ("WFD: Did not find any usable AAC audio encoder!");
-
-      if (missing_audio)
-        *missing_audio = (GStrv) aac_encoders;
+      gchar *missing[4] = { (gchar *) wfd_gst_elements[ELEMENT_AAC_FDK],
+                            (gchar *) wfd_gst_elements[ELEMENT_AAC_AVENC],
+                            (gchar *) wfd_gst_elements[ELEMENT_AAC_FAAC],
+                            NULL };
+      *missing_audio = (GStrv) g_strdupv (missing);
     }
 
-
-  if (self)
-    {
-      self->encoder = h264_selected;
-      self->aac_encoder = aac_selected;
-    }
-
-  return h264_selected != ENCODER_NONE;
+  return FALSE;
 }
 
 static void
@@ -807,18 +869,7 @@ wfd_media_factory_init (WfdMediaFactory *self)
 {
   GstRTSPMediaFactory *media_factory = GST_RTSP_MEDIA_FACTORY (self);
 
-  g_assert (wfd_media_factory_lookup_encoders (self, NULL, NULL));
-
   gst_rtsp_media_factory_set_media_gtype (media_factory, WFD_TYPE_MEDIA);
   gst_rtsp_media_factory_set_suspend_mode (media_factory, GST_RTSP_SUSPEND_MODE_RESET);
   gst_rtsp_media_factory_set_buffer_size (media_factory, 65536);
-}
-
-gboolean
-wfd_get_missing_codecs (GStrv *video, GStrv *audio)
-{
-  *video = NULL;
-  *audio = NULL;
-
-  return wfd_media_factory_lookup_encoders (NULL, video, audio);
 }

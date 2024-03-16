@@ -5,9 +5,10 @@
 
 struct _WfdServer
 {
-  GstRTSPServer parent_instance;
+  GstRTSPServer    parent_instance;
 
-  guint         clean_pool_source_id;
+  WfdMediaFactory *factory;
+  guint            clean_pool_source_id;
 };
 
 G_DEFINE_TYPE (WfdServer, wfd_server, GST_TYPE_RTSP_SERVER)
@@ -141,6 +142,17 @@ wfd_server_class_init (WfdServerClass *klass)
                   GST_TYPE_ELEMENT, 0);
 }
 
+gboolean
+wfd_server_lookup_encoders (WfdServer *self,
+                            GStrv     *missing_video,
+                            GStrv     *missing_audio)
+{
+  return wfd_media_factory_lookup_encoders (self->factory,
+                                            PROFILE_LAST,
+                                            missing_video,
+                                            missing_audio);
+}
+
 static gboolean
 clean_pool (gpointer user_data)
 {
@@ -177,27 +189,26 @@ factory_audio_source_create_cb (WfdMediaFactory *factory, WfdServer *self)
 static void
 wfd_server_init (WfdServer *self)
 {
-  g_autoptr(WfdMediaFactory) factory = NULL;
   g_autoptr(GstRTSPMountPoints) mount_points = NULL;
   /* We need to clean up the pool regularly as it does not happen
    * automatically. */
   self->clean_pool_source_id = g_timeout_add_seconds (2, clean_pool, self);
 
-  factory = wfd_media_factory_new ();
-  g_signal_connect_object (factory,
+  self->factory = wfd_media_factory_new ();
+  g_signal_connect_object (self->factory,
                            "create-source",
                            (GCallback) factory_source_create_cb,
                            self,
                            0);
 
-  g_signal_connect_object (factory,
+  g_signal_connect_object (self->factory,
                            "create-audio-source",
                            (GCallback) factory_audio_source_create_cb,
                            self,
                            0);
 
   mount_points = gst_rtsp_server_get_mount_points (GST_RTSP_SERVER (self));
-  gst_rtsp_mount_points_add_factory (mount_points, "/wfd1.0", GST_RTSP_MEDIA_FACTORY (g_steal_pointer (&factory)));
+  gst_rtsp_mount_points_add_factory (mount_points, "/wfd1.0", GST_RTSP_MEDIA_FACTORY (self->factory));
 
   gst_rtsp_server_set_address (GST_RTSP_SERVER (self), "0.0.0.0");
   gst_rtsp_server_set_service (GST_RTSP_SERVER (self), "7236");

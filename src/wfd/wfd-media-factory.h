@@ -12,13 +12,72 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (WfdMediaFactory, wfd_media_factory, WFD, MEDIA_FACTORY, GstRTSPMediaFactory)
 
 typedef enum {
+  /* video + audio profiles */
+  PROFILE_HIGH_H264,
+  PROFILE_BASE_H264,
+
+  /* audio only profiles */
+//PROFILE_AUDIO_AAC,
+
+  PROFILE_LAST,
+} WfdMediaProfile;
+
+typedef enum {
+  ELEMENT_OPENH264,
+  ELEMENT_X264,
+  ELEMENT_VAAPIH264,
+  ELEMENT_VIDEO_NONE,
+
+  ELEMENT_AAC_FDK,
+  ELEMENT_AAC_AVENC,
+  ELEMENT_AAC_FAAC,
+  ELEMENT_AUDIO_NONE,
+
+  ELEMENT_MPEGTS,
+
+  ELEMENT_NONE,
+} WfdGstElement;
+
+typedef struct
+{
+  WfdMediaProfile media_profile;
+  WfdGstElement   video_encoder;
+  WfdGstElement   audio_encoder;
+  WfdGstElement   muxer;
+} WfdMediaFactoryProfile;
+
+/* video encoder, audio encoder, muxer */
+static const WfdMediaFactoryProfile wfd_media_factory_profiles[] = {
+  /* video + audio profiles */
+  {PROFILE_HIGH_H264,    ELEMENT_VAAPIH264,  ELEMENT_AAC_FDK,    ELEMENT_MPEGTS},
+  {PROFILE_HIGH_H264,    ELEMENT_VAAPIH264,  ELEMENT_AAC_AVENC,  ELEMENT_MPEGTS},
+  {PROFILE_HIGH_H264,    ELEMENT_VAAPIH264,  ELEMENT_AAC_FAAC,   ELEMENT_MPEGTS},
+  {PROFILE_HIGH_H264,    ELEMENT_VAAPIH264,  ELEMENT_AUDIO_NONE, ELEMENT_MPEGTS},
+  {PROFILE_HIGH_H264,    ELEMENT_X264,       ELEMENT_AAC_FDK,    ELEMENT_MPEGTS},
+  {PROFILE_HIGH_H264,    ELEMENT_X264,       ELEMENT_AAC_AVENC,  ELEMENT_MPEGTS},
+  {PROFILE_HIGH_H264,    ELEMENT_X264,       ELEMENT_AAC_FAAC,   ELEMENT_MPEGTS},
+  {PROFILE_HIGH_H264,    ELEMENT_X264,       ELEMENT_AUDIO_NONE, ELEMENT_MPEGTS},
+  {PROFILE_BASE_H264,    ELEMENT_OPENH264,   ELEMENT_AAC_FDK,    ELEMENT_MPEGTS},
+  {PROFILE_BASE_H264,    ELEMENT_OPENH264,   ELEMENT_AAC_AVENC,  ELEMENT_MPEGTS},
+  {PROFILE_BASE_H264,    ELEMENT_OPENH264,   ELEMENT_AAC_FAAC,   ELEMENT_MPEGTS},
+  {PROFILE_BASE_H264,    ELEMENT_OPENH264,   ELEMENT_AUDIO_NONE, ELEMENT_MPEGTS},
+
+  /* TODO: audio-only profiles */
+//{PROFILE_AUDIO_AAC,    ELEMENT_VIDEO_NONE, ELEMENT_AAC_FDK,    ELEMENT_MPEGTS},
+//{PROFILE_AUDIO_AAC,    ELEMENT_VIDEO_NONE, ELEMENT_AAC_AVENC,  ELEMENT_MPEGTS},
+//{PROFILE_AUDIO_AAC,    ELEMENT_VIDEO_NONE, ELEMENT_AAC_FAAC,   ELEMENT_MPEGTS},
+};
+
+typedef enum {
   WFD_QUIRK_NO_IDR = 0x01,
 } WfdMediaQuirks;
 
 WfdMediaFactory * wfd_media_factory_new (void);
 
-gboolean          wfd_get_missing_codecs (GStrv *video,
-                                          GStrv *audio);
+gboolean wfd_media_factory_lookup_encoders (WfdMediaFactory *self,
+                                            WfdMediaProfile  media_profile,
+                                            GStrv           *missing_video,
+                                            GStrv           *missing_audio);
 
 /* Just because it is convenient to have next to the pipeline creation code */
 GstElement * wfd_media_factory_create_element (GstRTSPMediaFactory *factory,

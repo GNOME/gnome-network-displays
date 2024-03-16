@@ -17,7 +17,6 @@
  */
 
 #include "wfd/wfd-client.h"
-#include "wfd/wfd-media-factory.h"
 #include "wfd/wfd-server.h"
 #include "gnome-network-displays-config.h"
 #include "nd-firewalld.h"
@@ -360,8 +359,10 @@ p2p_connected (GObject      *source_object,
                gpointer      user_data)
 {
   g_autoptr(GError) error = NULL;
-  NdWFDP2PSink *sink = NULL;
+  NdWFDP2PSink *sink = ND_WFD_P2P_SINK (user_data);
   NMActiveConnection *ac = NULL;
+  GStrv missing_video = NULL, missing_audio = NULL;
+  gboolean have_wfd_codecs;
 
   g_debug ("NdWfdP2PSink: Got P2P connection");
 
@@ -373,18 +374,39 @@ p2p_connected (GObject      *source_object,
         return;
 
       g_warning ("Error activating connection: %s", error->message);
-      sink = ND_WFD_P2P_SINK (user_data);
       nd_wfd_p2p_sink_sink_stop_stream_int (sink);
       sink->state = ND_SINK_STATE_ERROR;
       g_object_notify (G_OBJECT (sink), "state");
       return;
     }
 
-  sink = ND_WFD_P2P_SINK (user_data);
   sink->nm_ac = ac;
 
   g_assert (sink->server == NULL);
   sink->server = wfd_server_new ();
+
+  have_wfd_codecs = wfd_server_lookup_encoders (sink->server,
+                                                &missing_video,
+                                                &missing_audio);
+
+  g_clear_object (&sink->missing_video_codec);
+  g_clear_object (&sink->missing_audio_codec);
+
+  sink->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
+  sink->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
+
+  g_object_notify (G_OBJECT (sink), "missing-video-codec");
+  g_object_notify (G_OBJECT (sink), "missing-audio-codec");
+
+  if (!have_wfd_codecs)
+    {
+      g_warning ("NdWfdP2PSink: Essential codecs are missing!");
+      sink->state = ND_SINK_STATE_ERROR;
+      g_object_notify (G_OBJECT (sink), "state");
+
+      return;
+    }
+
   /*
    * XXX: Not yet implemented, but we should only bind on the P2P device
    * wfd_server_set_interface (GST_RTSP_SERVER (sink->server), nm_device_get_ip_iface (sink->nm_device));
@@ -514,35 +536,10 @@ firewall_ready (GObject      *source_object,
 static NdSink *
 nd_wfd_p2p_sink_sink_start_stream (NdSink *sink)
 {
+  g_autoptr(NdFirewalld) firewalld = NULL;
   NdWFDP2PSink *self = ND_WFD_P2P_SINK (sink);
 
-  g_autoptr(NdFirewalld) firewalld = NULL;
-  gboolean have_basic_codecs;
-  GStrv missing_video, missing_audio;
-
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
-
-  g_assert (self->server == NULL);
-
-  have_basic_codecs = wfd_get_missing_codecs (&missing_video, &missing_audio);
-
-  g_clear_object (&self->missing_video_codec);
-  g_clear_object (&self->missing_audio_codec);
-
-  self->missing_video_codec = gtk_string_list_new ((const char *const *) missing_video);
-  self->missing_audio_codec = gtk_string_list_new ((const char *const *) missing_audio);
-
-  g_object_notify (G_OBJECT (self), "missing-video-codec");
-  g_object_notify (G_OBJECT (self), "missing-audio-codec");
-
-  if (!have_basic_codecs)
-    {
-      g_warning ("NdWFDP2PSinkEssential codecs are missing!");
-      self->state = ND_SINK_STATE_ERROR;
-      g_object_notify (G_OBJECT (self), "state");
-
-      return g_object_ref (sink);
-    }
 
   self->state = ND_SINK_STATE_ENSURE_FIREWALL;
   g_object_notify (G_OBJECT (self), "state");
