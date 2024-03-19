@@ -6,6 +6,7 @@ G_DEFINE_TYPE (CcMediaFactory, cc_media_factory, G_TYPE_OBJECT)
 static const gchar * cc_gst_elements[ELEMENT_NONE + 1] = {
   [ELEMENT_VP8] = "vp8enc",
   [ELEMENT_X264] = "x264enc",
+  [ELEMENT_VAAPIH264] = "vaapih264enc",
   [ELEMENT_VIDEO_NONE] = NULL,
 
   [ELEMENT_AAC_FDK] = "fdkaacenc",
@@ -51,6 +52,7 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
   GstElement *convert;
   GstElement *queue_pre_encoder;
   GstElement *encoder;
+  GstElement *parser;
   GstElement *codecfilter;
   GstElement *queue_post_encoder;
 
@@ -105,6 +107,20 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
                     "speed-preset", (guint) 1,
                     "tune", 0x00000004,
                     NULL);
+
+      parser = gst_element_factory_make ("h264parse", "cc-h264parse");
+      caps = gst_caps_from_string ("video/x-h264,stream-format=avc,alignment=au,profile=high");
+      break;
+
+    case ELEMENT_VAAPIH264:
+      encoder = gst_element_factory_make ("vaapih264enc", "cc-video-encoder");
+      g_object_set (encoder,
+                    "prediction-type", 1,
+                    "rate-control", 2,
+                    "compliance-mode", 0,
+                    NULL);
+
+      parser = gst_element_factory_make ("h264parse", "cc-h264parse");
       caps = gst_caps_from_string ("video/x-h264,stream-format=avc,alignment=au,profile=high");
       break;
 
@@ -159,9 +175,22 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
                                     convert,
                                     queue_pre_encoder,
                                     encoder,
-                                    codecfilter,
-                                    queue_post_encoder,
                                     NULL);
+
+  if (parser != NULL)
+    {
+      success &= gst_bin_add (bin, parser);
+      success &= gst_element_link_many (encoder,
+                                        parser,
+                                        codecfilter,
+                                        queue_post_encoder,
+                                        NULL);
+    }
+  else
+    success &= gst_element_link_many (encoder,
+                                      codecfilter,
+                                      queue_post_encoder,
+                                      NULL);
 
   gst_element_add_pad (GST_ELEMENT (bin),
                        gst_ghost_pad_new ("src",
