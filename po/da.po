@@ -1,15 +1,15 @@
 # Danish translation for gnome-network-displays.
 # Copyright (C) 2023 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
-# Alan Mortensen <alanmortensen.am@gmail.com>, 2023.
+# Alan Mortensen <alanmortensen.am@gmail.com>, 2023-24.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues\n"
-"POT-Creation-Date: 2022-09-26 08:54+0000\n"
-"PO-Revision-Date: 2023-01-09 19:59+0100\n"
+"issues/\n"
+"POT-Creation-Date: 2024-01-30 19:30+0000\n"
+"PO-Revision-Date: 2024-03-16 13:44+0100\n"
 "Last-Translator: Alan Mortensen <alanmortensen.am@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -20,87 +20,126 @@ msgstr ""
 "X-Generator: Poedit 3.0.1\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
 msgid "GNOME Network Displays"
 msgstr "GNOME-netværksskærme"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
-msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr ""
-"Stream indhold på computeren til enheder, der understøtter “Wi-Fi "
-"Display” (Miracast)"
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Screencasting til GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:25
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
-"Currently implemented is support for casting to Wi-Fi Display capable "
-"devices (a.k.a. Miracast)."
+"Supports the Miracast and Chromecast protocols."
 msgstr ""
 "Med GNOME-netværksskærme kan du caste indhold på din computer til en ekstern "
-"skærm. P.t. understøttes enheder med “Wi-Fi Display” (Miracast)"
+"skærm. Understøtter Miracast- og Chromecast-protokollerne."
 
-#: src/nd-codec-install.c:54
+#: src/nd-codec-install.c:59
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "GStreamer OpenH264-videokoder (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/nd-codec-install.c:61
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264-videokoder (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/nd-codec-install.c:63
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264-videokoder (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/nd-codec-install.c:65
+#, c-format
+#| msgid "GStreamer OpenH264 video encoder (%s)"
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "GStreamer On2 VP8-videokoder (%s)"
+
+#: src/nd-codec-install.c:67
+#, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "GStreamer On2 VP9-videokoder (%s)"
+
+#: src/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "GStreamer FDK AAC-lydkoder (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/nd-codec-install.c:72
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "GStreamer libav AAC-lydkoder (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/nd-codec-install.c:74
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC-lydkoder (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/nd-codec-install.c:76
+#, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "GStreamer Vorbis-lydkoder (%s)"
+
+#: src/nd-codec-install.c:78
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "GStreamer Opus-lydkoder (%s)"
+
+#: src/nd-codec-install.c:81
+#, c-format
+#| msgid "GStreamer x264 video encoder (%s)"
+msgid "GStreamer WebM muxer (%s)"
+msgstr "GStreamer WebM-muxer (%s)"
+
+#: src/nd-codec-install.c:83
+#, c-format
+#| msgid "GStreamer FDK AAC audio encoder (%s)"
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "GStreamer Matroska-muxer (%s)"
+
+#: src/nd-codec-install.c:85
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "GStreamer MPEG Transport Stream-muxer (%s)"
+
+#: src/nd-codec-install.c:87
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer-element “%s”"
 
-#: src/nd-codec-install.c:170
+#: src/nd-codec-install.c:193
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Installér et af de følgende GStreamer-udvidelsesmoduler ved at klikke "
 "nedenfor"
 
-#: src/nd-window.c:162
+#: src/nd-window.c:201
 msgid "Checking and installing required firewall zones."
 msgstr "Tjekker og installerer påkrævede firewallzoner."
 
-#: src/nd-window.c:169
+#: src/nd-window.c:208
 msgid "Making P2P connection"
 msgstr "Opretter P2P-forbindelse"
 
-#: src/nd-window.c:176
+#: src/nd-window.c:215
 msgid "Establishing connection to sink"
 msgstr "Etablerer forbindelse til datamodtager"
 
-#: src/nd-window.c:183
+#: src/nd-window.c:222
 msgid "Starting to stream"
 msgstr "Starter med at streame"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
-msgstr "Ingen wi‑fi-P2P-adaptere fundet"
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Netværksskærme"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
+msgstr "Ingen wi‑fi-P2P-adapter fundet"
+
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -110,48 +149,49 @@ msgstr ""
 "wi-fi-P2P-operationer er tilgængelige i både Netværkshåndtering og "
 "wpa_supplicant."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Tilgængelige datamodtagere af video"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "Forbinder"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Annullér"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Streamer"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Et af de følgende videocodec-udvidelsesmoduler er nødvendigt.\n"
-"Et klik vil starte installationsprocessen."
-
-#: src/nd-window.ui:603 src/nd-window.ui:802
-msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Et af de følgende lydcodec-udvidelsesmoduler er nødvendigt for at "
-"understøtte lyd.\n"
-"Et klik vil starte installationsprocessen."
-
-#: src/nd-window.ui:700
+#: src/nd-window.ui:276
 msgid "Error"
 msgstr "Fejl"
 
-#: src/nd-window.ui:762
+#: src/nd-window.ui:299
 msgid "Return"
 msgstr "Vend tilbage"
 
-#: src/nd-window.ui:830
+#: src/nd-window.ui:308
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Et af de følgende codec-udvidelsesmoduler er nødvendigt for at understøtte "
+"lyd.\n"
+"Et klik vil starte installationsprocessen."
+
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Et af de følgende codec-udvidelsesmoduler er nødvendigt for at understøtte "
+"video.\n"
+"Et klik vil starte installationsprocessen."
+
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -160,3 +200,15 @@ msgstr ""
 "En krævet firewallzone er ikke tilgængelig og kunne ikke installeres. Prøv "
 "igen og indtast adgangskoden, når du bliver bedt om det, eller kontakt en "
 "systemadministrator."
+
+#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
+#~ msgstr ""
+#~ "Stream indhold på computeren til enheder, der understøtter “Wi-Fi "
+#~ "Display” (Miracast)"
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Et af de følgende videocodec-udvidelsesmoduler er nødvendigt.\n"
+#~ "Et klik vil starte installationsprocessen."
