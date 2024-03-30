@@ -217,17 +217,17 @@ cc_ctrl_send_load (CcCtrl *ctrl, gchar *sessionId)
   guint port;
   CcMediaFactory *factory;
 
+  g_object_get (ctrl->http_server, "port", &port, NULL);
+  factory = (CcMediaFactory *) ctrl->http_server;
+
   GArray *tracks = g_array_new (FALSE, FALSE, sizeof (JsonNode *));
   JsonNode *track_node = cc_json_helper_build_node (
-    "trackContentType", CC_JSON_TYPE_STRING, "video/mp2t",
+    "trackContentType", CC_JSON_TYPE_STRING, content_types[cc_media_factory_profiles[factory->factory_profile].muxer],
     "trackId", CC_JSON_TYPE_INT, 1,
     "type", CC_JSON_TYPE_STRING, "VIDEO",
     NULL);
 
   g_array_append_val (tracks, track_node);
-
-  g_object_get (ctrl->http_server, "port", &port, NULL);
-  factory = (CcMediaFactory *) ctrl->http_server;
 
   gchar *json = cc_json_helper_build_string (
     "type", CC_JSON_TYPE_STRING, "LOAD",

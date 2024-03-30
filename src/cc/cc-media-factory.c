@@ -52,7 +52,7 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
   GstElement *convert;
   GstElement *queue_pre_encoder;
   GstElement *encoder;
-  GstElement *parser;
+  GstElement *parser = NULL;
   GstElement *codecfilter;
   GstElement *queue_post_encoder;
 
