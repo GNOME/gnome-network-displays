@@ -1,3 +1,8 @@
+GNOME Network Displays 0.92.2
+=============================
+* Add new, separate media factory for CC (@kyteinsky, @lorbus)
+* Fix a crash where gst elements could not be created for CC (@lorbus)
+
 GNOME Network Displays 0.92.1
 =============================
 * Fix compilation in Fedora Koji

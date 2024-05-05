@@ -1,5 +1,5 @@
 project('gnome-network-displays', 'c',
-  version: '0.92.1',
+  version: '0.92.2',
   meson_version: '>= 0.59.0',
 )
 
