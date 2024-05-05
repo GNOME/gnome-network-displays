@@ -116,7 +116,7 @@ nd_cc_sink_get_property (GObject    * object,
       }
 
     case PROP_PRIORITY:
-      g_value_set_int (value, 100);
+      g_value_set_int (value, 50);
       break;
 
     case PROP_STATE:
