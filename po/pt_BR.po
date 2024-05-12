@@ -3,104 +3,142 @@
 # Copyright (C) 2020 THE gnome-network-displays'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
 # Rafael Fontenelle <rafaelff@gnome.org>, 2020.
+# Hugo Fortini <hugofortinipbi@gmail.com>, 2024.
+# Juliano de Souza Camargo <julianosc@pm.me>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues\n"
-"POT-Creation-Date: 2020-07-02 10:51+0000\n"
-"PO-Revision-Date: 2020-07-18 08:09-0300\n"
-"Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
-"Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
+"issues/\n"
+"POT-Creation-Date: 2024-05-05 00:45+0000\n"
+"PO-Revision-Date: 2024-05-12 09:57-0300\n"
+"Last-Translator: Juliano de Souza Camargo <julianosc@pm.me>\n"
+"Language-Team: Brazilian Portuguese <https://br.gnome.org/traducao>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
-"X-Generator: Gtranslator 3.36.0\n"
+"X-Generator: Gtranslator 46.1\n"
 "X-Project-Style: gnome\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
 msgid "GNOME Network Displays"
 msgstr "GNOME Tela via Rede"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
-msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr ""
-"Transmita do seu computador para dispositivos com capacidade de Wi-Fi Display"
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Transmissão de tela para GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
-"Currently implemented is support for casting to Wi-Fi Display capable "
-"devices (a.k.a. Miracast)."
+"Supports the Miracast and Chromecast protocols."
 msgstr ""
-"GNOME Tela via Rede permite projetar seu computador em uma tela remota. "
-"Atualmente está implementado o suporte à projeção em dispositivos "
-"compatíveis com o Wi-Fi Display (também conhecido como Miracast)."
+"As exibições de rede GNOME permitem lançar sua área de trabalho em uma tela "
+"remota. Suporta os protocolos Miracast e Chromecast."
 
-#: src/nd-codec-install.c:54
+#: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "Codificador de vídeo OpenH264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "Codificador de vídeo x264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Codificador de vídeo VA-API H264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "Codificador de vídeo GStreamer On2 VP8 (%s)"
+
+#: src/nd-codec-install.c:68
+#, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "Codificador de vídeo GStreamer On2 VP9 (%s)"
+
+#: src/nd-codec-install.c:71
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "Codificador de áudio FDK AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "Codificador de áudio libav AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Codificador de áudio Free AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/nd-codec-install.c:77
+#, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "Codificador de áudio GStreamer Vorbis (%s)"
+
+#: src/nd-codec-install.c:79
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "Codificador de áudio GStreamer Opus (%s)"
+
+#: src/nd-codec-install.c:82
+#, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "GStreamer WebM muxer (%s)"
+
+#: src/nd-codec-install.c:84
+#, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "GStreamer Matroska muxer (%s)"
+
+#: src/nd-codec-install.c:86
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "GStreamer MPEG Transport Stream muxer (%s)"
+
+#: src/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer Element “%s”"
 
-#: src/nd-codec-install.c:170
+#: src/nd-codec-install.c:194
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Por favor, instale um dos seguintes plugins GStreamer clicando abaixo"
 
-#: src/nd-window.c:158
+#: src/nd-window.c:201
 msgid "Checking and installing required firewall zones."
 msgstr "Verificando e instalando zonas de firewall necessárias."
 
-#: src/nd-window.c:165
+#: src/nd-window.c:208
 msgid "Making P2P connection"
 msgstr "Fazendo a conexão P2P"
 
-#: src/nd-window.c:172
+#: src/nd-window.c:215
 msgid "Establishing connection to sink"
 msgstr "Estabelecendo conexão com o coletor"
 
-#: src/nd-window.c:179
+#: src/nd-window.c:222
 msgid "Starting to stream"
 msgstr "Iniciando a transmissão"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Tela via Rede"
+
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
 msgstr "Nenhum adaptador Wi-Fi P2P encontrado"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -110,48 +148,48 @@ msgstr ""
 "está ativado e as operações de Wi-Fi P2P estão disponíveis no NetworkManager "
 "e no wpa_supplicant."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Coletores de vídeo disponíveis"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "Conectando"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Transmitindo"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Um dos seguintes plugins de codec de vídeo é necessário.\n"
-"Clicar vai iniciar o processo de instalação."
+#: src/nd-window.ui:276
+msgid "Error"
+msgstr "Erro"
 
-#: src/nd-window.ui:603 src/nd-window.ui:802
+#: src/nd-window.ui:299
+msgid "Return"
+msgstr "Retornar"
+
+#: src/nd-window.ui:308
 msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
+"One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
 "Um dos seguintes plugins de codec de áudio é necessário para suporte a "
 "áudio.\n"
 "Clicar vai iniciar o processo de instalação."
 
-#: src/nd-window.ui:700
-msgid "Error"
-msgstr "Erro"
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Um dos seguintes plugins de codec é necessário para o suporte ao vídeo.\n"
+"Clicar vai iniciar o processo de instalação."
 
-#: src/nd-window.ui:762
-msgid "Return"
-msgstr "Retornar"
-
-#: src/nd-window.ui:830
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -160,6 +198,18 @@ msgstr ""
 "Uma zona de firewall necessária não está disponível e não pôde ser "
 "instalada. Tente novamente e insira a senha quando solicitada ou contate um "
 "administrador do sistema."
+
+#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
+#~ msgstr ""
+#~ "Transmita do seu computador para dispositivos com capacidade de Wi-Fi "
+#~ "Display"
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Um dos seguintes plugins de codec de vídeo é necessário.\n"
+#~ "Clicar vai iniciar o processo de instalação."
 
 #~ msgid "org.gnome.NetworkDisplays"
 #~ msgstr "org.gnome.NetworkDisplays"
