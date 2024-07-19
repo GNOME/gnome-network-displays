@@ -60,6 +60,8 @@ get_description (const gchar *codec)
     return g_strdup_printf (_("GStreamer OpenH264 video encoder (%s)"), codec);
   else if (g_strcmp0 (codec, "x264enc") == 0)
     return g_strdup_printf (_("GStreamer x264 video encoder (%s)"), codec);
+  else if (g_strcmp0 (codec, "vah264enc") == 0)
+    return g_strdup_printf (_("GStreamer VA H264 video encoder (%s)"), codec);
   else if (g_strcmp0 (codec, "vaapih264enc") == 0)
     return g_strdup_printf (_("GStreamer VA-API H264 video encoder (%s)"), codec);
   else if (g_strcmp0 (codec, "vp8enc") == 0)

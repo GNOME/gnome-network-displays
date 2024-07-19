@@ -5,6 +5,7 @@
 static const gchar * wfd_gst_elements[ELEMENT_NONE + 1] = {
   [ELEMENT_OPENH264] = "openh264enc",
   [ELEMENT_X264] = "x264enc",
+  [ELEMENT_VAH264] = "vah264enc",
   [ELEMENT_VAAPIH264] = "vaapih264enc",
   [ELEMENT_VIDEO_NONE] = NULL,
 
@@ -209,6 +210,20 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
       success &= gst_bin_add (bin, encoder);
 
       gst_preset_load_preset (GST_PRESET (encoder), "Profile Baseline");
+      break;
+
+    case ELEMENT_VAH264:
+      encoder = gst_element_factory_make ("vah264enc", "wfd-encoder");
+      encoder_elem = encoder;
+      success &= gst_bin_add (bin, encoder);
+      g_object_set (encoder,
+                    "qos", TRUE,
+                    "key-int-max", 30,
+                    "num-slices", 1,
+                    "cabac", FALSE,
+                    "dct8x8", FALSE,
+                    NULL);
+
       break;
 
     case ELEMENT_VAAPIH264:
@@ -592,6 +607,17 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
                     NULL);
       break;
 
+    case ELEMENT_VAH264:
+      if (codec->profile == WFD_H264_PROFILE_HIGH)
+        profile = WFD_H264_PROFILE_HIGH;
+      else
+        profile = WFD_H264_PROFILE_BASE;
+
+      g_object_set (encoder,
+                    "key-int-max", (guint) gop_size,
+                    "bitrate",  bitrate_kbit,
+                    NULL);
+      break;
 
     case ELEMENT_VAAPIH264:
       if (codec->profile == WFD_H264_PROFILE_HIGH)
@@ -811,10 +837,12 @@ missing_elements:
     case PROFILE_BASE_H264:
       if  (!wfd_gst_element_present (ELEMENT_OPENH264) &&
            !wfd_gst_element_present (ELEMENT_X264) &&
+           !wfd_gst_element_present (ELEMENT_VAH264) &&
            !wfd_gst_element_present (ELEMENT_VAAPIH264))
         {
-          gchar *missing[4] = { (gchar *) wfd_gst_elements[ELEMENT_OPENH264],
+          gchar *missing[5] = { (gchar *) wfd_gst_elements[ELEMENT_OPENH264],
                                 (gchar *) wfd_gst_elements[ELEMENT_X264],
+                                (gchar *) wfd_gst_elements[ELEMENT_VAH264],
                                 (gchar *) wfd_gst_elements[ELEMENT_VAAPIH264],
                                 NULL };
           *missing_video = (GStrv) g_strdupv (missing);
@@ -830,9 +858,11 @@ missing_elements:
 
     case PROFILE_HIGH_H264:
       if (!wfd_gst_element_present (ELEMENT_X264) &&
+          !wfd_gst_element_present (ELEMENT_VAH264) &&
           !wfd_gst_element_present (ELEMENT_VAAPIH264))
         {
-          gchar *missing[3] = { (gchar *) wfd_gst_elements[ELEMENT_X264],
+          gchar *missing[4] = { (gchar *) wfd_gst_elements[ELEMENT_X264],
+                                (gchar *) wfd_gst_elements[ELEMENT_VAH264],
                                 (gchar *) wfd_gst_elements[ELEMENT_VAAPIH264],
                                 NULL };
           *missing_video = (GStrv) g_strdupv (missing);
