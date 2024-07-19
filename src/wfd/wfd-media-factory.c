@@ -434,7 +434,7 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   GstElement *payloader;
   gboolean success = TRUE;
 
-  bin = GST_BIN (gst_bin_new ("wfd-encoder-bin"));
+  bin = GST_BIN (gst_bin_new ("nd-wfd-pipeline"));
 
   queue_mpegmux_video = wfd_media_factory_create_video_element (self, bin);
 
@@ -484,7 +484,7 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
 
   GST_DEBUG_BIN_TO_DOT_FILE (bin,
                              GST_DEBUG_GRAPH_SHOW_MEDIA_TYPE,
-                             "wfd-encoder-bin");
+                             "nd-wfd-pipeline");
   if (!success)
     {
       g_error ("WfdMediaFactory: Error creating encoding pipeline. If gstreamer is compiled with debugging and GST_DEBUG_DUMP_DOT_DIR is set, then the pipeline will have been dumped.");
@@ -678,7 +678,7 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
 
   GST_DEBUG_BIN_TO_DOT_FILE (bin,
                              GST_DEBUG_GRAPH_SHOW_ALL,
-                             "wfd-encoder-bin-configured");
+                             "nd-wfd-pipeline-configured");
 
   return quirks;
 }
