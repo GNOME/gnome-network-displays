@@ -36,23 +36,24 @@
 
 struct _NdWindow
 {
-  AdwApplicationWindow parent_instance;
+  AdwApplicationWindow   parent_instance;
 
-  GaClient            *avahi_client;
-  NdMetaProvider      *meta_provider;
-  NdNMDeviceRegistry  *nm_device_registry;
+  GaClient              *avahi_client;
+  NdMetaProvider        *meta_provider;
+  NdNMDeviceRegistry    *nm_device_registry;
 
-  XdpPortal           *portal;
-  XdpSession          *session;
-  gboolean             use_x11;
+  XdpPortal             *portal;
+  XdpSession            *session;
+  NdScreenCastSourceType screencast_type;
+  gboolean               use_x11;
 
-  NdPulseaudio        *pulse;
+  NdPulseaudio          *pulse;
 
-  GCancellable        *cancellable;
+  GCancellable          *cancellable;
 
-  NdSink              *stream_sink;
+  NdSink                *stream_sink;
 
-  GPtrArray           *sink_property_bindings;
+  GPtrArray             *sink_property_bindings;
 
   /* Template widgets */
   GtkStack        *has_providers_stack;
@@ -87,31 +88,40 @@ G_DEFINE_TYPE (NdWindow, gnome_nd_window, ADW_TYPE_APPLICATION_WINDOW)
 static GstElement *
 nd_window_screencast_get_source (NdWindow * self)
 {
-  g_autoptr(GstElement) src = NULL;
+  g_autoptr(GVariant) stream_properties = NULL;
+  g_autoptr(GError) error = NULL;
+  GstElement *src = NULL;
   GVariant *streams = NULL;
-  const gchar *stream_type;
-  gsize stream_count;
+  GVariantIter iter;
   guint32 node_id;
-
-  src = gst_element_factory_make ("pipewiresrc", "portal-pipewire-source");
-  if (src == NULL)
-    g_error ("GStreamer element \"pipewiresrc\" could not be created!");
+  guint32 screencast_type;
 
   streams = xdp_session_get_streams (self->session);
   if (streams == NULL)
     g_error ("XDP session streams not found!");
 
-  stream_type = g_variant_get_type_string (streams);
-  if (0 != strcmp (stream_type, "a(ua{sv})"))
-    g_error ("Unexpected XDP session type '%s'", stream_type);
-
-  stream_count = g_variant_n_children (streams);
-  if (stream_count == 0)
-    g_error ("Did not find any usable streams!");
-
-  g_variant_get_child (streams, 0, "(ua{sv})", &node_id, NULL);
+  g_variant_iter_init (&iter, streams);
+  g_variant_iter_loop (&iter, "(u@a{sv})", &node_id, &stream_properties);
+  g_variant_lookup (stream_properties, "source_type", "u", &screencast_type);
 
   g_debug ("Got a stream with node ID: %d", node_id);
+  g_debug ("Got a stream of type: %d", screencast_type);
+
+  switch (screencast_type)
+    {
+    case ND_SCREEN_CAST_SOURCE_TYPE_MONITOR:
+    case ND_SCREEN_CAST_SOURCE_TYPE_WINDOW:
+    case ND_SCREEN_CAST_SOURCE_TYPE_VIRTUAL:
+      self->screencast_type = screencast_type;
+      break;
+
+    default:
+      g_assert_not_reached ();
+    }
+
+  src = gst_element_factory_make ("pipewiresrc", "portal-pipewire-source");
+  if (src == NULL)
+    g_error ("GStreamer element \"pipewiresrc\" could not be created!");
 
   g_object_set (src,
                 "fd", xdp_session_open_pipewire_remote (self->session),
@@ -127,8 +137,9 @@ nd_window_screencast_get_source (NdWindow * self)
 static GstElement *
 sink_create_source_cb (NdWindow * self, NdSink * sink)
 {
+  g_autoptr(GstCaps) caps = NULL;
   GstBin *bin;
-  GstElement *src, *dst, *res;
+  GstElement *src, *filter, *dst, *res;
 
   bin = GST_BIN (gst_bin_new ("screencast source bin"));
   g_debug ("use x11: %d", self->use_x11);
@@ -152,7 +163,25 @@ sink_create_source_cb (NdWindow * self, NdSink * sink)
                 NULL);
   gst_bin_add (bin, dst);
 
-  gst_element_link_many (src, dst, NULL);
+  if (self->screencast_type == ND_SCREEN_CAST_SOURCE_TYPE_VIRTUAL)
+    {
+      /* Initial caps for virtual display */
+      caps = gst_caps_new_simple ("video/x-raw",
+                                  "max-framerate", GST_TYPE_FRACTION, 30, 1,
+                                  "width", G_TYPE_INT, 1920,
+                                  "height", G_TYPE_INT, 1080,
+                                  NULL);
+      filter = gst_element_factory_make ("capsfilter", "srcfilter");
+      gst_bin_add (bin, filter);
+      g_object_set (filter,
+                    "caps", caps,
+                    NULL);
+      g_clear_pointer (&caps, gst_caps_unref);
+
+      gst_element_link_many (src, filter, dst, NULL);
+    }
+  else
+    gst_element_link_many (src, dst, NULL);
 
   res = gst_element_factory_make ("intervideosrc", "screencastsrc");
   g_object_set (res,

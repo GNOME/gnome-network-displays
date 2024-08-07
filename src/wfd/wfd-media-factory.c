@@ -127,7 +127,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
   QOSData *qos_data;
 
   GstElement *scale;
-  GstElement *sizefilter;
+  GstElement *sinkfilter;
   GstElement *convert;
   GstElement *queue_pre_encoder;
   GstElement *encoder;
@@ -155,9 +155,9 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
                               "width", G_TYPE_INT, 1920,
                               "height", G_TYPE_INT, 1080,
                               NULL);
-  sizefilter = gst_element_factory_make ("capsfilter", "wfd-sizefilter");
-  success &= gst_bin_add (bin, sizefilter);
-  g_object_set (sizefilter,
+  sinkfilter = gst_element_factory_make ("capsfilter", "wfd-sinkfilter");
+  success &= gst_bin_add (bin, sinkfilter);
+  g_object_set (sinkfilter,
                 "caps", caps,
                 NULL);
   g_clear_pointer (&caps, gst_caps_unref);
@@ -312,7 +312,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
 
   success &= gst_element_link_many (source,
                                     scale,
-                                    sizefilter,
+                                    sinkfilter,
                                     convert,
                                     queue_pre_encoder,
                                     encoder,
@@ -512,9 +512,9 @@ wfd_media_factory_create_pipeline (GstRTSPMediaFactory *factory, GstRTSPMedia *m
 WfdMediaQuirks
 wfd_configure_media_element (GstBin *bin, WfdParams *params)
 {
-  g_autoptr(GstCaps) caps_sizefilter = NULL;
-  g_autoptr(GstElement) sizefilter = NULL;
-  g_autoptr(GstCaps) caps_codecfilter = NULL;
+  g_autoptr(GstCaps) caps = NULL;
+  g_autoptr(GstElement) srcfilter = NULL;
+  g_autoptr(GstElement) sinkfilter = NULL;
   g_autoptr(GstElement) codecfilter = NULL;
   g_autoptr(GstElement) encoder = NULL;
   g_autoptr(GstElement) audio_pipeline = NULL;
@@ -547,16 +547,32 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
   if (params->idr_request_capability && !(quirks & WFD_QUIRK_NO_IDR))
     gop_size = 10 * resolution->refresh_rate;
 
-  caps_sizefilter = gst_caps_new_simple ("video/x-raw",
-                                         "framerate", GST_TYPE_FRACTION, resolution->refresh_rate, 1,
-                                         "width", G_TYPE_INT, resolution->width,
-                                         "height", G_TYPE_INT, resolution->height,
-                                         NULL);
+  srcfilter = gst_bin_get_by_name (bin, "srcfilter");
+  if (srcfilter != NULL)
+    {
+      caps = gst_caps_new_simple ("video/x-raw",
+                                  "max-framerate", GST_TYPE_FRACTION, resolution->refresh_rate, 1,
+                                  "width", G_TYPE_INT, resolution->width,
+                                  "height", G_TYPE_INT, resolution->height,
+                                  NULL);
 
-  sizefilter = gst_bin_get_by_name (bin, "wfd-sizefilter");
-  g_object_set (sizefilter,
-                "caps", caps_sizefilter,
+      g_object_set (srcfilter,
+                    "caps", caps,
+                    NULL);
+      g_clear_pointer (&caps, gst_caps_unref);
+    }
+
+  caps = gst_caps_new_simple ("video/x-raw",
+                              "framerate", GST_TYPE_FRACTION, resolution->refresh_rate, 1,
+                              "width", G_TYPE_INT, resolution->width,
+                              "height", G_TYPE_INT, resolution->height,
+                              NULL);
+
+  sinkfilter = gst_bin_get_by_name (bin, "wfd-sinkfilter");
+  g_object_set (sinkfilter,
+                "caps", caps,
                 NULL);
+  g_clear_pointer (&caps, gst_caps_unref);
 
   switch (encoder_impl)
     {
@@ -636,20 +652,20 @@ wfd_configure_media_element (GstBin *bin, WfdParams *params)
     }
 
   if (profile == WFD_H264_PROFILE_HIGH)
-    caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=high");
+    caps = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=high");
   else
     {
       /* Permit both constrained-baseline and baseline. Would constrained-baseline be sufficient? */
-      caps_codecfilter = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=constrained-baseline");
-      gst_caps_append (caps_codecfilter,
+      caps = gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=constrained-baseline");
+      gst_caps_append (caps,
                        gst_caps_from_string ("video/x-h264,stream-format=byte-stream,profile=baseline"));
     }
 
   codecfilter = gst_bin_get_by_name (bin, "wfd-codecfilter");
   g_object_set (codecfilter,
-                "caps", caps_codecfilter,
+                "caps", caps,
                 NULL);
-
+  g_clear_pointer (&caps, gst_caps_unref);
 
   g_debug ("An audiocodec has been selected: %s", params->selected_audio_codec ? "yes" : "no");
   audio_pipeline = gst_bin_get_by_name (bin, "wfd-audio");

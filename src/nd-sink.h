@@ -42,6 +42,12 @@ typedef enum {
   ND_SINK_STATE_ERROR              =  0x10000,
 } NdSinkState;
 
+typedef enum {
+  ND_SCREEN_CAST_SOURCE_TYPE_MONITOR = 1,
+  ND_SCREEN_CAST_SOURCE_TYPE_WINDOW = 2,
+  ND_SCREEN_CAST_SOURCE_TYPE_VIRTUAL = 4,
+} NdScreenCastSourceType;
+
 struct _NdSinkIface
 {
   /*< private >*/

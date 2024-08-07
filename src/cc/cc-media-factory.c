@@ -49,7 +49,7 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
   g_autoptr(GstElement) source = NULL;
 
   GstElement *scale;
-  GstElement *sizefilter;
+  GstElement *sinkfilter;
   GstElement *convert;
   GstElement *queue_pre_encoder;
   GstElement *encoder;
@@ -83,9 +83,9 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
                               "width", G_TYPE_INT, 1920,
                               "height", G_TYPE_INT, 1080,
                               NULL);
-  sizefilter = gst_element_factory_make ("capsfilter", "cc-sizefilter");
-  success &= gst_bin_add (bin, sizefilter);
-  g_object_set (sizefilter,
+  sinkfilter = gst_element_factory_make ("capsfilter", "cc-sinkfilter");
+  success &= gst_bin_add (bin, sinkfilter);
+  g_object_set (sinkfilter,
                 "caps", caps,
                 NULL);
   g_clear_pointer (&caps, gst_caps_unref);
@@ -184,7 +184,7 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
 
   success &= gst_element_link_many (source,
                                     scale,
-                                    sizefilter,
+                                    sinkfilter,
                                     convert,
                                     queue_pre_encoder,
                                     encoder,
