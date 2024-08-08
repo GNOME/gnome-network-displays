@@ -249,9 +249,11 @@ nd_dummy_wfd_sink_sink_start_stream (NdSink *sink)
     }
 
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
-
   if (self->server_source_id == 0)
-    goto error;
+    {
+      g_warning ("NdDummyWFDSink: Unable to attach RTSP server");
+      goto error;
+    }
 
   g_message ("NdDummyWFDSink: You should now be able to connect to rtsp://localhost:7236/wfd1.0");
 
