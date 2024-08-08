@@ -3,12 +3,12 @@ subdir('wfd')
 subdir('cc')
 
 gnome_nd_sources = [
-  'main.c',
-  'nd-window.c',
-  'nd-codec-install.c',
+  'app/main.c',
+  'app/nd-codec-install.c',
+  'app/nd-sink-list-model.c',
+  'app/nd-sink-row.c',
+  'app/nd-window.c',
   'nd-firewalld.c',
-  'nd-sink-list-model.c',
-  'nd-sink-row.c',
   'nd-sink.c',
   'nd-provider.c',
   'nd-meta-sink.c',
