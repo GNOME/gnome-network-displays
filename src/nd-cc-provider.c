@@ -155,7 +155,7 @@ resolver_found_cb (GaServiceResolver  *resolver,
                    NdCCProvider       *provider)
 {
   NdCCSink *sink = NULL;
-  gchar address[AVAHI_ADDRESS_STR_MAX];
+  gchar ip[AVAHI_ADDRESS_STR_MAX];
   AvahiStringList *cc_name, *cc_model;
 
   /* chromecast has pretty name and model in txt */
@@ -166,12 +166,12 @@ resolver_found_cb (GaServiceResolver  *resolver,
 
   g_debug ("NdCCProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
 
-  if (avahi_address_snprint (address, sizeof (address), addr) == NULL)
+  if (avahi_address_snprint (ip, sizeof (ip), addr) == NULL)
     g_warning ("NdCCProvider: Failed to convert AvahiAddress to string");
 
-  g_debug ("NdCCProvider: Resolved %s to %s", hostname, address);
+  g_debug ("NdCCProvider: Resolved %s to %s", hostname, ip);
 
-  sink = nd_cc_sink_new (provider->signalling_client, name, address);
+  sink = nd_cc_sink_new (provider->signalling_client, name, ip);
 
   g_object_unref (resolver);
 
