@@ -408,18 +408,20 @@ cc_comm_send_request (CcComm       *comm,
     {
     /* CAST__CHANNEL__CAST_MESSAGE__PROTOCOL_VERSION__CASTV2_1_3 allows for binary payloads over utf8 */
     case CC_MESSAGE_TYPE_AUTH:
-      ProtobufCBinaryData binary_payload;
-      binary_payload.data = NULL;
-      binary_payload.len = 0;
+      {
+        ProtobufCBinaryData binary_payload;
+        binary_payload.data = NULL;
+        binary_payload.len = 0;
 
-      cc_comm_build_message (&message,
-                             comm->sender_id,
-                             destination_id,
-                             message_type,
-                             CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
-                             &binary_payload,
-                             NULL);
-      break;
+        cc_comm_build_message (&message,
+                               comm->sender_id,
+                               destination_id,
+                               message_type,
+                               CAST__CHANNEL__CAST_MESSAGE__PAYLOAD_TYPE__BINARY,
+                               &binary_payload,
+                               NULL);
+        break;
+      }
 
     default:
       cc_comm_build_message (&message,
