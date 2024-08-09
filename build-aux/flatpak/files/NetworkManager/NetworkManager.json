@@ -1,0 +1,78 @@
+{
+    "modules": [
+        {
+            "name": "libndp",
+            "buildsystem": "autotools",
+            "cleanup": [
+                "/bin",
+                "/include",
+                "/lib/pkgconfig",
+                "/share/man"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/jpirko/libndp/archive/v1.9.tar.gz",
+                    "sha256": "e564f5914a6b1b799c3afa64c258824a801c1b79a29e2fe6525b682249c65261",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 14944,
+                        "stable-only": true,
+                        "url-template": "https://github.com/jpirko/libndp/archive/v$version.tar.gz"
+                    }
+                }
+            ]
+        }
+    ],
+    "name": "NetworkManager",
+    "buildsystem": "meson",
+    "build-options": {
+        "cflags": "-ltinfo",
+        "cxxflags": "-ltinfo"
+    },
+    "config-opts": [
+        "-Dsystemdsystemunitdir=no",
+        "-Ddbus_conf_dir=/app/etc/dbus-1/system.d",
+        "-Diptables=/usr/bin/true",
+        "-Ddnsmasq=/usr/bin/true",
+        "-Dsession_tracking=no",
+        "-Dselinux=false",
+        "-Dsystemd_journal=false",
+        "-Dlibaudit=no",
+        "-Dwext=false",
+        "-Dwifi=true",
+        "-Dppp=false",
+        "-Dmodem_manager=false",
+        "-Dovs=false",
+        "-Dnmcli=false",
+        "-Dnmtui=false",
+        "-Dintrospection=false",
+        "-Dvapi=false",
+        "-Ddocs=false",
+        "-Dtests=no",
+        "-Dfirewalld_zone=false",
+        "-Dlibpsl=false",
+        "-Dqt=false"
+    ],
+    "cleanup": [
+        "/bin",
+        "/etc",
+        "/include",
+        "/lib/pkgconfig",
+        "/libexec",
+        "/sbin",
+        "/var"
+    ],
+    "sources": [
+        {
+            "type": "git",
+            "url": "https://gitlab.freedesktop.org/NetworkManager/NetworkManager.git",
+            "tag": "1.48.6",
+            "commit": "27f130ab0c3f39bbf36ed952cb24454e34a83708",
+            "x-checker-data": {
+                "type": "git",
+                "tag-pattern": "^([\\d.]+)$"
+            }
+        }
+    ]
+}

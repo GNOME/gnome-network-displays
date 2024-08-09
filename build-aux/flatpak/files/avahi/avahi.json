@@ -1,0 +1,68 @@
+{
+  "modules": [
+    {
+      "name": "libevent",
+      "cleanup": [
+        "/include",
+        "/lib/pkgconfig"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz",
+          "sha256": "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb",
+          "x-checker-data": {
+            "type": "anitya",
+            "project-id": 1606,
+            "url-template": "https://github.com/libevent/libevent/releases/download/release-$version-stable/libevent-$version-stable.tar.gz"
+          }
+        }
+      ]
+    }
+  ],
+  "name": "avahi",
+  "cleanup": [
+    "/bin",
+    "/include",
+    "/lib/avahi",
+    "/lib/pkgconfig",
+    "/share/applications/*.desktop",
+    "/share/avahi",
+    "/share/man"
+  ],
+  "config-opts": [
+    "--with-distro=none",
+    "--disable-introspection",
+    "--disable-qt3",
+    "--disable-qt4",
+    "--disable-qt5",
+    "--disable-gtk",
+    "--disable-gtk3",
+    "--disable-core-docs",
+    "--disable-manpages",
+    "--disable-libdaemon",
+    "--disable-python",
+    "--disable-pygobject",
+    "--disable-mono",
+    "--disable-monodoc",
+    "--disable-autoipd",
+    "--disable-doxygen-doc",
+    "--disable-doxygen-dot",
+    "--disable-doxygen-xml",
+    "--disable-doxygen-html",
+    "--disable-manpages",
+    "--disable-xmltoman"
+  ],
+  "sources": [
+    {
+      "type": "archive",
+      "url": "https://www.avahi.org/download/avahi-0.8.tar.gz",
+      "sha256": "060309d7a333d38d951bc27598c677af1796934dbd98e1024e7ad8de798fedda",
+      "x-checker-data": {
+        "type": "anitya",
+        "project-id": 147,
+        "url-template": "https://www.avahi.org/download/avahi-$version.tar.gz"
+      }
+    }
+  ]
+}
