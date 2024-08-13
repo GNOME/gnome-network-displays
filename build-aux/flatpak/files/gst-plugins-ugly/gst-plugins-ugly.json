@@ -13,8 +13,8 @@
     "sources": [
         {
             "type": "archive",
-            "url": "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.22.9.tar.xz",
-            "sha256": "0bf685d66015a01dd3fc1671b64a1c8acb321dd9d4ab9e05a29ab19782aa6236",
+            "url": "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.22.12.tar.xz",
+            "sha256": "d59a1aaf8dd2cc416dc5b5c0b7aecd02b1811bf1229aa724e6c2a503d3799083",
             "x-checker-data": {
                 "type": "json",
                 "url": "https://gitlab.freedesktop.org/api/v4/projects/1357/repository/tags?search=^1.22.",
