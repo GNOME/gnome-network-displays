@@ -3,22 +3,23 @@
 # This file is distributed under the same license as the gnome-network-displays package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 王滋涵 Zephyr Wang <wi24rd@fedoraproject.org>, 2020.
+# lumingzh <lumingzh@qq.com>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues/\n"
-"POT-Creation-Date: 2024-01-30 19:30+0000\n"
-"PO-Revision-Date: 2024-06-18 15:42-0400\n"
-"Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
-"Language-Team: Chinese - China <i18n-zh@googlegroups.com>\n"
+"POT-Creation-Date: 2024-08-07 14:38+0000\n"
+"PO-Revision-Date: 2024-08-15 14:23+0800\n"
+"Last-Translator: lumingzh <lumingzh@qq.com>\n"
+"Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Gtranslator 46.1\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
@@ -29,7 +30,7 @@ msgstr "GNOME 网络显示器"
 msgid "Screencasting for GNOME"
 msgstr "GNOME 的远程投屏工具"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:25
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -37,81 +38,82 @@ msgstr ""
 "GNOME 网络显示器允许您将桌面投射到远程显示器上。支持 Miracast 和 Chromecast "
 "协议。"
 
-#: src/nd-codec-install.c:59
+#: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
-msgstr "GStreamer OpenH264 视频编码器 (%s)"
+msgstr "GStreamer OpenH264 视频编码器（%s）"
 
-#: src/nd-codec-install.c:61
+#: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
-msgstr "GStreamer x264 视频编码器 (%s)"
+msgstr "GStreamer x264 视频编码器（%s）"
 
-#: src/nd-codec-install.c:63
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "GStreamer VA H264 视频编码器（%s）"
+
+#: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
-msgstr "GStreamer VA-API 视频编码器 (%s)"
+msgstr "GStreamer VA-API H264 视频编码器（%s）"
 
-#: src/nd-codec-install.c:65
-#, fuzzy, c-format
-#| msgid "GStreamer OpenH264 video encoder (%s)"
+#: src/nd-codec-install.c:68
+#, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
-msgstr "GStreamer OpenH264 视频编码器 (%s)"
-
-#: src/nd-codec-install.c:67
-#, fuzzy, c-format
-#| msgid "GStreamer OpenH264 video encoder (%s)"
-msgid "GStreamer On2 VP9 video encoder (%s)"
-msgstr "GStreamer OpenH264 视频编码器 (%s)"
+msgstr "GStreamer On2 VP8 视频编码器（%s）"
 
 #: src/nd-codec-install.c:70
 #, c-format
-msgid "GStreamer FDK AAC audio encoder (%s)"
-msgstr "GStreamer FDK AAC 音频编码器 (%s)"
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "GStreamer On2 VP9 视频编码器（%s）"
 
-#: src/nd-codec-install.c:72
+#: src/nd-codec-install.c:73
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "GStreamer FDK AAC 音频编码器（%s）"
+
+#: src/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
-msgstr "GStreamer libav 音频编码器 (%s)"
+msgstr "GStreamer libav AAC 音频编码器（%s）"
 
-#: src/nd-codec-install.c:74
+#: src/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
-msgstr "GStreamer Free AAC 音频编码器 (%s)"
+msgstr "GStreamer Free AAC 音频编码器（%s）"
 
-#: src/nd-codec-install.c:76
+#: src/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
-msgstr "GStreamer Vorbis 音频编码器 (%s)"
-
-#: src/nd-codec-install.c:78
-#, c-format
-msgid "GStreamer Opus audio encoder (%s)"
-msgstr "GStreamer Opus 音频编码器 (%s)"
+msgstr "GStreamer Vorbis 音频编码器（%s）"
 
 #: src/nd-codec-install.c:81
-#, fuzzy, c-format
-#| msgid "GStreamer x264 video encoder (%s)"
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "GStreamer Opus 音频编码器（%s）"
+
+#: src/nd-codec-install.c:84
+#, c-format
 msgid "GStreamer WebM muxer (%s)"
-msgstr "GStreamer x264 视频编码器 (%s)"
+msgstr "GStreamer WebM 复用器（%s）"
 
-#: src/nd-codec-install.c:83
-#, fuzzy, c-format
-#| msgid "GStreamer FDK AAC audio encoder (%s)"
+#: src/nd-codec-install.c:86
+#, c-format
 msgid "GStreamer Matroska muxer (%s)"
-msgstr "GStreamer FDK AAC 音频编码器 (%s)"
+msgstr "GStreamer Matroska 复用器（%s）"
 
-#: src/nd-codec-install.c:85
+#: src/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
-msgstr ""
+msgstr "GStreamer MPEG 传输流复用器（%s）"
 
-#: src/nd-codec-install.c:87
+#: src/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
-msgstr "GStreamer 元素 “%s”"
+msgstr "GStreamer 元素“%s”"
 
-#: src/nd-codec-install.c:193
+#: src/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "请单击下列的按钮安装其中一个 GStreamer 插件"
 
@@ -121,7 +123,7 @@ msgstr "检查并安装所需的防火墙区域中。"
 
 #: src/nd-window.c:208
 msgid "Making P2P connection"
-msgstr "建立P2P连接中"
+msgstr "正在建立 P2P 连接"
 
 #: src/nd-window.c:215
 msgid "Establishing connection to sink"
