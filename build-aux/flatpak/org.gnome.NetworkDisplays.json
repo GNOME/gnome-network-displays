@@ -11,10 +11,6 @@
         "--socket=pulseaudio",
         "--socket=wayland",
         "--socket=fallback-x11",
-        "--filesystem=xdg-run/gvfs",
-        "--filesystem=xdg-run/gvfsd",
-        "--talk-name=org.gtk.vfs",
-        "--talk-name=org.gtk.vfs.*",
         "--system-talk-name=org.freedesktop.Avahi",
         "--system-talk-name=org.freedesktop.NetworkManager",
         "--system-talk-name=org.fedoraproject.FirewallD1"
