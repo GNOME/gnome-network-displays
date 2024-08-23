@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues/\n"
-"POT-Creation-Date: 2024-02-21 19:09+0000\n"
-"PO-Revision-Date: 2024-02-25 12:27+0100\n"
+"POT-Creation-Date: 2024-08-07 14:38+0000\n"
+"PO-Revision-Date: 2024-08-07 19:02+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
@@ -36,77 +36,82 @@ msgstr ""
 "GNOME Nätverksskärmar låter dig överföra ditt skrivbord till en fjärrskärm. "
 "Det har stöd för Miracast- och Chromecast-protokollen."
 
-#: src/nd-codec-install.c:59
+#: src/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "GStreamer OpenH264-videokodare (%s)"
 
-#: src/nd-codec-install.c:61
+#: src/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264-videokodare (%s)"
 
-#: src/nd-codec-install.c:63
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "GStreamer VA H264-videokodare (%s)"
+
+#: src/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264-videokodare (%s)"
 
-#: src/nd-codec-install.c:65
+#: src/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr "GStreamer On2 VP8-videokodare (%s)"
 
-#: src/nd-codec-install.c:67
+#: src/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr "GStreamer On2 VP9-videokodare (%s)"
 
-#: src/nd-codec-install.c:70
+#: src/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "GStreamer FDK AAC-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:72
+#: src/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "GStreamer libav AAC-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:74
+#: src/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:76
+#: src/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr "GStreamer Vorbis-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:78
+#: src/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr "GStreamer Opus-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:81
+#: src/nd-codec-install.c:84
 #, c-format
 msgid "GStreamer WebM muxer (%s)"
 msgstr "GStreamer WebM-multiplexor (%s)"
 
-#: src/nd-codec-install.c:83
+#: src/nd-codec-install.c:86
 #, c-format
 msgid "GStreamer Matroska muxer (%s)"
 msgstr "GStreamer Matroska-multiplexor (%s)"
 
-#: src/nd-codec-install.c:85
+#: src/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr "GStreamer MPEG Transport Stream-multiplexor (%s)"
 
-#: src/nd-codec-install.c:87
+#: src/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer-element ”%s”"
 
-#: src/nd-codec-install.c:193
+#: src/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Installera en av följande GStreamer-insticksmoduler genom att klicka nedan"
@@ -194,13 +199,3 @@ msgstr ""
 "En brandväggszon som krävs är inte tillgänglig och kunde inte installeras. "
 "Försök igen och ange lösenordet när det efterfrågas, eller kontakta en "
 "systemadministratör."
-
-#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
-#~ msgstr "Strömma skrivbordet till enheter kapabla för Wi-Fi-visning"
-
-#~ msgid ""
-#~ "One of the following video codec plugins is required.\n"
-#~ "Clicking will start the installation process."
-#~ msgstr ""
-#~ "Ett av följande videokodekinstick krävs.\n"
-#~ "Att klicka kommer att starta installationsprocessen."
