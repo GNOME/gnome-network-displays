@@ -1,19 +1,19 @@
 # Portuguese translations for gnome-network-displays package
 # Traduções em português brasileiro para o pacote gnome-network-displays.
-# Copyright (C) 2020 THE gnome-network-displays'S COPYRIGHT HOLDER
+# Copyright (C) 2024 THE gnome-network-displays'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
-# Rafael Fontenelle <rafaelff@gnome.org>, 2020.
 # Hugo Fortini <hugofortinipbi@gmail.com>, 2024.
 # Juliano de Souza Camargo <julianosc@pm.me>, 2024.
+# Rafael Fontenelle <rafaelff@gnome.org>, 2020-2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues/\n"
-"POT-Creation-Date: 2024-05-05 00:45+0000\n"
-"PO-Revision-Date: 2024-05-12 09:57-0300\n"
-"Last-Translator: Juliano de Souza Camargo <julianosc@pm.me>\n"
+"POT-Creation-Date: 2024-08-07 14:38+0000\n"
+"PO-Revision-Date: 2024-09-21 00:54-0300\n"
+"Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <https://br.gnome.org/traducao>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -52,65 +52,70 @@ msgstr "Codificador de vídeo x264 GStreamer (%s)"
 
 #: src/nd-codec-install.c:64
 #, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "Codificador de vídeo VA H264 GStreamer (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Codificador de vídeo VA-API H264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr "Codificador de vídeo GStreamer On2 VP8 (%s)"
 
-#: src/nd-codec-install.c:68
+#: src/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr "Codificador de vídeo GStreamer On2 VP9 (%s)"
 
-#: src/nd-codec-install.c:71
+#: src/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "Codificador de áudio FDK AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:73
+#: src/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "Codificador de áudio libav AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:75
+#: src/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Codificador de áudio Free AAC GStreamer (%s)"
 
-#: src/nd-codec-install.c:77
+#: src/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr "Codificador de áudio GStreamer Vorbis (%s)"
 
-#: src/nd-codec-install.c:79
+#: src/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr "Codificador de áudio GStreamer Opus (%s)"
 
-#: src/nd-codec-install.c:82
+#: src/nd-codec-install.c:84
 #, c-format
 msgid "GStreamer WebM muxer (%s)"
 msgstr "GStreamer WebM muxer (%s)"
 
-#: src/nd-codec-install.c:84
+#: src/nd-codec-install.c:86
 #, c-format
 msgid "GStreamer Matroska muxer (%s)"
 msgstr "GStreamer Matroska muxer (%s)"
 
-#: src/nd-codec-install.c:86
+#: src/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr "GStreamer MPEG Transport Stream muxer (%s)"
 
-#: src/nd-codec-install.c:88
+#: src/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer Element “%s”"
 
-#: src/nd-codec-install.c:194
+#: src/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Por favor, instale um dos seguintes plugins GStreamer clicando abaixo"
 
