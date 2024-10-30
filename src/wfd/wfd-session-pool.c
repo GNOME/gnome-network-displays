@@ -42,17 +42,17 @@ static const gchar session_id_charset[] =
 static gchar *
 create_session_id (GstRTSPSessionPool * pool)
 {
-  gchar id[15];
+  gchar id[10];
   gint i;
 
-  for (i = 0; i < 15; i++)
+  for (i = 0; i < 10; i++)
     {
       id[i] =
         session_id_charset[g_random_int_range (0,
                                                G_N_ELEMENTS (session_id_charset))];
     }
 
-  return g_strndup (id, 15);
+  return g_strndup (id, 10);
 }
 
 static void
