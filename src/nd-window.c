@@ -96,6 +96,9 @@ nd_window_screencast_get_source (NdWindow * self)
   guint32 node_id;
   guint32 screencast_type;
 
+  if (!self->session)
+    g_error ("XDP session not found!");
+
   streams = xdp_session_get_streams (self->session);
   if (streams == NULL)
     g_error ("XDP session streams not found!");
@@ -334,6 +337,16 @@ nd_screencast_started_cb (GObject      *source_object,
 }
 
 static void
+session_closed_cb (NdWindow *self)
+{
+  g_debug ("Session closed");
+  if (self->stream_sink)
+    nd_sink_stop_stream (self->stream_sink);
+
+  g_clear_object (&self->session);
+}
+
+static void
 nd_screencast_init_cb (GObject      *source_object,
                        GAsyncResult *result,
                        gpointer      user_data)
@@ -348,9 +361,14 @@ nd_screencast_init_cb (GObject      *source_object,
   if (window->session == NULL)
     {
       g_warning ("Failed to create screencast session: %s", error->message);
-      window->use_x11 = TRUE;
       return;
     }
+
+  g_signal_connect_object (window->session,
+                           "closed",
+                           (GCallback) session_closed_cb,
+                           window,
+                           G_CONNECT_SWAPPED);
 
   parent = xdp_parent_new_gtk (GTK_WINDOW (window));
   xdp_session_start (window->session, parent, NULL, nd_screencast_started_cb, window);
@@ -362,9 +380,24 @@ find_sink_list_row_activated_cb (NdWindow *self, NdSinkRow *row, GtkListBox *sin
 {
   NdSink *sink;
 
-  if (!self->portal && !self->use_x11)
+  if (!self->use_x11 && !self->portal)
     {
       g_warning ("Cannot start streaming right now as we don't have a portal!");
+      return;
+    }
+
+  if (!self->use_x11 && self->portal && !self->session)
+    {
+      xdp_portal_create_screencast_session (self->portal,
+                                            XDP_OUTPUT_MONITOR | XDP_OUTPUT_WINDOW | XDP_OUTPUT_VIRTUAL,
+                                            XDP_SCREENCAST_FLAG_NONE,
+                                            XDP_CURSOR_MODE_EMBEDDED,
+                                            XDP_PERSIST_MODE_NONE,
+                                            NULL,
+                                            self->cancellable,
+                                            nd_screencast_init_cb,
+                                            self);
+      g_debug ("NdWindow: Re-creating portal session!");
       return;
     }
 
@@ -658,15 +691,18 @@ gnome_nd_window_init (NdWindow *self)
     }
 
   if (self->portal)
-    xdp_portal_create_screencast_session (self->portal,
-                                          XDP_OUTPUT_MONITOR | XDP_OUTPUT_WINDOW | XDP_OUTPUT_VIRTUAL,
-                                          XDP_SCREENCAST_FLAG_NONE,
-                                          XDP_CURSOR_MODE_EMBEDDED,
-                                          XDP_PERSIST_MODE_NONE,
-                                          NULL,
-                                          self->cancellable,
-                                          nd_screencast_init_cb,
-                                          self);
+    {
+      xdp_portal_create_screencast_session (self->portal,
+                                            XDP_OUTPUT_MONITOR | XDP_OUTPUT_WINDOW | XDP_OUTPUT_VIRTUAL,
+                                            XDP_SCREENCAST_FLAG_NONE,
+                                            XDP_CURSOR_MODE_EMBEDDED,
+                                            XDP_PERSIST_MODE_NONE,
+                                            NULL,
+                                            self->cancellable,
+                                            nd_screencast_init_cb,
+                                            self);
+      g_debug ("NdWindow: Creating portal session!");
+    }
 
   pulse = nd_pulseaudio_new ();
   g_async_initable_init_async (G_ASYNC_INITABLE (pulse),
