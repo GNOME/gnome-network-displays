@@ -301,6 +301,63 @@ transform_str_is_set_to_bool (GBinding     *binding,
 }
 
 static void
+nd_screencast_started_cb (GObject      *source_object,
+                          GAsyncResult *result,
+                          gpointer      user_data)
+{
+  g_autoptr(GError) error = NULL;
+  XdpSession *session = (XdpSession *) source_object;
+  NdWindow *window = ND_WINDOW (user_data);
+
+  window->session = session;
+  if (!xdp_session_start_finish (window->session, result, &error))
+    {
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        {
+          g_warning ("Error initializing screencast portal: %s", error->message);
+
+          /* Unknown method means the portal does not exist, give a slightly
+           * more specific warning then.
+           */
+          if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+            g_warning ("Screencasting portal is unavailable! It is required to select the monitor to stream!");
+
+          g_warning ("Falling back to X11! You need to fix your setup to avoid issues (XDG Portals and/or mutter screencasting support)!");
+          window->use_x11 = TRUE;
+        }
+
+      g_warning ("Failed to start screencast session: %s", error->message);
+      g_clear_object (&window->session);
+      return;
+    }
+  g_debug ("Created screencast session");
+}
+
+static void
+nd_screencast_init_cb (GObject      *source_object,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+  g_autoptr(GError) error = NULL;
+  XdpPortal *portal = XDP_PORTAL (source_object);
+  NdWindow *window = ND_WINDOW (user_data);
+  XdpParent *parent = NULL;
+
+  window->portal = portal;
+  window->session = xdp_portal_create_screencast_session_finish (window->portal, result, &error);
+  if (window->session == NULL)
+    {
+      g_warning ("Failed to create screencast session: %s", error->message);
+      window->use_x11 = TRUE;
+      return;
+    }
+
+  parent = xdp_parent_new_gtk (GTK_WINDOW (window));
+  xdp_session_start (window->session, parent, NULL, nd_screencast_started_cb, window);
+  xdp_parent_free (parent);
+}
+
+static void
 find_sink_list_row_activated_cb (NdWindow *self, NdSinkRow *row, GtkListBox *sink_list)
 {
   NdSink *sink;
@@ -476,63 +533,6 @@ gnome_nd_window_class_init (NdWindowClass *klass)
   gtk_widget_class_bind_template_child (widget_class, NdWindow, error_sink_list);
   gtk_widget_class_bind_template_child (widget_class, NdWindow, error_firewall_zone);
   gtk_widget_class_bind_template_child (widget_class, NdWindow, error_return);
-}
-
-static void
-nd_screencast_started_cb (GObject      *source_object,
-                          GAsyncResult *result,
-                          gpointer      user_data)
-{
-  g_autoptr(GError) error = NULL;
-  XdpSession *session = (XdpSession *) source_object;
-  NdWindow *window = ND_WINDOW (user_data);
-
-  window->session = session;
-  if (!xdp_session_start_finish (window->session, result, &error))
-    {
-      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-        {
-          g_warning ("Error initializing screencast portal: %s", error->message);
-
-          /* Unknown method means the portal does not exist, give a slightly
-           * more specific warning then.
-           */
-          if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
-            g_warning ("Screencasting portal is unavailable! It is required to select the monitor to stream!");
-
-          g_warning ("Falling back to X11! You need to fix your setup to avoid issues (XDG Portals and/or mutter screencasting support)!");
-          window->use_x11 = TRUE;
-        }
-
-      g_warning ("Failed to start screencast session: %s", error->message);
-      g_clear_object (&window->session);
-      return;
-    }
-  g_debug ("Created screencast session");
-}
-
-static void
-nd_screencast_init_cb (GObject      *source_object,
-                       GAsyncResult *result,
-                       gpointer      user_data)
-{
-  g_autoptr(GError) error = NULL;
-  XdpPortal *portal = XDP_PORTAL (source_object);
-  NdWindow *window = ND_WINDOW (user_data);
-  XdpParent *parent = NULL;
-
-  window->portal = portal;
-  window->session = xdp_portal_create_screencast_session_finish (window->portal, result, &error);
-  if (window->session == NULL)
-    {
-      g_warning ("Failed to create screencast session: %s", error->message);
-      window->use_x11 = TRUE;
-      return;
-    }
-
-  parent = xdp_parent_new_gtk (GTK_WINDOW (window));
-  xdp_session_start (window->session, parent, NULL, nd_screencast_started_cb, window);
-  xdp_parent_free (parent);
 }
 
 static void
