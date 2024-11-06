@@ -116,9 +116,7 @@ cc_media_factory_create_video_element (CcMediaFactory *self)
     case ELEMENT_VAH264:
       encoder = gst_element_factory_make ("vah264enc", "cc-video-encoder");
       g_object_set (encoder,
-                    "prediction-type", 1,
                     "rate-control", 2,
-                    "compliance-mode", 0,
                     NULL);
 
       parser = gst_element_factory_make ("h264parse", "cc-h264parse");
