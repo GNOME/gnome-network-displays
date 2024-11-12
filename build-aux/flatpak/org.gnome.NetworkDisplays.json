@@ -15,17 +15,6 @@
         "--system-talk-name=org.freedesktop.NetworkManager",
         "--system-talk-name=org.fedoraproject.FirewallD1"
     ],
-    "add-extensions": {
-        "org.freedesktop.Platform.GStreamer.gstreamer-vaapi": {
-            "directory": "lib/gstreamer-1.0",
-            "version": 23.08,
-            "autodelete": false,
-            "no-autodownload": true,
-            "add-ld-path": "lib",
-            "download-if": "have-intel-gpu",
-            "autoprune-unless": "have-intel-gpu"
-        }
-    },
     "modules": [
         "files/intltool/intltool.json",
         "files/avahi/avahi.json",

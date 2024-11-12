@@ -15,11 +15,11 @@
     "sources": [
         {
             "type": "archive",
-            "url": "https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-1.22.12.tar.xz",
-            "sha256": "bf6c7871e7cf3528e4ec87ddc2f2949691cd269f98e536482ae744c1405cf451",
+            "url": "https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-1.24.9.tar.xz",
+            "sha256": "299c9aafac3c91bbebe4cd481ed4e4ade8cb2b0677097bc4a8dcf6d4364c9804",
             "x-checker-data": {
                 "type": "json",
-                "url": "https://gitlab.freedesktop.org/api/v4/projects/1357/repository/tags?search=^1.22.",
+                "url": "https://gitlab.freedesktop.org/api/v4/projects/1357/repository/tags?search=^1.24.",
                 "version-query": ".[0].name",
                 "url-query": "\"https://gstreamer.freedesktop.org/src/gst-rtsp-server/gst-rtsp-server-\" + $version + \".tar.xz\""
             }
