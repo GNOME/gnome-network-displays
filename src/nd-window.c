@@ -617,6 +617,8 @@ gnome_nd_window_init (NdWindow *self)
   g_autoptr(GError) error = NULL;
   NdPulseaudio *pulse;
 
+  g_debug ("GNOME Network Displays v%s started", PACKAGE_VERSION);
+
   gtk_widget_init_template (GTK_WIDGET (self));
 
   self->meta_provider = nd_meta_provider_new ();
