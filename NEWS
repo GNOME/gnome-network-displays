@@ -1,3 +1,8 @@
+GNOME Network Displays 0.94.0
+=============================
+* Re-create portal session when needed
+* Shorten WFD RTSP session id to 10 chars
+
 GNOME Network Displays 0.93.0
 =============================
 * Add support for VA H264 encoder
