@@ -361,6 +361,7 @@ nd_screencast_init_cb (GObject      *source_object,
   if (window->session == NULL)
     {
       g_warning ("Failed to create screencast session: %s", error->message);
+      window->use_x11 = TRUE;
       return;
     }
 
