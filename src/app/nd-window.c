@@ -309,11 +309,10 @@ nd_screencast_started_cb (GObject      *source_object,
                           gpointer      user_data)
 {
   g_autoptr(GError) error = NULL;
-  XdpSession *session = (XdpSession *) source_object;
+  XdpSession *session = XDP_SESSION (source_object);
   NdWindow *window = ND_WINDOW (user_data);
 
-  window->session = session;
-  if (!xdp_session_start_finish (window->session, result, &error))
+  if (!xdp_session_start_finish (session, result, &error))
     {
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         {
@@ -330,7 +329,6 @@ nd_screencast_started_cb (GObject      *source_object,
         }
 
       g_warning ("Failed to start screencast session: %s", error->message);
-      g_clear_object (&window->session);
       return;
     }
   g_debug ("Created screencast session");
@@ -526,6 +524,12 @@ gnome_nd_window_finalize (GObject *obj)
   g_clear_object (&self->avahi_client);
 
   g_clear_pointer (&self->sink_property_bindings, g_ptr_array_unref);
+
+  if (self->session)
+    xdp_session_close (self->session);
+
+  if (self->session)
+    g_clear_object (&self->session);
 
   G_OBJECT_CLASS (gnome_nd_window_parent_class)->finalize (obj);
 }
