@@ -1,0 +1,58 @@
+<!DOCTYPE node PUBLIC
+'-//freedesktop//DTD D-BUS Object Introspection 1.0//EN'
+'http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd'>
+<node>
+
+  <!--
+      org.gnome.NetworkDisplays.Manager:
+      @short_description: Connection manager interface
+
+      Interface used to connect and disconnect network display sinks. It may be
+      used in conjunction with org.gnome.NetworkDisplays.Registry, which
+      exposes the UUIDs needed by this interface.
+  -->
+  <interface name="org.gnome.NetworkDisplays.Manager">
+
+    <!--
+        StartStream:
+        @short_description: Connect and start streaming to a sink
+
+        It is possible that sink_uuid and connected_sink_uuid are not equal.
+        That happens when the sink_uuid belongs to a MetaSink, which will
+        establish the connection to whichever of its "real" sinks has the
+        highest priority.
+
+        @sink_uuid: UUID of the sink to connect with
+        @connected_sink_uuid: UUID of the sink that was actually connected to
+    -->
+    <method name="StartStream">
+      <arg name="sink_uuid" type="s" direction="in" />
+      <arg name="stream_unit_name" type="s" direction="out" />
+    </method>
+
+    <!--
+        StopStream:
+        @short_description: Disconnect and start streaming to a sink
+
+        @uuid: UUID of the sink to disconnect with
+    -->
+    <method name="StopStream">
+      <arg name="stream_unit_name" type="s" direction="in" />
+    </method>
+
+    <!--
+        ConnectedSinks:
+        @short_description: UUIDs of connected sinks
+    -->
+    <property name="ConnectedSinksUUIDs" type="as" access="read" />
+
+    <!--
+        Version:
+        @short_description: API version
+    -->
+    <property name="Version" type="i" access="read" />
+
+  </interface>
+
+</node>
+

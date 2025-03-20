@@ -1,0 +1,58 @@
+<!DOCTYPE node PUBLIC
+'-//freedesktop//DTD D-BUS Object Introspection 1.0//EN'
+'http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd'>
+<node>
+
+  <!--
+      org.gnome.NetworkDisplays.Registry:
+      @short_description: Sink registry interface
+
+      Interface used to expose information on all detected sinks. These "sinks"
+      are devices that are compatible with any protocol implemented by GNOME
+      Network Displays (Miracast, Chromecast, MICE), such as HDMI dongles,
+      projectors, and smartTVs.
+  -->
+  <interface name="org.gnome.NetworkDisplays.Registry">
+
+    <!--
+        Sinks:
+        @short_description: Retrieves detected sinks and their properties
+
+        Available properties:
+
+        * display-name (s): The name of the sink to display to the user
+        * priority     (u): The priority of the sink, for de-duplication purposes
+                            (a higher priority sink will be the preferred one)
+        * state        (u): value representing the current state of the sink.
+
+        Possible values for state:
+
+        0x0    : disconnected,
+        0x50   : ensure-firewall,
+        0x100  : wait-p2p,
+        0x110  : wait-socket,
+        0x120  : wait-streaming,
+        0x1000 : streaming,
+        0x10000: error,
+
+        * protocol     (u): value representing the protocol used by the sink.
+
+        Possible values for protocol:
+
+        0: Unknown,
+        1: WiFi Display P2P,
+        2: WiFi Display MICE,
+        3: Chromecast,
+    -->
+    <property name="Sinks" type="aa{sv}" access="read" />
+
+    <!--
+        Version:
+        @short_description: API version
+    -->
+    <property name="Version" type="i" access="read" />
+
+  </interface>
+
+</node>
+

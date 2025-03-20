@@ -1,0 +1,532 @@
+/* nd-stream.c
+ *
+ * Copyright 2024 Pedro Sader Azevedo <pedro.saderazevedo@proton.me>
+ * Copyright 2024 Christian Glombek <lorbus@fedoraproject.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <avahi-gobject/ga-client.h>
+#include <avahi-gobject/ga-service-browser.h>
+#include <glib/gi18n.h>
+#include <glib-unix.h>
+#include <libportal-gtk4/portal-gtk4.h>
+#include <gst/base/base.h>
+#include <gst/gst.h>
+
+#include "nd-stream.h"
+#include "nd-pulseaudio.h"
+#include "nd-sink.h"
+
+struct _NdStream
+{
+  GApplication         parent_instance;
+
+  GSource             *sigterm_source;
+  GSource             *sigint_source;
+
+  XdpPortal           *portal;
+  XdpSession          *session;
+  NdPulseaudio        *pulse;
+  gboolean             use_x11;
+  gboolean             is_screencasting;
+  
+  GCancellable        *cancellable;
+
+  NdSink              *stream_sink;
+};
+
+enum {
+  PROP_SINK = 1,
+  PROP_LAST,
+};
+
+G_DEFINE_TYPE (NdStream, nd_stream, G_TYPE_APPLICATION)
+
+static GParamSpec * props[PROP_LAST] = { NULL, };
+
+static void
+nd_stream_get_property (GObject    *object,
+                        guint       prop_id,
+                        GValue     *value,
+                        GParamSpec *pspec)
+{
+  NdStream *self = ND_STREAM (object);
+
+  switch (prop_id)
+    {
+    case PROP_SINK:
+      g_value_set_object (value, self->stream_sink);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void
+nd_stream_set_property (GObject      *object,
+                        guint         prop_id,
+                        const GValue *value,
+                        GParamSpec   *pspec)
+{
+  NdStream *self = ND_STREAM (object);
+
+  switch (prop_id)
+    {
+    case PROP_SINK:
+      if (!self->stream_sink)
+        {
+          self->stream_sink = g_value_dup_object (value);
+          g_object_notify (G_OBJECT (self), "sink");
+        }
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static GstElement *
+nd_stream_get_source (NdStream *self)
+{
+  g_autoptr (GVariant) stream_properties = NULL;
+  g_autoptr (GError) error = NULL;
+  GstElement *src = NULL;
+  GVariant *streams = NULL;
+  GVariantIter iter;
+  guint32 node_id;
+  int fd;
+
+  fd = xdp_session_open_pipewire_remote (self->session);
+  streams = xdp_session_get_streams (self->session);
+
+  g_variant_iter_init (&iter, streams);
+  g_variant_iter_loop (&iter, "(u@a{sv})", &node_id, &stream_properties);
+
+  g_debug ("Got a stream with node ID: %d", node_id);
+
+  //src = gnd_pw_stream_new (fd, node_id, &error);
+  src = gst_element_factory_make ("pipewiresrc", "portal-pipewire-source");
+  if (src == NULL)
+    g_error ("GStreamer element \"pipewiresrc\" could not be created!");                
+
+  g_object_set (src,
+                "fd", fd,
+                "path", g_strdup_printf ("%u", node_id),
+                "do-timestamp", TRUE,
+                NULL);
+
+  gst_base_src_set_live (GST_BASE_SRC (src), TRUE);
+
+  return g_steal_pointer (&src);
+}
+
+void
+session_closed_cb(NdStream * self, NdSink * sink)
+{
+  g_debug ("Session closed");
+  if (self->stream_sink)
+  {
+    nd_sink_stop_stream (self->stream_sink);
+    self->is_screencasting = FALSE;
+  }
+
+  g_clear_object (&self->session);
+}
+
+static GstElement *
+sink_create_source_cb (NdStream * self, NdSink * sink)
+{
+  GstBin *bin;
+  GstElement *src, *dst, *res;
+
+  bin = GST_BIN (gst_bin_new ("screencast source bin"));
+  g_debug ("use x11: %d", self->use_x11);
+  if (self->use_x11)
+    src = gst_element_factory_make ("ximagesrc", "X11 screencast source");
+  else
+    src = nd_stream_get_source (self);
+
+  if (!src)
+    g_error ("Error creating video source element, likely a missing dependency!");
+
+  gst_bin_add (bin, src);
+
+  dst = gst_element_factory_make ("intervideosink", "inter video sink");
+  if (!dst)
+    g_error ("Error creating intervideosink, missing dependency!");
+  g_object_set (dst,
+                "channel", "nd-inter-video",
+                "max-lateness", (gint64) - 1,
+                "sync", FALSE,
+                NULL);
+  gst_bin_add (bin, dst);
+
+  gst_element_link_many (src, dst, NULL);
+
+  res = gst_element_factory_make ("intervideosrc", "screencastsrc");
+  g_object_set (res,
+                "do-timestamp", FALSE,
+                "timeout", (guint64) G_MAXUINT64,
+                "channel", "nd-inter-video",
+                NULL);
+
+  gst_bin_add (bin, res);
+
+  gst_element_add_pad (GST_ELEMENT (bin),
+                       gst_ghost_pad_new ("src",
+                                          gst_element_get_static_pad (res,
+                                                                      "src")));
+
+  g_object_ref_sink (bin);
+  return GST_ELEMENT (bin);
+}
+
+static GstElement *
+sink_create_audio_source_cb (NdStream * self, NdSink * sink)
+{
+  GstElement *res;
+
+  if (!self->pulse)
+    return NULL;
+
+  res = nd_pulseaudio_get_source (self->pulse);
+
+  return g_object_ref_sink (res);
+}
+
+static void
+nd_stream_release (NdStream *self)
+{
+  g_application_release (G_APPLICATION (self));
+}
+
+static void
+sink_notify_state_cb (NdStream *self, GParamSpec *pspec, NdSink *sink)
+{
+  g_autoptr(GError) error = NULL;
+  NdSinkState state;
+
+  g_object_get (sink, "state", &state, NULL);
+  g_debug ("Got state change notification from streaming sink to state %s",
+           g_enum_to_string (ND_TYPE_SINK_STATE, state));
+
+  switch (state)
+    {
+    case ND_SINK_STATE_ENSURE_FIREWALL:
+      g_debug("Checking and installing required firewall zones.");
+      break;
+
+    case ND_SINK_STATE_WAIT_P2P:
+      g_debug("Making P2P connection");
+      break;
+
+    case ND_SINK_STATE_WAIT_SOCKET:
+      g_debug("Establishing connection to sink");
+      break;
+
+    case ND_SINK_STATE_WAIT_STREAMING:
+      g_debug("Starting to stream");
+      break;
+
+    case ND_SINK_STATE_STREAMING:
+      g_debug("Streaming");
+      break;
+
+    case ND_SINK_STATE_ERROR:
+      g_warning("Sink error");
+    case ND_SINK_STATE_DISCONNECTED:
+      g_warning("Sink disconnected");
+
+      /* Stop screencast stream, if necessary */
+      if (self->is_screencasting)
+        {
+          g_debug("NdStream: Closing screencast session");
+          xdp_session_close (self->session);
+        }
+      self->is_screencasting = FALSE;
+
+      /* Release the application so it stops */
+      nd_stream_release (self);
+
+      break;
+    }
+}
+
+static void
+nd_stream_finalize (GObject *obj)
+{
+  NdStream *self = ND_STREAM (obj);
+
+  g_cancellable_cancel (self->cancellable);
+  g_clear_object (&self->cancellable);
+
+  g_clear_object (&self->portal);
+  g_clear_object (&self->pulse);
+
+  g_clear_object (&self->stream_sink);
+
+  if (self->sigterm_source)
+    {
+      g_source_destroy (self->sigterm_source);
+      g_clear_pointer (&self->sigterm_source, g_source_unref);
+    }
+
+  if (self->sigint_source)
+    {
+      g_source_destroy (self->sigint_source);
+      g_clear_pointer (&self->sigint_source, g_source_unref);
+    }
+
+  G_OBJECT_CLASS (nd_stream_parent_class)->finalize (obj);
+}
+
+static void
+nd_stream_startup (GApplication *app)
+{
+  /* Run indefinitely, until told to exit. */
+  g_application_hold (app);
+
+  G_APPLICATION_CLASS (nd_stream_parent_class)->startup (app);
+}
+
+static void
+nd_stream_class_init (NdStreamClass *klass)
+{
+  GApplicationClass *g_application_class = G_APPLICATION_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  g_application_class->startup = nd_stream_startup;
+
+  object_class->set_property = nd_stream_set_property;
+  object_class->get_property = nd_stream_get_property;
+  object_class->finalize = nd_stream_finalize;
+
+  props[PROP_SINK] =
+    g_param_spec_object ("sink", "The stream sink",
+                         "The sink used to stream, usually not a MetaSink",
+                         ND_TYPE_SINK,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+
+  g_object_class_install_properties (object_class, PROP_LAST, props);
+}
+
+static void
+nd_screencast_started_cb (GObject      *source_object,
+                          GAsyncResult *result,
+                          gpointer      user_data)
+{
+  g_autoptr(GError) error = NULL;
+  XdpSession *session = (XdpSession *) source_object;
+  NdStream *self = ND_STREAM (user_data);
+
+  self->session = session;
+  if (!xdp_session_start_finish (self->session, result, &error))
+    {
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        {
+          g_warning ("Error initializing screencast portal: %s", error->message);
+
+          /* Unknown method means the portal does not exist, give a slightly
+           * more specific warning then.
+           */
+          if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+            g_warning ("Screencasting portal is unavailable! It is required to select the monitor to stream!");
+
+          g_warning ("Falling back to X11! You need to fix your setup to avoid issues (XDG Portals and/or mutter screencasting support)!");
+          self->use_x11 = TRUE;
+        }
+
+      g_warning ("Failed to start screencast session: %s", error->message);
+      g_clear_object (&self->session);
+      return;
+    }
+
+  g_debug ("Created screencast session");
+  g_signal_connect_object (self->session,
+                           "closed",
+                           (GCallback) session_closed_cb,
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  self->is_screencasting = TRUE;
+  self->stream_sink = nd_sink_start_stream (self->stream_sink);
+
+  if (!self->stream_sink)
+    {
+      g_warning ("NdStream: Could not start streaming!");
+      return;
+    }
+
+  g_signal_connect_object (self->stream_sink,
+                           "create-source",
+                           (GCallback) sink_create_source_cb,
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (self->stream_sink,
+                           "create-audio-source",
+                           (GCallback) sink_create_audio_source_cb,
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (self->stream_sink,
+                           "notify::state",
+                           (GCallback) sink_notify_state_cb,
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  /* We might have moved into the error state in the meantime. */
+  sink_notify_state_cb (self, NULL, self->stream_sink);
+}
+
+static void
+nd_screencast_init_cb (GObject      *source_object,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+  g_autoptr(GError) error = NULL;
+  XdpPortal *portal = XDP_PORTAL (source_object);
+  NdStream *self = ND_STREAM (user_data);
+
+  self->portal = portal;
+  self->session = xdp_portal_create_screencast_session_finish (self->portal, result, &error);
+  if (self->session == NULL)
+    {
+      g_warning ("Failed to create screencast session: %s", error->message);
+      self->use_x11 = TRUE;
+      return;
+    }
+
+  xdp_session_start (self->session, NULL, NULL, nd_screencast_started_cb, self);
+}
+
+static void
+nd_pulseaudio_init_async_cb (GObject      *source_object,
+                             GAsyncResult *res,
+                             gpointer      user_data)
+{
+  NdStream *self;
+
+  g_autoptr(GError) error = NULL;
+
+  if (!g_async_initable_init_finish (G_ASYNC_INITABLE (source_object), res, &error))
+    {
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+        g_warning ("Error initializing pulse audio sink: %s", error->message);
+
+      g_object_unref (source_object);
+      return;
+    }
+
+  self = ND_STREAM (user_data);
+  self->pulse = ND_PULSEAUDIO (source_object);
+}
+
+static void
+nd_stream_init (NdStream *self)
+{
+  g_autoptr(GError) error = NULL;
+  NdPulseaudio *pulse;
+
+  self->cancellable = g_cancellable_new ();
+  self->is_screencasting = FALSE;
+
+  self->portal = xdp_portal_initable_new (&error);
+  if (error)
+    {
+      g_warning ("Failed to create screencast portal: %s", error->message);
+      self->use_x11 = TRUE;
+      g_clear_object (&self->portal);
+    }
+
+  if (self->portal)
+    xdp_portal_create_screencast_session (self->portal,
+                                          XDP_OUTPUT_MONITOR | XDP_OUTPUT_WINDOW | XDP_OUTPUT_VIRTUAL,
+                                          XDP_SCREENCAST_FLAG_NONE,
+                                          XDP_CURSOR_MODE_EMBEDDED,
+                                          XDP_PERSIST_MODE_NONE,
+                                          NULL,
+                                          self->cancellable,
+                                          nd_screencast_init_cb,
+                                          self);
+
+  pulse = nd_pulseaudio_new ();
+  g_async_initable_init_async (G_ASYNC_INITABLE (pulse),
+                               G_PRIORITY_LOW,
+                               self->cancellable,
+                               nd_pulseaudio_init_async_cb,
+                               self);
+}
+
+static gboolean
+on_signal (NdStream *self, GSource *source, const char *signal_name)
+{
+  g_debug ("NdStream: Received %s signal. Exiting...", signal_name);
+  g_clear_pointer (&source, g_source_unref);
+
+  nd_sink_stop_stream (self->stream_sink);
+
+  return G_SOURCE_REMOVE;
+}
+
+static gboolean
+on_sigterm (gpointer user_data)
+{
+  NdStream *self = ND_STREAM (user_data);
+  return on_signal(self, self->sigterm_source, "SIGTERM");
+}
+
+static gboolean
+on_sigint (gpointer user_data)
+{
+  NdStream *self = ND_STREAM (user_data);
+  return on_signal(self, self->sigint_source, "SIGINT");
+}
+
+void
+nd_stream_register_unix_signals (NdStream *self)
+{
+  self->sigterm_source = g_unix_signal_source_new (SIGTERM);
+  g_source_set_callback (self->sigterm_source, on_sigterm, self, NULL);
+  g_source_attach (self->sigterm_source, NULL);
+
+  self->sigint_source = g_unix_signal_source_new (SIGINT);
+  g_source_set_callback (self->sigint_source, on_sigint, self, NULL);
+  g_source_attach (self->sigint_source, NULL);
+}
+
+NdStream *
+nd_stream_new ()
+{
+  NdStream *detached_stream;
+
+  detached_stream = g_object_new (ND_TYPE_STREAM,
+                                  "application-id", "org.gnome.NetworkDisplays.stream",
+                                  "flags", G_APPLICATION_HANDLES_OPEN,
+                                  NULL);
+
+  if (!detached_stream)
+    {
+      g_warning ("NdStream: Failed to construct NdStream object");
+      return NULL;
+    }
+
+  nd_stream_register_unix_signals (detached_stream);
+
+  return detached_stream;
+}

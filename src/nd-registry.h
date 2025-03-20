@@ -1,4 +1,4 @@
-/* nd-uri-helpers.h
+/* nd-registry.h
  *
  * Copyright 2023 Pedro Sader Azevedo <pedro.saderazevedo@proton.me>
  *
@@ -19,10 +19,17 @@
 #pragma once
 
 #include <glib-object.h>
-#include <nd-sink.h>
+#include "nd-provider.h"
 
-gchar * nd_uri_helpers_generate_uri (GHashTable *params);
+G_BEGIN_DECLS
 
-GHashTable * nd_uri_helpers_parse_uri (gchar *uri);
+#define ND_TYPE_REGISTRY (nd_registry_get_type ())
+G_DECLARE_FINAL_TYPE (NdRegistry, nd_registry, ND, REGISTRY, GObject)
 
-NdSink * nd_uri_helpers_uri_to_sink (gchar *uri);
+NdRegistry * nd_registry_new (NdProvider * provider);
+
+void nd_registry_set_provider (NdRegistry *registry, NdProvider *provider);
+
+NdProvider *nd_registry_get_provider (NdRegistry *registry);
+
+G_END_DECLS

@@ -19,6 +19,13 @@
 #include <glib-object.h>
 #include "nd-uri-helpers.h"
 
+#include "nd-cc-sink.h"
+#include "nd-dummy-cc-sink.h"
+#include "nd-dummy-wfd-sink.h"
+#include "nd-sink.h"
+#include "nd-wfd-mice-sink.h"
+#include "nd-wfd-p2p-sink.h"
+
 /**
  * nd_uri_helpers_generate_uri
  * @params: a #GHashTable of URI parameters
@@ -106,4 +113,55 @@ GHashTable * nd_uri_helpers_parse_uri (gchar *uri) {
   }
 
   return params;
+}
+
+/**
+ * nd_uri_helpers_uri_to_sink
+ * @params: a URI string
+ *
+ * Instantiates an NdSink using the information encoded in an URI
+ *
+ * Returns: an NdSink
+ */
+NdSink * nd_uri_helpers_uri_to_sink (gchar *uri) {
+  NdSink *sink = NULL;
+  g_autoptr (GHashTable) params = NULL;
+
+  g_autofree gchar *protocol_in_uri_str = NULL;
+  g_autofree gchar *display_name = NULL;
+
+  NdSinkProtocol protocol_in_uri;
+
+  params = nd_uri_helpers_parse_uri(uri);
+
+  protocol_in_uri_str = g_strdup(g_hash_table_lookup(params, "protocol"));
+  protocol_in_uri = g_ascii_strtoll(protocol_in_uri_str, NULL, 10);
+
+  switch (protocol_in_uri) {
+    case ND_SINK_PROTOCOL_META:
+      g_assert_not_reached();
+    case ND_SINK_PROTOCOL_DUMMY_WFD_P2P:
+      sink = ND_SINK (nd_dummy_wfd_sink_from_uri(uri));
+      break;
+    case ND_SINK_PROTOCOL_DUMMY_CC:
+      sink = ND_SINK (nd_dummy_cc_sink_from_uri(uri));
+      break;
+    case ND_SINK_PROTOCOL_WFD_P2P:
+      sink = ND_SINK (nd_wfd_p2p_sink_from_uri(uri));
+      break;
+    case ND_SINK_PROTOCOL_WFD_MICE:
+      sink = ND_SINK (nd_wfd_mice_sink_from_uri(uri));
+      break;
+    case ND_SINK_PROTOCOL_CC:
+      sink = ND_SINK (nd_cc_sink_from_uri(uri));
+      break;
+  }
+
+  if (!sink)
+    g_warning("Failed to recreate sink from URI %s", uri);
+
+  g_object_get (sink, "display-name", &display_name, NULL);
+  g_debug("Sink \"%s\" recreated successfully", display_name);
+
+  return g_steal_pointer(&sink);
 }

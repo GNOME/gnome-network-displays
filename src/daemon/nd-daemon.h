@@ -1,4 +1,4 @@
-/* nd-uri-helpers.h
+/* nd-daemon.h
  *
  * Copyright 2023 Pedro Sader Azevedo <pedro.saderazevedo@proton.me>
  *
@@ -18,11 +18,12 @@
 
 #pragma once
 
+#include <gio/gio.h>
 #include <glib-object.h>
-#include <nd-sink.h>
 
-gchar * nd_uri_helpers_generate_uri (GHashTable *params);
+G_BEGIN_DECLS
 
-GHashTable * nd_uri_helpers_parse_uri (gchar *uri);
+#define ND_TYPE_DAEMON (nd_daemon_get_type ())
+G_DECLARE_FINAL_TYPE (NdDaemon, nd_daemon, ND, DAEMON, GApplication)
 
-NdSink * nd_uri_helpers_uri_to_sink (gchar *uri);
+G_END_DECLS

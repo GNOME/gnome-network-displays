@@ -1,6 +1,7 @@
-/* nd-uri-helpers.h
+/* nd-stream.h
  *
- * Copyright 2023 Pedro Sader Azevedo <pedro.saderazevedo@proton.me>
+ * Copyright 2024 Pedro Sader Azevedo <pedro.saderazevedo@proton.me>
+ * Copyright 2024 Christian Glombek <lorbus@fedoraproject.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +19,14 @@
 
 #pragma once
 
+#include <gio/gio.h>
 #include <glib-object.h>
-#include <nd-sink.h>
 
-gchar * nd_uri_helpers_generate_uri (GHashTable *params);
+G_BEGIN_DECLS
 
-GHashTable * nd_uri_helpers_parse_uri (gchar *uri);
+#define ND_TYPE_STREAM (nd_stream_get_type ())
+G_DECLARE_FINAL_TYPE (NdStream, nd_stream, ND, STREAM, GApplication)
 
-NdSink * nd_uri_helpers_uri_to_sink (gchar *uri);
+NdStream * nd_stream_new ();
+
+G_END_DECLS

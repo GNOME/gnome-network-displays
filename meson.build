@@ -23,11 +23,14 @@ add_project_arguments([
 ], language: 'c')
 
 enable_firewalld_zone = get_option('firewalld_zone')
-
+build_daemon = get_option('build_daemon')
+build_app = get_option('build_app')
 
 subdir('data')
 subdir('src')
-subdir('po')
+if build_app
+  subdir('po')
+endif
 
 gnome.post_install(
   gtk_update_icon_cache: true,

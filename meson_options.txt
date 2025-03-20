@@ -1,1 +1,14 @@
-option('firewalld_zone', type: 'boolean', value: true, description: 'Install firewalld zones')
+option('firewalld_zone',
+       type: 'boolean',
+       value: true,
+       description: 'Install firewalld zones')
+
+option('build_daemon',
+       type: 'boolean',
+       value: true,
+       description: 'Build a headless client daemon')
+
+option('build_app',
+       type: 'boolean',
+       value: true,
+       description: 'Build a graphical client app')
