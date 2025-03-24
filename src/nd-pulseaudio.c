@@ -9,16 +9,16 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (pa_proplist, pa_proplist_free)
 
 struct _NdPulseaudio
 {
-  GObject           parent_instance;
+  GObject               parent_instance;
 
-  GTask            *init_task;
+  GTask                *init_task;
 
-  pa_glib_mainloop *mainloop;
-  pa_mainloop_api  *mainloop_api;
-  pa_context       *context;
-  guint             null_module_idx;
+  pa_threaded_mainloop *mainloop;
+  pa_mainloop_api      *mainloop_api;
+  pa_context           *context;
+  guint                 null_module_idx;
 
-  pa_operation     *operation;
+  pa_operation         *operation;
 };
 
 static void      nd_pulseaudio_async_initable_iface_init (GAsyncInitableIface *iface);
@@ -136,7 +136,7 @@ on_pa_nd_sink_got_info (pa_context         *c,
 
       g_debug ("NdPulseaudio: Error querying sink info");
       g_debug ("NdPulseaudio: Got a sink info for the expected name");
-
+      self->null_module_idx = i->owner_module;
       return_idle_success (self->init_task);
       g_clear_object (&self->init_task);
       return;
@@ -156,6 +156,36 @@ on_pa_nd_sink_got_info (pa_context         *c,
                                             "device.icon_name=\"network-wireless\"",
                                             on_pa_null_module_loaded,
                                             self);
+}
+
+static void
+nd_pulseaudio_unload_module_cb (pa_context *c, int success, void *userdata)
+{
+  if (success)
+    g_info ("NdPulseaudio: Module unloaded");
+  else
+    g_warning ("NdPulseaudio: Error unloading module");
+}
+
+void
+nd_pulseaudio_unload (NdPulseaudio *self)
+{
+  if (!PA_CONTEXT_IS_GOOD (pa_context_get_state (self->context)))
+    return;
+  while (pa_context_get_state (self->context) != PA_CONTEXT_READY)
+    pa_threaded_mainloop_wait (self->mainloop);
+  pa_operation *operation = pa_context_unload_module (self->context,
+                                                      self->null_module_idx,
+				                      nd_pulseaudio_unload_module_cb,
+				                      NULL);
+  if (!operation)
+    {
+      g_warning ("NdPulseaudio: Error unloading module operation");
+      return;
+    }
+  while (pa_operation_get_state (operation) == PA_OPERATION_RUNNING)
+    pa_threaded_mainloop_wait (self->mainloop);
+  pa_operation_unref (operation);
 }
 
 static void
@@ -214,8 +244,9 @@ nd_pulseaudio_async_initable_init_async (GAsyncInitable     *initable,
   g_autoptr(pa_proplist) proplist = NULL;
   gint res;
 
-  self->mainloop = pa_glib_mainloop_new (g_main_context_default ());
-  self->mainloop_api = pa_glib_mainloop_get_api (self->mainloop);
+  self->mainloop = pa_threaded_mainloop_new ();
+  pa_threaded_mainloop_start(self->mainloop);
+  self->mainloop_api = pa_threaded_mainloop_get_api(self->mainloop);
 
   proplist = pa_proplist_new ();
   pa_proplist_sets (proplist, PA_PROP_APPLICATION_NAME, "GNOME Network Displays");
@@ -283,10 +314,12 @@ nd_pulseaudio_finalize (GObject *object)
   if (self->operation)
     pa_operation_cancel (self->operation);
   g_clear_pointer (&self->operation, pa_operation_unref);
-
+  if (self->context)
+    pa_context_disconnect (self->context);
   g_clear_pointer (&self->context, pa_context_unref);
   self->mainloop_api = NULL;
-  g_clear_pointer (&self->mainloop, pa_glib_mainloop_free);
+  pa_threaded_mainloop_stop (self->mainloop);
+  g_clear_pointer (&self->mainloop, pa_threaded_mainloop_free);
 
   G_OBJECT_CLASS (nd_pulseaudio_parent_class)->finalize (object);
 }

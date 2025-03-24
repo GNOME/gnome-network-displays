@@ -14,4 +14,6 @@ NdPulseaudio *nd_pulseaudio_new (void);
 
 GstElement           *nd_pulseaudio_get_source (NdPulseaudio *self);
 
+void  nd_pulseaudio_unload (NdPulseaudio *self);
+
 G_END_DECLS
