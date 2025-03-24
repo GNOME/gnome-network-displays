@@ -1,6 +1,6 @@
 data/org.gnome.NetworkDisplays.desktop.in
 data/org.gnome.NetworkDisplays.appdata.xml.in
-src/main.c
-src/nd-codec-install.c
-src/nd-window.c
-src/nd-window.ui
+src/app/main.c
+src/app/nd-codec-install.c
+src/app/nd-window.c
+src/app/nd-window.ui
