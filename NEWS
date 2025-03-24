@@ -1,3 +1,8 @@
+GNOME Network Displays 0.95.0
+=============================
+* Fix X11 support regression
+* Fix XDP session free operation
+
 GNOME Network Displays 0.94.0
 =============================
 * Re-create portal session when needed
