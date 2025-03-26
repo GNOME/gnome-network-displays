@@ -17,7 +17,7 @@ Build
 
 To build it locally:
 
-- Install build dependencies (e.g. on Fedora with `dnf build-dep gnome-network-displays`, on Ubuntu based system with `apt install libgstrtspserver-1.0-dev libgstreamer-plugins-base1.0-dev libavahi-client-dev libavahi-gobject-dev libgtk-3-dev libnm-dev libpulse-dev libprotobuf-c-dev libjson-glib-dev libsoup-3.0-dev`)
+- Install build dependencies (e.g. on Fedora with `dnf build-dep gnome-network-displays`, on Ubuntu based system with `apt install libgstrtspserver-1.0-dev libgstreamer-plugins-base1.0-dev libavahi-client-dev libavahi-gobject-dev libgtk-3-dev libnm-dev libpulse-dev libprotobuf-c-dev libjson-glib-dev libsoup-3.0-dev libportal-gtk4-dev libgtk-4-dev libadwaita-1-dev`)
 - Install `meson`
 - Clone the repository
 - `cd gnome-network-displays`
