@@ -1,3 +1,9 @@
+GNOME Network Displays 0.96.0
+=============================
+* Add CI/CD release automation
+* Update Ubuntu build instructions
+* Unload Pulseaudio module on exit
+
 GNOME Network Displays 0.95.0
 =============================
 * Fix X11 support regression
