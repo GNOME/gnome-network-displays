@@ -1,24 +1,24 @@
 include:
   - project: 'gnome/citemplates'
     file: 'flatpak/flatpak_ci_initiative.yml'
+  - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
+    inputs:
+      dist-job-name: "flatpak"
+      tarball-artifact-path: "${TARBALL_ARTIFACT_PATH}"
 
 variables:
-  APP_ID: "org.gnome.NetworkDisplays"
-  BUNDLE: "gnome-network-displays-dev.flatpak"
-  RUNTIME_REPO: "https://nightly.gnome.org/gnome-nightly.flatpakrepo"
-  MANIFEST_PATH: "build-aux/flatpak/org.gnome.NetworkDisplays.json"
   FLATPAK_MODULE: "gnome-network-displays"
+  TARBALL_ARTIFACT_PATH: ".flatpak-builder/build/${FLATPAK_MODULE}/_flatpak_build/meson-dist/${CI_PROJECT_NAME}-${CI_COMMIT_TAG}.tar.xz"
 
-stages:
-  - lint
-  - build
-  - deploy
-
-build-flatpak:
-  extends: '.flatpak@x86_64'
-  stage: build
-  before_script: []
+flatpak:
+  extends: '.flatpak'
+  variables:
+    MANIFEST_PATH: "build-aux/flatpak/org.gnome.NetworkDisplays.json"
+    RUNTIME_REPO: "https://nightly.gnome.org/gnome-nightly.flatpakrepo"
+    APP_ID: "org.gnome.NetworkDisplays"
+    BUNDLE: "org.gnome.NetworkDisplaysDevel.flatpak"
 
 nightly:
   extends: '.publish_nightly'
-  needs: ['build-flatpak']
+  dependencies: ['flatpak']
+  needs: ['flatpak']
