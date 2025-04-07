@@ -52,7 +52,8 @@
         "-Dtests=no",
         "-Dfirewalld_zone=false",
         "-Dlibpsl=false",
-        "-Dqt=false"
+        "-Dqt=false",
+        "-Dnm_cloud_setup=false"
     ],
     "cleanup": [
         "/bin",
@@ -67,8 +68,8 @@
         {
             "type": "git",
             "url": "https://gitlab.freedesktop.org/NetworkManager/NetworkManager.git",
-            "tag": "1.50.0",
-            "commit": "acc9926e1da6aa58152e519abad4d80b9f371b3b",
+            "tag": "1.52.0",
+            "commit": "995a28fa1ccc54ad22e794294c3c6783cc3f30ed",
             "x-checker-data": {
                 "type": "git",
                 "tag-pattern": "^([\\d.]+)$"
