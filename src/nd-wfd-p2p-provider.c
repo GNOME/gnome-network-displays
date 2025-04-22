@@ -70,6 +70,11 @@ on_peer_wfd_ie_notify_cb (NdWFDP2PProvider *provider,
   peer_added_cb (provider, peer, provider->nm_device);
 }
 
+static gboolean compare_sinks(NdWFDP2PSink *a, NdWFDP2PSink *b)
+{
+  return nd_wfd_p2p_sink_get_peer(a) == nd_wfd_p2p_sink_get_peer(b);
+}
+
 static void
 peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device)
 {
@@ -91,14 +96,20 @@ peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device
                                G_CONNECT_SWAPPED);
       return;
     }
-
-  g_debug ("WFDP2PProvider: Found a new sink with peer \"%s\" (%s) on device %p",
-           nm_wifi_p2p_peer_get_name (peer),
-           nm_wifi_p2p_peer_get_hw_address (peer),
-           device);
-
   sink = nd_wfd_p2p_sink_new (provider->nm_client, provider->nm_device, peer);
-
+  if (g_ptr_array_find_with_equal_func (provider->sinks, sink,
+					(GEqualFunc) compare_sinks, NULL))
+    {
+      g_debug ("WFDP2PProvider: Repeat peer \"%s\" (%s)",
+                nm_wifi_p2p_peer_get_name (peer),
+                nm_wifi_p2p_peer_get_hw_address (peer));
+      g_object_unref (sink);
+      return;
+    }
+  g_debug ("WFDP2PProvider: Found a new sink with peer \"%s\" (%s) on device %p",
+            nm_wifi_p2p_peer_get_name (peer),
+            nm_wifi_p2p_peer_get_hw_address (peer),
+            device);
   g_ptr_array_add (provider->sinks, sink);
   g_signal_emit_by_name (provider, "sink-added", sink);
 }
@@ -106,7 +117,9 @@ peer_added_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device
 static void
 peer_removed_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *device)
 {
-  g_debug ("WFDP2PProvider: Peer removed");
+  g_debug ("WFDP2PProvider: Peer removed \"%s\" (%s)",
+	      nm_wifi_p2p_peer_get_hw_address (peer),
+	      nm_wifi_p2p_peer_get_name (peer));
 
   /* Otherwise we may see properties changing to NULL before the object is destroyed. */
   g_signal_handlers_disconnect_by_func (peer, on_peer_wfd_ie_notify_cb, provider);
@@ -115,16 +128,21 @@ peer_removed_cb (NdWFDP2PProvider *provider, NMWifiP2PPeer *peer, NMDevice *devi
     {
       g_autoptr(NdWFDP2PSink) sink = g_object_ref (g_ptr_array_index (provider->sinks, i));
 
-      NdSinkState state = nd_wfd_p2p_sink_get_state (sink);
+      const NdSinkState state = nd_wfd_p2p_sink_get_state (sink);
       if (nd_wfd_p2p_provider_get_device (provider) != device ||
           state == ND_SINK_STATE_WAIT_STREAMING ||
           state == ND_SINK_STATE_STREAMING)
         continue;
 
-      g_debug ("NdWFDP2PProvider: Removing sink");
-      g_ptr_array_remove_index (provider->sinks, i);
-      g_signal_emit_by_name (provider, "sink-removed", sink);
-      break;
+      if (nd_wfd_p2p_sink_get_peer (sink) == peer)
+	    {
+	      g_debug ("WFDP2PProvider: Removing sink \"%s\" (%s)",
+	                nm_wifi_p2p_peer_get_hw_address (nd_wfd_p2p_sink_get_peer (sink)),
+	                nm_wifi_p2p_peer_get_name (nd_wfd_p2p_sink_get_peer (sink)));
+	      g_ptr_array_remove_index (provider->sinks, i);
+	      g_signal_emit_by_name (provider, "sink-removed", sink);
+	      break;
+	    }
     }
 }
 
