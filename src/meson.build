@@ -51,19 +51,11 @@ gnome_nd_common_deps += cc_deps
 gnome_nd_daemon_sources = [
   'daemon/main.c',
   'daemon/nd-daemon.c',
-  'nd-registry.c',
   'nd-manager.c',
   'nd-systemd-helpers.c',
 ]
 
 gnome_nd_daemon_sources += gnome_nd_common_sources
-
-gnome_nd_daemon_sources += gnome.gdbus_codegen(
-  'nd-dbus-registry',
-  'org.gnome.NetworkDisplays.Registry.xml',
-  interface_prefix: 'org.gnome.NetworkDisplays.',
-  namespace: 'NdDBus'
-)
 
 gnome_nd_daemon_sources += gnome.gdbus_codegen(
   'nd-dbus-manager',

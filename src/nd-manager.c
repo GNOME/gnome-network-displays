@@ -31,8 +31,6 @@ struct _NdManager
 
   NdProvider                          *provider;
 
-  GHashTable                          *uuid_to_sink;
-
   NdDBusManager                       *manager_proxy;
   NdDBusOrgFreedesktopSystemd1Manager *systemd_proxy;
 
@@ -49,17 +47,69 @@ G_DEFINE_TYPE (NdManager, nd_manager, G_TYPE_OBJECT)
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
+void
+nd_manager_sink_to_variant (NdSink *sink, GVariantBuilder *sinks_builder)
+{
+  GVariantBuilder *sink_builder;
+  g_autofree gchar *uuid = NULL;
+  g_autofree gchar *display_name = NULL;
+  gint priority;
+  gint state;
+  gint protocol;
+  GVariant *value;
+
+  g_assert (ND_IS_SINK (sink));
+
+  sink_builder = g_variant_builder_new (G_VARIANT_TYPE ("a{sv}"));
+
+  g_object_get (sink, "uuid", &uuid, NULL);
+  g_variant_builder_add (sink_builder, "{sv}",
+                         "uuid", g_variant_new ("s", uuid));
+
+  g_object_get (sink, "display-name", &display_name, NULL);
+  g_variant_builder_add (sink_builder, "{sv}",
+                         "display-name", g_variant_new ("s", display_name));
+
+  g_object_get (sink, "priority", &priority, NULL);
+  g_variant_builder_add (sink_builder, "{sv}",
+                         "priority", g_variant_new ("u", priority));
+
+  g_object_get (sink, "state", &state, NULL);
+  g_variant_builder_add (sink_builder, "{sv}",
+                         "state", g_variant_new ("u", state));
+
+  g_object_get (sink, "protocol", &protocol, NULL);
+  g_variant_builder_add (sink_builder, "{sv}",
+                         "protocol", g_variant_new ("u", protocol));
+
+  value = g_variant_new ("a{sv}", sink_builder);
+
+  g_variant_builder_add_value (sinks_builder, value);
+}
+
+void
+nd_manager_update_exposed_sinks (NdManager *manager)
+{
+  GVariantBuilder *sinks_builder;
+  GVariant *value;
+
+  g_autoptr(GList) sinks = NULL;
+  sinks = nd_provider_get_sinks (manager->provider);
+
+  sinks_builder = g_variant_builder_new (G_VARIANT_TYPE ("aa{sv}"));
+
+  g_list_foreach (sinks, (GFunc) nd_manager_sink_to_variant, sinks_builder);
+
+  value = g_variant_new ("aa{sv}", sinks_builder);
+  nd_dbus_manager_set_displays (manager->manager_proxy, value);
+}
+
 static void
 sink_added_cb (NdManager  *manager,
                NdSink     *sink,
                NdProvider *provider)
 {
-  g_autofree gchar *uuid = NULL;
-
-  g_object_get (sink, "uuid", &uuid, NULL);
-  g_hash_table_insert (manager->uuid_to_sink, g_strdup (uuid), sink);
-
-  g_debug ("NdManager: Adding a sink");
+  nd_manager_update_exposed_sinks (manager);
 }
 
 static void
@@ -67,12 +117,7 @@ sink_removed_cb (NdManager  *manager,
                  NdSink     *sink,
                  NdProvider *provider)
 {
-  g_autofree gchar *uuid = NULL;
-
-  g_object_get (sink, "uuid", &uuid, NULL);
-  g_hash_table_remove (manager->uuid_to_sink, g_strdup (uuid));
-
-  g_debug ("NdManager: Removing a sink");
+  nd_manager_update_exposed_sinks (manager);
 }
 
 static gchar *
@@ -143,17 +188,33 @@ handle_start_stream_cb (NdDBusManager         *dbus_manager,
                         const gchar           *uuid,
                         gpointer               user_data)
 {
-  NdManager *manager = ND_MANAGER (user_data);
-
-  NdSink *sink = NULL;
+  g_autoptr(GList) list = NULL;
   g_autofree gchar *unit_name = NULL;
   g_autofree gchar *uri = NULL;
+  NdManager *manager = ND_MANAGER (user_data);
+  GList *item;
+  NdSink *sink = NULL;
 
-  sink = g_hash_table_lookup (manager->uuid_to_sink, uuid);
-
-  if (sink == NULL)
+  list = nd_provider_get_sinks (manager->provider);
+  item = list;
+  while (item)
     {
-      g_warning ("Failed to find sink with uuid %s", uuid);
+      gchar *sink_uuid = NULL;
+
+      g_object_get (ND_SINK (item->data), "uuid", &sink_uuid, NULL);
+
+      if (g_str_equal (sink_uuid, uuid))
+        {
+          sink = ND_SINK (item->data);
+          break;
+        }
+
+      item = item->next;
+    }
+
+  if (!sink)
+    {
+      g_warning ("NdManager: Failed to find sink with uuid %s", uuid);
       return G_DBUS_METHOD_INVOCATION_HANDLED;
     }
 
@@ -199,6 +260,41 @@ nd_manager_get_property (GObject    *object,
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
+    }
+}
+
+/**
+ * nd_manager_set_provider
+ * @manager: a #NdManager
+ *
+ * Set the sink provider that is used to populate the manager list.
+ */
+void
+nd_manager_set_provider (NdManager  *manager,
+                         NdProvider *provider)
+{
+  if (manager->provider)
+    {
+      g_signal_handlers_disconnect_by_data (manager->provider, manager);
+      g_clear_object (&manager->provider);
+    }
+
+  if (provider)
+    {
+      manager->provider = g_object_ref (provider);
+
+      g_signal_connect_object (manager->provider,
+                               "sink-added",
+                               (GCallback) sink_added_cb,
+                               manager,
+                               G_CONNECT_SWAPPED);
+
+      g_signal_connect_object (manager->provider,
+                               "sink-removed",
+                               (GCallback) sink_removed_cb,
+                               manager,
+                               G_CONNECT_SWAPPED);
+
     }
 }
 
@@ -362,63 +458,12 @@ nd_manager_class_init (NdManagerClass *klass)
 static void
 nd_manager_init (NdManager *manager)
 {
-  manager->uuid_to_sink = g_hash_table_new (g_str_hash, g_str_equal);
 }
 
 
 /******************************************************************
 * NdManager public functions
 ******************************************************************/
-
-/**
- * nd_manager_get_provider
- * @manager: an #NdManager
- *
- * Retrieve the sink provider that is used to populate the manager list.
- *
- * Returns: (transfer none): The sink provider
- */
-NdProvider *
-nd_manager_get_provider (NdManager *manager)
-{
-  return manager->provider;
-}
-
-
-/**
- * nd_manager_set_provider
- * @manager: a #NdManager
- *
- * Set the sink provider that is used to populate the manager list.
- */
-void
-nd_manager_set_provider (NdManager  *manager,
-                         NdProvider *provider)
-{
-  if (manager->provider)
-    {
-      g_signal_handlers_disconnect_by_data (manager->provider, manager);
-      g_clear_object (&manager->provider);
-    }
-
-  if (provider)
-    {
-      manager->provider = g_object_ref (provider);
-
-      g_signal_connect_object (manager->provider,
-                               "sink-added",
-                               (GCallback) sink_added_cb,
-                               manager,
-                               G_CONNECT_SWAPPED);
-
-      g_signal_connect_object (manager->provider,
-                               "sink-removed",
-                               (GCallback) sink_removed_cb,
-                               manager,
-                               G_CONNECT_SWAPPED);
-
-    }
-}
 
 NdManager *
 nd_manager_new (NdProvider *provider)

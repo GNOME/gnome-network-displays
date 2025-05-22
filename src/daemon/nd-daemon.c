@@ -24,7 +24,6 @@
 
 #include "nd-daemon.h"
 #include "nd-manager.h"
-#include "nd-registry.h"
 #include "nd-meta-provider.h"
 #include "nd-nm-device-registry.h"
 #include "nd-dummy-provider.h"
@@ -35,8 +34,6 @@ struct _NdDaemon
 {
   GApplication        parent_instance;
 
-  NdRegistry         *registry;
-
   NdManager          *manager;
 
   GaClient           *avahi_client;
@@ -46,8 +43,7 @@ struct _NdDaemon
 };
 
 enum {
-  PROP_REGISTRY = 1,
-  PROP_MANAGER,
+  PROP_MANAGER = 1,
 
   PROP_LAST,
 };
@@ -64,10 +60,6 @@ nd_daemon_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_REGISTRY:
-      g_value_set_object (value, self->registry);
-      break;
-
     case PROP_MANAGER:
       g_value_set_object (value, self->manager);
       break;
@@ -88,10 +80,6 @@ nd_daemon_set_property (GObject      *object,
 
   switch (prop_id)
     {
-    case PROP_REGISTRY:
-      self->registry = g_value_get_object (value);
-      break;
-
     case PROP_MANAGER:
       self->manager = g_value_get_object (value);
       break;
@@ -220,9 +208,6 @@ nd_daemon_init (NdDaemon *self)
                            G_CONNECT_SWAPPED);
 
   self->nm_device_registry = nd_nm_device_registry_new (self->meta_provider);
-
-  self->registry = nd_registry_new (NULL);
-  nd_registry_set_provider (self->registry, ND_PROVIDER (self->meta_provider));
 
   self->manager = nd_manager_new (ND_PROVIDER (self->meta_provider));
 

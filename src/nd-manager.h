@@ -28,13 +28,4 @@ G_DECLARE_FINAL_TYPE (NdManager, nd_manager, ND, MANAGER, GObject)
 
 NdManager * nd_manager_new (NdProvider * provider);
 
-void nd_manager_set_provider (NdManager  *manager,
-                              NdProvider *provider);
-
-NdProvider *nd_manager_get_provider (NdManager *manager);
-
-gchar *nd_manager_connect_by_uuid (NdManager *manager);
-
-void nd_manager_disconnect_by_uuid (NdManager *manager);
-
 G_END_DECLS
