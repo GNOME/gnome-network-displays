@@ -39,7 +39,6 @@ struct _NdStream
   XdpPortal    *portal;
   XdpSession   *session;
   NdPulseaudio *pulse;
-  gboolean      use_x11;
   gboolean      is_screencasting;
 
   GCancellable *cancellable;
@@ -163,11 +162,7 @@ sink_create_source_cb (NdStream * self, NdSink * sink)
   g_debug ("NdStream: Sink create source cb");
 
   bin = GST_BIN (gst_bin_new ("screencast source bin"));
-  g_debug ("NdStream: Use x11: %d", self->use_x11);
-  if (self->use_x11)
-    src = gst_element_factory_make ("ximagesrc", "X11 screencast source");
-  else
-    src = nd_stream_get_source (self);
+  src = nd_stream_get_source (self);
 
   if (!src)
     g_error ("NdStream: Error creating video source element, likely a missing dependency!");
@@ -372,13 +367,10 @@ nd_screencast_started_cb (GObject      *source_object,
            */
           if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
             g_warning ("NdStream: Screencasting portal is unavailable! It is required to select the monitor to stream!");
-
-          g_warning ("NdStream: Falling back to X11! You need to fix your setup to avoid issues (XDG Portals and/or mutter screencasting support)!");
-          self->use_x11 = TRUE;
         }
 
-      g_warning ("NdStream: Failed to start screencast session: %s", error->message);
-      g_clear_object (&self->session);
+      g_warning ("NdStream: Failed to start screencast session: %s\nNdStream: Quitting...", error->message);
+      g_application_quit (G_APPLICATION (self));
       return;
     }
 
@@ -395,7 +387,8 @@ nd_screencast_started_cb (GObject      *source_object,
 
   if (!self->sink)
     {
-      g_warning ("NdStream: Could not start streaming!");
+      g_warning ("NdStream: Could not start streaming! Quitting...");
+      g_application_quit (G_APPLICATION (self));
       return;
     }
 
@@ -465,7 +458,7 @@ nd_screencast_init_cb (GObject      *source_object,
   if (self->session == NULL)
     {
       g_warning ("NdStream: Failed to create screencast session: %s", error->message);
-      self->use_x11 = TRUE;
+      g_application_quit (G_APPLICATION (self));
       return;
     }
 
@@ -494,8 +487,7 @@ nd_stream_init (NdStream *self)
   if (error)
     {
       g_warning ("NdStream: Failed to create screencast portal: %s", error->message);
-      self->use_x11 = TRUE;
-      g_clear_object (&self->portal);
+      g_application_quit (G_APPLICATION (self));
     }
 
   if (!self->portal)
