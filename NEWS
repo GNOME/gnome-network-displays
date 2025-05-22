@@ -1,3 +1,7 @@
+GNOME Network Displays 0.97.0
+=============================
+* p2p: correct p2p peer add and remove
+
 GNOME Network Displays 0.96.0
 =============================
 * Add CI/CD release automation
