@@ -210,74 +210,26 @@ sink_create_audio_source_cb (NdStream * self, NdSink * sink)
 }
 
 static void
-nd_stream_release (NdStream *self)
+nd_stream_cleanup (GApplication *app)
 {
-  g_application_release (G_APPLICATION (self));
-}
+  NdStream *self = ND_STREAM (app);
 
-static void
-sink_notify_state_cb (NdStream *self, GParamSpec *pspec, NdSink *sink)
-{
-  g_autoptr(GError) error = NULL;
-  NdSinkState state;
-
-  g_object_get (sink, "state", &state, NULL);
-  g_debug ("Got state change notification from streaming sink to state %s",
-           g_enum_to_string (ND_TYPE_SINK_STATE, state));
-
-  switch (state)
-    {
-    case ND_SINK_STATE_ENSURE_FIREWALL:
-      g_debug ("Checking and installing required firewall zones.");
-      break;
-
-    case ND_SINK_STATE_WAIT_P2P:
-      g_debug ("Making P2P connection");
-      break;
-
-    case ND_SINK_STATE_WAIT_SOCKET:
-      g_debug ("Establishing connection to sink");
-      break;
-
-    case ND_SINK_STATE_WAIT_STREAMING:
-      g_debug ("Starting to stream");
-      break;
-
-    case ND_SINK_STATE_STREAMING:
-      g_debug ("Streaming");
-      break;
-
-    case ND_SINK_STATE_ERROR:
-      g_warning ("Sink error");
-
-    case ND_SINK_STATE_DISCONNECTED:
-      g_warning ("Sink disconnected");
-
-      /* Stop screencast stream, if necessary */
-      if (self->is_screencasting)
-        {
-          g_debug ("NdStream: Closing screencast session");
-          xdp_session_close (self->session);
-        }
-      self->is_screencasting = FALSE;
-
-      /* Release the application so it stops */
-      nd_stream_release (self);
-
-      break;
-    }
-}
-
-static void
-nd_stream_finalize (GObject *obj)
-{
-  NdStream *self = ND_STREAM (obj);
-
-  g_cancellable_cancel (self->cancellable);
-  g_clear_object (&self->cancellable);
+  g_debug ("NdStream: Cleanup");
 
   g_clear_object (&self->portal);
-  g_clear_object (&self->pulse);
+  if (self->session)
+    {
+      g_debug ("NdStream: Closing screencast session");
+      xdp_session_close (self->session);
+      g_clear_object (&self->session);
+    }
+
+  if (self->pulse)
+    {
+      g_debug ("NdStream: Unloading PulseAudio client");
+      nd_pulseaudio_unload (self->pulse);
+      g_clear_object (&self->pulse);
+    }
 
   g_clear_object (&self->sink);
 
@@ -293,7 +245,8 @@ nd_stream_finalize (GObject *obj)
       g_clear_pointer (&self->sigint_source, g_source_unref);
     }
 
-  G_OBJECT_CLASS (nd_stream_parent_class)->finalize (obj);
+  g_cancellable_cancel (self->cancellable);
+  g_clear_object (&self->cancellable);
 }
 
 static void
@@ -306,16 +259,29 @@ nd_stream_startup (GApplication *app)
 }
 
 static void
+nd_stream_shutdown (GApplication *app)
+{
+  nd_stream_cleanup (app);
+
+  g_debug ("NdStream: Shutdown");
+  G_APPLICATION_CLASS (nd_stream_parent_class)->shutdown (app);
+  /* Stop running */
+
+  g_debug ("NdStream: Release");
+  g_application_release (app);
+}
+
+static void
 nd_stream_class_init (NdStreamClass *klass)
 {
   GApplicationClass *g_application_class = G_APPLICATION_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   g_application_class->startup = nd_stream_startup;
+  g_application_class->shutdown = nd_stream_shutdown;
 
   object_class->set_property = nd_stream_set_property;
   object_class->get_property = nd_stream_get_property;
-  object_class->finalize = nd_stream_finalize;
 
   props[PROP_SINK] =
     g_param_spec_object ("sink", "The stream sink",
@@ -324,6 +290,52 @@ nd_stream_class_init (NdStreamClass *klass)
                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, PROP_LAST, props);
+}
+
+static void
+sink_notify_state_cb (NdStream *self, GParamSpec *pspec, NdSink *sink)
+{
+  NdSinkState state;
+
+  g_object_get (sink, "state", &state, NULL);
+  g_debug ("NdStream: State changed to %s",
+           g_enum_to_string (ND_TYPE_SINK_STATE, state));
+
+  switch (state)
+    {
+    case ND_SINK_STATE_ENSURE_FIREWALL:
+      g_debug ("NdStream: Checking and installing required firewall zones.");
+      break;
+
+    case ND_SINK_STATE_WAIT_P2P:
+      g_debug ("NdStream: Waiting for P2P connection");
+      break;
+
+    case ND_SINK_STATE_WAIT_SOCKET:
+      g_debug ("NdStream: Establishing connection to sink");
+      break;
+
+    case ND_SINK_STATE_WAIT_STREAMING:
+      g_debug ("NdStream: Starting to stream");
+      break;
+
+    case ND_SINK_STATE_STREAMING:
+      g_debug ("NdStream: Streaming");
+      break;
+
+    case ND_SINK_STATE_ERROR:
+      g_warning ("NdStream: Sink error");
+
+    case ND_SINK_STATE_DISCONNECTED:
+      g_debug ("NdStream: Sink disconnected");
+      self->is_screencasting = FALSE;
+
+      /* Quit the application */
+      g_debug ("NdStream: Quitting");
+      g_application_quit (G_APPLICATION (self));
+
+      break;
+    }
 }
 
 static void
@@ -478,7 +490,6 @@ static gboolean
 on_signal (NdStream *self, GSource *source, const char *signal_name)
 {
   g_debug ("NdStream: Received %s signal. Exiting...", signal_name);
-  g_clear_pointer (&source, g_source_unref);
 
   nd_sink_stop_stream (self->sink);
 
