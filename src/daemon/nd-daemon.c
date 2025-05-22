@@ -106,8 +106,18 @@ nd_daemon_constructed (GObject *obj)
   NdDaemon *self = ND_DAEMON (obj);
 
   g_autoptr(GError) error = NULL;
+  g_autoptr(NdDummyProvider) dummy_provider = NULL;
   g_autoptr(NdWFDMiceProvider) mice_provider = NULL;
   g_autoptr(NdCCProvider) cc_provider = NULL;
+
+  if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_DUMMY"), "1") == 0)
+    {
+      g_debug ("Adding dummy provider");
+      dummy_provider = nd_dummy_provider_new ();
+      nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (dummy_provider));
+    }
+
+  self->nm_device_registry = nd_nm_device_registry_new (self->meta_provider);
 
   self->avahi_client = ga_client_new (GA_CLIENT_FLAG_NO_FLAGS);
 
@@ -140,9 +150,9 @@ nd_daemon_finalize (GObject *obj)
 {
   NdDaemon *self = ND_DAEMON (obj);
 
-  g_clear_object (&self->meta_provider);
   g_clear_object (&self->nm_device_registry);
   g_clear_object (&self->avahi_client);
+  g_clear_object (&self->meta_provider);
 
   g_clear_pointer (&self->sink_property_bindings, g_ptr_array_unref);
 
@@ -198,8 +208,6 @@ nd_daemon_class_init (NdDaemonClass *klass)
 static void
 nd_daemon_init (NdDaemon *self)
 {
-  g_autoptr(NdDummyProvider) dummy_provider = NULL;
-
   self->meta_provider = nd_meta_provider_new ();
   g_signal_connect_object (self->meta_provider,
                            "notify::has-providers",
@@ -207,16 +215,7 @@ nd_daemon_init (NdDaemon *self)
                            self,
                            G_CONNECT_SWAPPED);
 
-  self->nm_device_registry = nd_nm_device_registry_new (self->meta_provider);
-
   self->manager = nd_manager_new (ND_PROVIDER (self->meta_provider));
-
-  if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_DUMMY"), "1") == 0)
-    {
-      g_debug ("Adding dummy provider");
-      dummy_provider = nd_dummy_provider_new ();
-      nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (dummy_provider));
-    }
 
   self->sink_property_bindings = g_ptr_array_new_full (0, (GDestroyNotify) g_binding_unbind);
 }
