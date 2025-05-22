@@ -44,7 +44,7 @@ struct _NdStream
 
   GCancellable *cancellable;
 
-  NdSink       *stream_sink;
+  NdSink       *sink;
 };
 
 enum {
@@ -67,7 +67,7 @@ nd_stream_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_SINK:
-      g_value_set_object (value, self->stream_sink);
+      g_value_set_object (value, self->sink);
       break;
 
     default:
@@ -87,9 +87,9 @@ nd_stream_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_SINK:
-      if (!self->stream_sink)
+      if (!self->sink)
         {
-          self->stream_sink = g_value_dup_object (value);
+          self->sink = g_value_dup_object (value);
           g_object_notify (G_OBJECT (self), "sink");
         }
       break;
@@ -141,7 +141,7 @@ session_closed_cb (NdStream * self, NdSink * sink)
   g_debug ("Session closed");
   if (self->stream_sink)
     {
-      nd_sink_stop_stream (self->stream_sink);
+      nd_sink_stop_stream (self->sink);
       self->is_screencasting = FALSE;
     }
 
@@ -279,7 +279,7 @@ nd_stream_finalize (GObject *obj)
   g_clear_object (&self->portal);
   g_clear_object (&self->pulse);
 
-  g_clear_object (&self->stream_sink);
+  g_clear_object (&self->sink);
 
   if (self->sigterm_source)
     {
@@ -365,34 +365,34 @@ nd_screencast_started_cb (GObject      *source_object,
                            G_CONNECT_SWAPPED);
 
   self->is_screencasting = TRUE;
-  self->stream_sink = nd_sink_start_stream (self->stream_sink);
+  self->sink = nd_sink_start_stream (self->sink);
 
-  if (!self->stream_sink)
+  if (!self->sink)
     {
       g_warning ("NdStream: Could not start streaming!");
       return;
     }
 
-  g_signal_connect_object (self->stream_sink,
+  g_signal_connect_object (self->sink,
                            "create-source",
                            (GCallback) sink_create_source_cb,
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_signal_connect_object (self->stream_sink,
+  g_signal_connect_object (self->sink,
                            "create-audio-source",
                            (GCallback) sink_create_audio_source_cb,
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_signal_connect_object (self->stream_sink,
+  g_signal_connect_object (self->sink,
                            "notify::state",
                            (GCallback) sink_notify_state_cb,
                            self,
                            G_CONNECT_SWAPPED);
 
   /* We might have moved into the error state in the meantime. */
-  sink_notify_state_cb (self, NULL, self->stream_sink);
+  sink_notify_state_cb (self, NULL, self->sink);
 }
 
 static void
@@ -480,7 +480,7 @@ on_signal (NdStream *self, GSource *source, const char *signal_name)
   g_debug ("NdStream: Received %s signal. Exiting...", signal_name);
   g_clear_pointer (&source, g_source_unref);
 
-  nd_sink_stop_stream (self->stream_sink);
+  nd_sink_stop_stream (self->sink);
 
   return G_SOURCE_REMOVE;
 }
