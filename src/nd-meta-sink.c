@@ -46,8 +46,6 @@ enum {
   PROP_LAST = PROP_UUID,
 };
 
-const static NdSinkProtocol protocol = ND_SINK_PROTOCOL_META;
-
 static void nd_meta_sink_sink_iface_init (NdSinkIface *iface);
 static NdSink * nd_meta_sink_sink_start_stream (NdSink *sink);
 static void nd_meta_sink_sink_stop_stream (NdSink *sink);
@@ -189,7 +187,10 @@ nd_meta_sink_get_property (GObject    *object,
       break;
 
     case PROP_PROTOCOL:
-      g_value_set_enum (value, protocol);
+      if (meta_sink->current_sink)
+        g_object_get_property (G_OBJECT (meta_sink->current_sink), pspec->name, value);
+      else
+        g_value_set_enum (value, ND_SINK_PROTOCOL_META);
       break;
 
     case PROP_MISSING_VIDEO_CODEC:
