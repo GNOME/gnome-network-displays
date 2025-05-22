@@ -66,21 +66,21 @@ int
 main (int   argc,
       char *argv[])
 {
-  NdStream *detached_stream = NULL;
+  NdStream *stream = NULL;
   int ret;
 
   gst_init (&argc, &argv);
 
-  detached_stream = nd_stream_new ();
+  stream = nd_stream_new ();
 
   /*
    * Connect "open" signal to handle the URI command line argument
    */
-  g_signal_connect (detached_stream,
+  g_signal_connect (stream,
                     "open",
                     G_CALLBACK (on_open),
                     NULL);
 
-  ret = g_application_run (G_APPLICATION (detached_stream), argc, argv);
+  ret = g_application_run (G_APPLICATION (stream), argc, argv);
   return ret;
 }

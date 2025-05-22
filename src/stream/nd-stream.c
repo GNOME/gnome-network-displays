@@ -516,20 +516,20 @@ nd_stream_register_unix_signals (NdStream *self)
 NdStream *
 nd_stream_new ()
 {
-  NdStream *detached_stream;
+  NdStream *stream;
 
-  detached_stream = g_object_new (ND_TYPE_STREAM,
-                                  "application-id", "org.gnome.NetworkDisplays.stream",
-                                  "flags", G_APPLICATION_HANDLES_OPEN,
-                                  NULL);
+  stream = g_object_new (ND_TYPE_STREAM,
+                         "application-id", "org.gnome.NetworkDisplays.stream",
+                         "flags", G_APPLICATION_HANDLES_OPEN,
+                         NULL);
 
-  if (!detached_stream)
+  if (!stream)
     {
       g_warning ("NdStream: Failed to construct NdStream object");
       return NULL;
     }
 
-  nd_stream_register_unix_signals (detached_stream);
+  nd_stream_register_unix_signals (stream);
 
-  return detached_stream;
+  return stream;
 }
