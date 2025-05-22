@@ -78,7 +78,8 @@ sink_removed_cb (NdManager  *manager,
 static gchar *
 nd_manager_start_transient_unit (NdManager   *manager,
                                  const gchar *uri,
-                                 const gchar *uuid)
+                                 const gchar *uuid,
+                                 const gchar *display_name)
 {
   const gchar *unit_name = g_strdup_printf ("gnome-network-displays-stream-%s.service", uuid);
 
@@ -89,7 +90,7 @@ nd_manager_start_transient_unit (NdManager   *manager,
   GVariant *properties;
   GVariant *aux;
 
-  properties = build_properties (uuid, uri);
+  properties = build_properties (uuid, uri, display_name);
   aux = build_aux ();
 
   nd_dbus_org_freedesktop_systemd1_manager_call_start_transient_unit_sync (
@@ -157,7 +158,9 @@ handle_start_stream_cb (NdDBusManager         *dbus_manager,
     }
 
   uri = nd_sink_to_uri (sink);
-  unit_name = nd_manager_start_transient_unit (manager, uri, uuid);
+  g_autofree gchar *name = NULL;
+  g_object_get (sink, "display_name", &name, NULL);
+  unit_name = nd_manager_start_transient_unit (manager, uri, uuid, name);
 
   nd_dbus_manager_complete_start_stream (manager->manager_proxy, invocation, unit_name);
 

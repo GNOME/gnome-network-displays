@@ -29,9 +29,9 @@ build_execstart (const gchar *uuid,
 }
 
 static GVariant *
-build_description (const gchar *uuid)
+build_description (const gchar *name)
 {
-  const gchar *desc = g_strdup_printf ("GNOME Network Displays stream for %s", uuid);
+  const gchar *desc = g_strdup_printf ("GNOME Network Displays stream for %s", name);
 
   GVariant *description;
 
@@ -42,7 +42,8 @@ build_description (const gchar *uuid)
 
 GVariant *
 build_properties (const gchar *uuid,
-                  const gchar *uri)
+                  const gchar *uri,
+                  const gchar *display_name)
 {
   GVariantBuilder properties_builder;
 
@@ -55,7 +56,7 @@ build_properties (const gchar *uuid,
   execstart = build_execstart (uuid, uri);
   g_variant_builder_add (&properties_builder, "(sv)", "ExecStart", execstart);
 
-  description = build_description (uuid);
+  description = build_description (display_name);
   g_variant_builder_add (&properties_builder, "(sv)", "Description", description);
 
   properties = g_variant_builder_end (&properties_builder);
