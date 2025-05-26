@@ -28,9 +28,8 @@ G_DECLARE_FINAL_TYPE (NdWFDMiceSink, nd_wfd_mice_sink, ND, WFD_MICE_SINK, GObjec
 
 NdWFDMiceSink * nd_wfd_mice_sink_new (gchar * name,
                                       gchar * ip,
-                                      gchar * p2p_mac);
-
-NdSinkState nd_wfd_mice_sink_get_state (NdWFDMiceSink *sink);
+                                      gchar * p2p_mac,
+                                      gint    interface);
 
 GSocketClient *  nd_wfd_mice_sink_get_signalling_client (NdWFDMiceSink *sink);
 

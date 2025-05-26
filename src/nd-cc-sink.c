@@ -40,6 +40,8 @@ struct _NdCCSink
   gchar         *uuid;
   gchar         *ip;
   gchar         *name;
+  gchar         *display_name;
+  gint           interface;
 
   GSocketClient *client;
 
@@ -51,9 +53,10 @@ enum {
   PROP_CLIENT = 1,
   PROP_NAME,
   PROP_IP,
+  PROP_DISPLAY_NAME,
+  PROP_INTERFACE,
 
   PROP_UUID,
-  PROP_DISPLAY_NAME,
   PROP_MATCHES,
   PROP_PRIORITY,
   PROP_STATE,
@@ -109,7 +112,11 @@ nd_cc_sink_get_property (GObject    * object,
       break;
 
     case PROP_DISPLAY_NAME:
-      g_object_get_property (G_OBJECT (self), "name", value);
+      g_value_set_string (value, self->display_name);
+      break;
+
+    case PROP_INTERFACE:
+      g_value_set_int (value, self->interface);
       break;
 
     case PROP_MATCHES:
@@ -174,12 +181,20 @@ nd_cc_sink_set_property (GObject      *object,
 
     case PROP_NAME:
       self->name = g_value_dup_string (value);
-      g_object_notify (G_OBJECT (self), "display-name");
       break;
 
     case PROP_IP:
       g_assert (self->ip == NULL);
       self->ip = g_value_dup_string (value);
+      break;
+
+    case PROP_DISPLAY_NAME:
+      g_assert (self->display_name == NULL);
+      self->display_name = g_value_dup_string (value);
+      break;
+
+    case PROP_INTERFACE:
+      self->interface = g_value_get_int (value);
       break;
 
     default:
@@ -277,10 +292,21 @@ nd_cc_sink_class_init (NdCCSinkClass *klass)
                          NULL,
                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
 
+  props[PROP_DISPLAY_NAME] =
+    g_param_spec_string ("display-name", "Sink Display Name",
+                         "The human-readable display name of the sink",
+                         NULL,
+                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+
+  props[PROP_INTERFACE] =
+    g_param_spec_int ("interface", "Network Interface",
+                      "The network interface Avahi discovered this entry on",
+                      0, G_MAXINT, 0,
+                      G_PARAM_READWRITE);
+
   g_object_class_install_properties (object_class, PROP_LAST, props);
 
   g_object_class_override_property (object_class, PROP_UUID, "uuid");
-  g_object_class_override_property (object_class, PROP_DISPLAY_NAME, "display-name");
   g_object_class_override_property (object_class, PROP_MATCHES, "matches");
   g_object_class_override_property (object_class, PROP_PRIORITY, "priority");
   g_object_class_override_property (object_class, PROP_STATE, "state");
@@ -297,6 +323,7 @@ nd_cc_sink_init (NdCCSink *self)
 
   self->uuid = g_uuid_string_random ();
   self->state = ND_SINK_STATE_DISCONNECTED;
+  self->interface = 0;
   self->ctrl.state = CC_CTRL_STATE_DISCONNECTED;
 
   closure = (CcCtrlClosure *) g_malloc (sizeof (CcCtrlClosure));
@@ -449,12 +476,16 @@ error:
 NdCCSink *
 nd_cc_sink_new (GSocketClient *client,
                 gchar         *name,
-                gchar         *ip)
+                gchar         *ip,
+                gchar         *display_name,
+                gint           interface)
 {
   return g_object_new (ND_TYPE_CC_SINK,
                        "client", client,
                        "name", name,
                        "ip", ip,
+                       "display-name", display_name,
+                       "interface", interface,
                        NULL);
 }
 
@@ -508,11 +539,5 @@ nd_cc_sink_from_uri (gchar *uri)
       return NULL;
     }
 
-  return nd_cc_sink_new (client, name, ip);
-}
-
-NdSinkState
-nd_cc_sink_get_state (NdCCSink *self)
-{
-  return self->state;
+  return nd_cc_sink_new (client, name, ip, NULL, 0);
 }

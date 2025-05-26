@@ -140,6 +140,28 @@ nd_cc_provider_class_init (NdCCProviderClass *klass)
   g_object_class_override_property (object_class, PROP_DISCOVER, "discover");
 }
 
+static gboolean
+compare_sinks (NdCCSink *a, NdCCSink *b)
+{
+  gchar *a_name = NULL;
+  gchar *b_name = NULL;
+  gchar *a_ip = NULL;
+  gchar *b_ip = NULL;
+  gint a_iface = 0;
+  gint b_iface = 0;
+
+  g_object_get (a, "name", &a_name, NULL);
+  g_object_get (b, "name", &b_name, NULL);
+  g_object_get (a, "ip", &a_ip, NULL);
+  g_object_get (b, "ip", &b_ip, NULL);
+  g_object_get (a, "interface", &a_iface, NULL);
+  g_object_get (b, "interface", &b_iface, NULL);
+
+  return g_str_equal (a_name, b_name) &&
+         g_str_equal (a_ip, b_ip) &&
+         (a_iface == b_iface);
+}
+
 static void
 resolver_found_cb (GaServiceResolver  *resolver,
                    AvahiIfIndex        iface,
@@ -157,24 +179,38 @@ resolver_found_cb (GaServiceResolver  *resolver,
   NdCCSink *sink = NULL;
   gchar ip[AVAHI_ADDRESS_STR_MAX];
   AvahiStringList *cc_name, *cc_model;
+  gchar *display_name = NULL;
+  gint interface = iface;
+
+  if (avahi_address_snprint (ip, sizeof (ip), addr) == NULL)
+    g_warning ("NdCCProvider: Failed to convert AvahiAddress to string");
+
+  g_debug ("NdCCProvider: Found entry \"%s\" at %s:%d (%s) on interface %i", name, hostname, port, ip, iface);
 
   /* chromecast has pretty name and model in txt */
   cc_name = avahi_string_list_find (txt, "fn");
   cc_model = avahi_string_list_find (txt, "md");
   if (cc_name && cc_model)
-    name = g_strdup_printf ("%s - %s", cc_name->text + 3, cc_model->text + 3);
+    display_name = g_strdup_printf ("%s - %s", cc_name->text + 3, cc_model->text + 3);
+  else if (cc_name)
+    display_name = g_strdup_printf ("%s", cc_name->text + 3);
+  else
+    display_name = name;
 
-  g_debug ("NdCCProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
-
-  if (avahi_address_snprint (ip, sizeof (ip), addr) == NULL)
-    g_warning ("NdCCProvider: Failed to convert AvahiAddress to string");
-
-  g_debug ("NdCCProvider: Resolved %s to %s", hostname, ip);
-
-  sink = nd_cc_sink_new (provider->signalling_client, name, ip);
-
+  sink = nd_cc_sink_new (provider->signalling_client, name, ip, display_name, interface);
+  if (g_ptr_array_find_with_equal_func (provider->sinks, sink,
+                                        (GEqualFunc) compare_sinks, NULL))
+    {
+      g_debug ("NdCCProvider: Duplicate entry \"%s\" (%s) on interface %i",
+               display_name,
+               ip,
+               interface);
+      g_object_unref (sink);
+      return;
+    }
   g_object_unref (resolver);
 
+  g_debug ("NdCCProvider: Creating sink \"%s\" (%s on IP %s) on interface %i", display_name, name, ip, interface);
   g_ptr_array_add (provider->sinks, sink);
   g_signal_emit_by_name (provider, "sink-added", sink);
 }
@@ -244,15 +280,19 @@ service_removed_cb (GaServiceBrowser   *browser,
     {
       g_autoptr(NdCCSink) sink = g_object_ref (g_ptr_array_index (provider->sinks, i));
 
-      NdSinkState state = nd_cc_sink_get_state (sink);
-      if (state == ND_SINK_STATE_WAIT_STREAMING ||
-          state == ND_SINK_STATE_STREAMING)
-        continue;
-
-      g_debug ("NdCCProvider: Removing sink");
-      g_ptr_array_remove_index (provider->sinks, i);
-      g_signal_emit_by_name (provider, "sink-removed", sink);
-      break;
+      gchar *remote_name = NULL;
+      gint interface = 0;
+      g_object_get (sink, "name", &remote_name, NULL);
+      g_object_get (sink, "interface", &interface, NULL);
+      if (g_str_equal (remote_name, name) && (iface == interface))
+        {
+          g_debug ("NdCCProvider: Removing sink \"%s\" from interface %i", remote_name, interface);
+          g_ptr_array_remove_index (provider->sinks, i);
+          g_signal_emit_by_name (provider, "sink-removed", sink);
+          break;
+        }
+      else
+        g_debug ("NdCCProvider: Keeping sink \"%s\" on interface %i", remote_name, interface);
     }
 }
 

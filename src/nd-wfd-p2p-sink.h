@@ -30,7 +30,6 @@ NdWFDP2PSink  *nd_wfd_p2p_sink_new (NMClient * client,
                                     NMDevice * device,
                                     NMWifiP2PPeer * peer);
 
-NdSinkState    nd_wfd_p2p_sink_get_state (NdWFDP2PSink *sink);
 NMClient      *nd_wfd_p2p_sink_get_client (NdWFDP2PSink * sink);
 NMDevice      *nd_wfd_p2p_sink_get_device (NdWFDP2PSink * sink);
 NMWifiP2PPeer *nd_wfd_p2p_sink_get_peer (NdWFDP2PSink * sink);

@@ -685,20 +685,6 @@ nd_wfd_p2p_sink_get_peer (NdWFDP2PSink * sink)
   return sink->nm_peer;
 }
 
-/**
- * nd_wfd_p2p_sink_get_state
- * @sink: a #NdWFDP2PSink
- *
- * Retrieve the #NdSinkState.
- *
- * Returns: (transfer none): The #NdSinkState
- */
-NdSinkState
-nd_wfd_p2p_sink_get_state (NdWFDP2PSink *sink)
-{
-  return sink->state;
-}
-
 NdWFDP2PSink *
 nd_wfd_p2p_sink_new (NMClient *client, NMDevice *device, NMWifiP2PPeer * peer)
 {

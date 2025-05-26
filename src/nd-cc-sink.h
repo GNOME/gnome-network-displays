@@ -29,9 +29,10 @@ G_DECLARE_FINAL_TYPE (NdCCSink, nd_cc_sink, ND, CC_SINK, GObject)
 
 NdCCSink * nd_cc_sink_new (GSocketClient * client,
                            gchar         * name,
-                           gchar         * ip);
+                           gchar         * ip,
+                           gchar         * display_name,
+                           gint            interface);
 
-NdSinkState nd_cc_sink_get_state (NdCCSink *sink);
 NdCCSink * nd_cc_sink_from_uri (gchar *uri);
 
 G_END_DECLS

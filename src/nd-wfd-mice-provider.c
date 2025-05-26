@@ -138,6 +138,28 @@ nd_wfd_mice_provider_class_init (NdWFDMiceProviderClass *klass)
   g_object_class_override_property (object_class, PROP_DISCOVER, "discover");
 }
 
+static gboolean
+compare_sinks (NdWFDMiceSink *a, NdWFDMiceSink *b)
+{
+  gchar *a_name = NULL;
+  gchar *b_name = NULL;
+  gchar *a_ip = NULL;
+  gchar *b_ip = NULL;
+  gint a_iface = 0;
+  gint b_iface = 0;
+
+  g_object_get (a, "name", &a_name, NULL);
+  g_object_get (b, "name", &b_name, NULL);
+  g_object_get (a, "ip", &a_ip, NULL);
+  g_object_get (b, "ip", &b_ip, NULL);
+  g_object_get (a, "interface", &a_iface, NULL);
+  g_object_get (b, "interface", &b_iface, NULL);
+
+  return g_str_equal (a_name, b_name) &&
+         g_str_equal (a_ip, b_ip) &&
+         (a_iface == b_iface);
+}
+
 static void
 resolver_found_cb (GaServiceResolver  *resolver,
                    AvahiIfIndex        iface,
@@ -154,15 +176,14 @@ resolver_found_cb (GaServiceResolver  *resolver,
 {
   NdWFDMiceSink * sink = NULL;
   AvahiStringList *l;
-  gchar address[AVAHI_ADDRESS_STR_MAX];
+  gchar ip[AVAHI_ADDRESS_STR_MAX];
   gchar *p2p_mac = NULL;
+  gint interface = iface;
 
-  g_debug ("NdWFDMiceProvider: Found sink %s at %s:%d on interface %i", name, hostname, port, iface);
-
-  if (avahi_address_snprint (address, sizeof (address), addr) == NULL)
+  if (avahi_address_snprint (ip, sizeof (ip), addr) == NULL)
     g_warning ("NdWFDMiceProvider: Failed to convert AvahiAddress to string");
 
-  g_debug ("NdWFDMiceProvider: Resolved %s to %s", hostname, address);
+  g_debug ("NdWFDMiceProvider: Found entry \"%s\" at %s:%d (%s) on interface %i", name, hostname, port, ip, iface);
 
   for (l = txt; l; l = l->next)
     {
@@ -178,11 +199,20 @@ resolver_found_cb (GaServiceResolver  *resolver,
       avahi_free (value);
     }
 
-  /* TODO it might be more convenient to pass the whole AvahiStringList */
-  sink = nd_wfd_mice_sink_new (name, address, p2p_mac);
-
+  sink = nd_wfd_mice_sink_new (name, ip, p2p_mac, interface);
+  if (g_ptr_array_find_with_equal_func (provider->sinks, sink,
+                                        (GEqualFunc) compare_sinks, NULL))
+    {
+      g_debug ("NdWFDMiceProvider: Duplicate entry \"%s\" (%s) on interface %i",
+               name,
+               ip,
+               interface);
+      g_object_unref (sink);
+      return;
+    }
   g_object_unref (resolver);
 
+  g_debug ("NdWFDMiceProvider: Creating sink \"%s\" (%s) on interface %i", name, ip, interface);
   g_ptr_array_add (provider->sinks, sink);
   g_signal_emit_by_name (provider, "sink-added", sink);
 }
@@ -252,15 +282,19 @@ service_removed_cb (GaServiceBrowser   *browser,
     {
       g_autoptr(NdWFDMiceSink) sink = g_object_ref (g_ptr_array_index (provider->sinks, i));
 
-      NdSinkState state = nd_wfd_mice_sink_get_state (sink);
-      if (state == ND_SINK_STATE_WAIT_STREAMING ||
-          state == ND_SINK_STATE_STREAMING)
-        continue;
-
-      g_debug ("NdWFDMiceProvider: Removing sink");
-      g_ptr_array_remove_index (provider->sinks, i);
-      g_signal_emit_by_name (provider, "sink-removed", sink);
-      break;
+      gchar *remote_name = NULL;
+      gint interface = 0;
+      g_object_get (sink, "name", &remote_name, NULL);
+      g_object_get (sink, "interface", &interface, NULL);
+      if (g_str_equal (remote_name, name) && (iface == interface))
+        {
+          g_debug ("NdWFDMiceProvider: Removing sink \"%s\" from interface %i", remote_name, interface);
+          g_ptr_array_remove_index (provider->sinks, i);
+          g_signal_emit_by_name (provider, "sink-removed", sink);
+          break;
+        }
+      else
+        g_debug ("NdWFDMiceProvider: Keeping sink \"%s\" on interface %i", remote_name, interface);
     }
 }
 

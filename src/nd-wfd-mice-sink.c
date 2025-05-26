@@ -39,6 +39,7 @@ struct _NdWFDMiceSink
   gchar             *name;
   gchar             *ip;
   gchar             *p2p_mac;
+  gint               interface;
 
   GSocketClient     *signalling_client;
   GSocketConnection *signalling_client_conn;
@@ -51,6 +52,7 @@ enum {
   PROP_CLIENT = 1,
   PROP_NAME,
   PROP_IP,
+  PROP_INTERFACE,
   PROP_P2P_MAC,
   PROP_UUID,
   PROP_DISPLAY_NAME,
@@ -138,6 +140,10 @@ nd_wfd_mice_sink_get_property (GObject    *object,
       g_object_get_property (G_OBJECT (sink), "name", value);
       break;
 
+    case PROP_INTERFACE:
+      g_value_set_int (value, sink->interface);
+      break;
+
     case PROP_MATCHES:
       {
         g_autoptr(GPtrArray) res = NULL;
@@ -218,6 +224,10 @@ nd_wfd_mice_sink_set_property (GObject      *object,
       sink->p2p_mac = g_value_dup_string (value);
       break;
 
+    case PROP_INTERFACE:
+      sink->interface = g_value_get_int (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -277,6 +287,11 @@ nd_wfd_mice_sink_class_init (NdWFDMiceSinkClass *klass)
                          NULL,
                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
 
+  props[PROP_INTERFACE] =
+    g_param_spec_int ("interface", "Network Interface",
+                      "The network interface Avahi discovered this entry on",
+                      0, G_MAXINT, 0,
+                      G_PARAM_READWRITE);
   g_object_class_install_properties (object_class, PROP_LAST, props);
 
   g_object_class_override_property (object_class, PROP_UUID, "uuid");
@@ -297,6 +312,7 @@ nd_wfd_mice_sink_init (NdWFDMiceSink *sink)
   sink->state = ND_SINK_STATE_DISCONNECTED;
   sink->cancellable = g_cancellable_new ();
   sink->signalling_client = g_socket_client_new ();
+  sink->interface = 0;
 }
 
 static gchar *
@@ -469,7 +485,15 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   gboolean have_wfd_codecs, send_ok;
   GStrv missing_video = NULL, missing_audio = NULL;
 
+  g_debug ("NdWFDMiceSink: Start Stream");
+
   g_return_val_if_fail (self->state == ND_SINK_STATE_DISCONNECTED, NULL);
+
+  if (self->ip == NULL)
+    {
+      g_warning ("NdWFDMiceSink: Cannot start without IP");
+      goto error;
+    }
 
   g_assert (self->server == NULL);
   self->server = wfd_server_new ();
@@ -494,9 +518,11 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
     }
 
   self->server_source_id = gst_rtsp_server_attach (GST_RTSP_SERVER (self->server), NULL);
-
-  if (self->server_source_id == 0 || self->ip == NULL)
-    goto error;
+  if (self->server_source_id == 0)
+    {
+      g_warning ("NdWFDMiceSink: Couldn't attach RTSP server!");
+      goto error;
+    }
 
   g_signal_connect_object (self->server,
                            "client-connected",
@@ -647,12 +673,14 @@ nd_wfd_mice_sink_sink_stop_stream (NdSink *sink)
 NdWFDMiceSink *
 nd_wfd_mice_sink_new (gchar *name,
                       gchar *ip,
-                      gchar *p2p_mac)
+                      gchar *p2p_mac,
+                      gint   interface)
 {
   return g_object_new (ND_TYPE_WFD_MICE_SINK,
                        "name", name,
                        "ip", ip,
                        "p2p-mac", p2p_mac,
+                       "interface", interface,
                        NULL);
 }
 
@@ -702,13 +730,7 @@ nd_wfd_mice_sink_from_uri (gchar *uri)
   gchar *p2p_mac = NULL;
   p2p_mac = g_hash_table_lookup (params, "p2p-mac");
 
-  return nd_wfd_mice_sink_new (name, ip, p2p_mac);
-}
-
-NdSinkState
-nd_wfd_mice_sink_get_state (NdWFDMiceSink *sink)
-{
-  return sink->state;
+  return nd_wfd_mice_sink_new (name, ip, p2p_mac, 0);
 }
 
 GSocketClient *
