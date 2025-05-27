@@ -39,7 +39,6 @@ struct _NdStream
   XdpPortal    *portal;
   XdpSession   *session;
   NdPulseaudio *pulse;
-  gboolean      is_screencasting;
 
   GCancellable *cancellable;
 
@@ -145,10 +144,7 @@ session_closed_cb (NdStream * self, NdSink * sink)
   g_debug ("NdStream: Session closed cb");
 
   if (self->sink)
-    {
-      nd_sink_stop_stream (self->sink);
-      self->is_screencasting = FALSE;
-    }
+    nd_sink_stop_stream (self->sink);
 
   g_clear_object (&self->session);
 }
@@ -334,7 +330,6 @@ sink_notify_state_cb (NdStream *self, GParamSpec *pspec, NdSink *sink)
 
     case ND_SINK_STATE_DISCONNECTED:
       g_debug ("NdStream: Sink disconnected");
-      self->is_screencasting = FALSE;
 
       /* Quit the application */
       g_debug ("NdStream: Quitting");
@@ -381,7 +376,6 @@ nd_screencast_started_cb (GObject      *source_object,
                            self,
                            G_CONNECT_SWAPPED);
 
-  self->is_screencasting = TRUE;
   /* change pointer from meta_sink to current_sink */
   self->sink = nd_sink_start_stream (self->sink);
 
@@ -481,7 +475,6 @@ nd_stream_init (NdStream *self)
 {
   g_autoptr(GError) error = NULL;
   self->cancellable = g_cancellable_new ();
-  self->is_screencasting = FALSE;
 
   self->portal = xdp_portal_initable_new (&error);
   if (error)
