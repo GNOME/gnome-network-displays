@@ -55,6 +55,8 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
   g_autoptr(GPtrArray) meta_sinks = NULL;
   NdMetaSink *meta_sink;
 
+  g_debug ("NdMetaProvider: Provider sink added cb");
+
   g_object_get (sink, "matches", &sink_matches, NULL);
   g_assert (sink_matches != NULL);
 
@@ -65,7 +67,7 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
       g_ptr_array_add (meta_sinks, g_ptr_array_index (meta_provider->sinks, i));
 
   if (meta_sinks->len > 1)
-    g_warning ("MetaProvider: Found two meta sinks that belong to the same sink. This should not happen!\n");
+    g_warning ("NdMetaProvider: Found two meta sinks that belong to the same sink. This should not happen!\n");
 
   if (meta_sinks->len > 0)
     {
@@ -76,8 +78,9 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
           NdMetaSink *merge_meta;
           NdSink *merge_sink;
           merge_meta = g_ptr_array_remove_index_fast (meta_sinks, 0);
+          g_debug ("NdMetaProvider: Removing previous meta sink from internal list");
           if (!g_ptr_array_remove (meta_provider->sinks, merge_meta))
-            g_warning ("Could not remove sink from internal list!");
+            g_warning ("NdMetaProvider: Could not remove previous meta sink from internal list!");
           g_signal_emit_by_name (meta_provider, "sink-removed", merge_meta);
 
           while ((merge_sink = nd_meta_sink_get_sink (merge_meta)))
@@ -87,14 +90,20 @@ provider_sink_added_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvider 
             }
         }
 
+      g_debug ("NdMetaProvider: Adding sink to meta sink");
       nd_meta_sink_add_sink (meta_sink, sink);
+      /* update the meta sink list */
+      g_signal_emit_by_name (meta_provider, "sink-added", NULL);
+
+      return;
     }
-  else
-    {
-      meta_sink = nd_meta_sink_new (sink);
-      g_ptr_array_add (meta_provider->sinks, meta_sink);
-      g_signal_emit_by_name (meta_provider, "sink-added", meta_sink);
-    }
+
+  g_debug ("NdMetaProvider: Creating meta sink with new sink");
+  meta_sink = nd_meta_sink_new (sink);
+  g_ptr_array_add (meta_provider->sinks, meta_sink);
+
+  /* update the meta sink list */
+  g_signal_emit_by_name (meta_provider, "sink-added", meta_sink);
 }
 
 static void
@@ -103,6 +112,8 @@ provider_sink_removed_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvide
   g_autoptr(GPtrArray) sink_matches = NULL;
   NdMetaSink *meta_sink = NULL;
   guint idx = 0;
+
+  g_debug ("NdMetaProvider: provider sink removed cb");
 
   g_object_get (sink, "matches", &sink_matches, NULL);
   g_assert (sink_matches != NULL);
@@ -122,11 +133,16 @@ provider_sink_removed_cb (NdMetaProvider *meta_provider, NdSink *sink, NdProvide
   if (nd_meta_sink_remove_sink (meta_sink, sink))
     {
       /* meta sink is empty, remove it and we are done */
+      g_debug ("NdMetaProvider: Removing empty meta sink");
       g_ptr_array_remove (meta_provider->sinks, meta_sink);
+      /* update the meta sink list */
       g_signal_emit_by_name (meta_provider, "sink-removed", meta_sink);
 
       return;
     }
+
+  /* update the meta sink list */
+  g_signal_emit_by_name (meta_provider, "sink-removed", NULL);
 }
 
 static void

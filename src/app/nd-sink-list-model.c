@@ -76,7 +76,13 @@ sink_added_cb (NdSinkListModel *sink_list_model,
 {
   guint n_items;
 
-  g_debug ("SinkList: Adding a sink");
+  if (!sink)
+    {
+      g_debug ("NdSinkList: No sink to add");
+      return;
+    }
+
+  g_debug ("NdSinkList: Adding a sink");
 
   n_items = g_list_length (sink_list_model->list);
   sink_list_model->list = g_list_append (sink_list_model->list, sink);
@@ -91,7 +97,13 @@ sink_removed_cb (NdSinkListModel *sink_list_model,
 {
   guint pos;
 
-  g_debug ("SinkList: Removing a sink");
+  if (!sink)
+    {
+      g_debug ("NdSinkList: No sink to remove");
+      return;
+    }
+
+  g_debug ("NdSinkList: Removing a sink");
 
   pos = g_list_index (sink_list_model->list, sink);
   g_return_if_fail (pos >= 0);
