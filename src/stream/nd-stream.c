@@ -559,9 +559,12 @@ NdStream *
 nd_stream_new ()
 {
   NdStream *stream;
+  gchar * uuid = g_uuid_string_random ();
+  gchar * id = g_strdup_printf ("org.gnome.NetworkDisplays.Stream_%.8s", uuid);
 
+  g_debug ("NdStream: Starting with app-id: %s", id);
   stream = g_object_new (ND_TYPE_STREAM,
-                         "application-id", "org.gnome.NetworkDisplays.stream",
+                         "application-id", g_strdup (id),
                          "flags", G_APPLICATION_HANDLES_OPEN,
                          NULL);
 
