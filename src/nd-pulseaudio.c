@@ -176,8 +176,8 @@ nd_pulseaudio_unload (NdPulseaudio *self)
     pa_threaded_mainloop_wait (self->mainloop);
   pa_operation *operation = pa_context_unload_module (self->context,
                                                       self->null_module_idx,
-				                      nd_pulseaudio_unload_module_cb,
-				                      NULL);
+                                                      nd_pulseaudio_unload_module_cb,
+                                                      NULL);
   if (!operation)
     {
       g_warning ("NdPulseaudio: Error unloading module operation");
@@ -245,8 +245,8 @@ nd_pulseaudio_async_initable_init_async (GAsyncInitable     *initable,
   gint res;
 
   self->mainloop = pa_threaded_mainloop_new ();
-  pa_threaded_mainloop_start(self->mainloop);
-  self->mainloop_api = pa_threaded_mainloop_get_api(self->mainloop);
+  pa_threaded_mainloop_start (self->mainloop);
+  self->mainloop_api = pa_threaded_mainloop_get_api (self->mainloop);
 
   proplist = pa_proplist_new ();
   pa_proplist_sets (proplist, PA_PROP_APPLICATION_NAME, "GNOME Network Displays");

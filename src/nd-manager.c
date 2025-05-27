@@ -27,17 +27,17 @@
 
 struct _NdManager
 {
-  GObject parent_instance;
+  GObject                              parent_instance;
 
-  NdProvider *provider;
+  NdProvider                          *provider;
 
-  GHashTable *uuid_to_sink;
+  GHashTable                          *uuid_to_sink;
 
   NdDBusManager                       *manager_proxy;
   NdDBusOrgFreedesktopSystemd1Manager *systemd_proxy;
 
-  guint manager_name_watch_id;
-  guint systemd_name_watch_id;
+  guint                                manager_name_watch_id;
+  guint                                systemd_name_watch_id;
 };
 
 enum {
@@ -55,8 +55,9 @@ sink_added_cb (NdManager  *manager,
                NdProvider *provider)
 {
   g_autofree gchar *uuid = NULL;
+
   g_object_get (sink, "uuid", &uuid, NULL);
-  g_hash_table_insert(manager->uuid_to_sink, g_strdup(uuid), sink);
+  g_hash_table_insert (manager->uuid_to_sink, g_strdup (uuid), sink);
 
   g_debug ("NdManager: Adding a sink");
 }
@@ -67,8 +68,9 @@ sink_removed_cb (NdManager  *manager,
                  NdProvider *provider)
 {
   g_autofree gchar *uuid = NULL;
+
   g_object_get (sink, "uuid", &uuid, NULL);
-  g_hash_table_remove(manager->uuid_to_sink, g_strdup(uuid));
+  g_hash_table_remove (manager->uuid_to_sink, g_strdup (uuid));
 
   g_debug ("NdManager: Removing a sink");
 }
@@ -80,7 +82,7 @@ nd_manager_start_transient_unit (NdManager   *manager,
 {
   const gchar *unit_name = g_strdup_printf ("gnome-network-displays-stream-%s.service", uuid);
 
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
 
   g_autofree gchar *job = NULL;
 
@@ -111,7 +113,7 @@ void
 nd_manager_stop_transient_unit (NdManager   *manager,
                                 const gchar *unit_name)
 {
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GError) error = NULL;
   g_autofree gchar *job = NULL;
   gboolean is_stream_unit;
 
@@ -122,7 +124,7 @@ nd_manager_stop_transient_unit (NdManager   *manager,
       return;
     }
 
-  nd_dbus_org_freedesktop_systemd1_manager_call_kill_unit_sync(
+  nd_dbus_org_freedesktop_systemd1_manager_call_kill_unit_sync (
     manager->systemd_proxy,
     unit_name,
     "all",
@@ -140,24 +142,24 @@ handle_start_stream_cb (NdDBusManager         *dbus_manager,
                         const gchar           *uuid,
                         gpointer               user_data)
 {
-  NdManager *manager = ND_MANAGER(user_data);
+  NdManager *manager = ND_MANAGER (user_data);
 
   NdSink *sink = NULL;
   g_autofree gchar *unit_name = NULL;
   g_autofree gchar *uri = NULL;
 
-  sink = g_hash_table_lookup(manager->uuid_to_sink, uuid);
+  sink = g_hash_table_lookup (manager->uuid_to_sink, uuid);
 
   if (sink == NULL)
     {
-      g_warning("Failed to find sink with uuid %s", uuid);
+      g_warning ("Failed to find sink with uuid %s", uuid);
       return G_DBUS_METHOD_INVOCATION_HANDLED;
     }
 
-  uri = nd_sink_to_uri(sink);
-  unit_name = nd_manager_start_transient_unit(manager, uri, uuid);
+  uri = nd_sink_to_uri (sink);
+  unit_name = nd_manager_start_transient_unit (manager, uri, uuid);
 
-  nd_dbus_manager_complete_start_stream(manager->manager_proxy, invocation, unit_name);
+  nd_dbus_manager_complete_start_stream (manager->manager_proxy, invocation, unit_name);
 
   return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
@@ -168,11 +170,11 @@ handle_stop_stream_cb (NdDBusManager         *dbus_manager,
                        const gchar           *unit_name,
                        gpointer               user_data)
 {
-  NdManager *manager = ND_MANAGER(user_data);
+  NdManager *manager = ND_MANAGER (user_data);
 
-  nd_manager_stop_transient_unit(manager, unit_name);
+  nd_manager_stop_transient_unit (manager, unit_name);
 
-  nd_dbus_manager_complete_stop_stream(dbus_manager, invocation);
+  nd_dbus_manager_complete_stop_stream (dbus_manager, invocation);
 
   return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
@@ -258,11 +260,12 @@ on_manager_name_lost (GDBusConnection *connection,
 
 static void
 on_systemd_name_appeared (GDBusConnection *connection,
-                          const char *name,
-                          const char *name_owner,
-                          gpointer user_data)
+                          const char      *name,
+                          const char      *name_owner,
+                          gpointer         user_data)
 {
   NdManager *manager = ND_MANAGER (user_data);
+
   g_autoptr(GError) error = NULL;
 
   manager->systemd_proxy =
@@ -279,13 +282,13 @@ on_systemd_name_appeared (GDBusConnection *connection,
                  error ? error->message : "none");
       return;
     }
-    g_info ("NdManager: Acquired org.freedesktop.systemd1.Manager proxy");
+  g_info ("NdManager: Acquired org.freedesktop.systemd1.Manager proxy");
 }
 
 static void
 on_systemd_name_vanished (GDBusConnection *connection,
-                          const char *name,
-                          gpointer user_data)
+                          const char      *name,
+                          gpointer         user_data)
 {
   NdManager *manager = ND_MANAGER (user_data);
 
@@ -356,7 +359,7 @@ nd_manager_class_init (NdManagerClass *klass)
 static void
 nd_manager_init (NdManager *manager)
 {
-  manager->uuid_to_sink = g_hash_table_new(g_str_hash, g_str_equal);
+  manager->uuid_to_sink = g_hash_table_new (g_str_hash, g_str_equal);
 }
 
 
@@ -378,7 +381,7 @@ nd_manager_get_provider (NdManager *manager)
   return manager->provider;
 }
 
- 
+
 /**
  * nd_manager_set_provider
  * @manager: a #NdManager

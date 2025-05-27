@@ -513,7 +513,7 @@ gnome_nd_window_finalize (GObject *obj)
 
   g_cancellable_cancel (self->cancellable);
   g_clear_object (&self->cancellable);
-  nd_pulseaudio_unload(self->pulse);
+  nd_pulseaudio_unload (self->pulse);
   g_clear_object (&self->portal);
   g_clear_object (&self->pulse);
 

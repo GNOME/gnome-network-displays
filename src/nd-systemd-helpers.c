@@ -19,9 +19,9 @@ build_execstart (const gchar *uuid,
   g_variant_builder_add (&command_builder, "s", uri);
 
   g_variant_builder_add (&execstart_builder, "(sasb)",
-			 path,
-			 &command_builder,
-			 FALSE);
+                         path,
+                         &command_builder,
+                         FALSE);
 
   execstart = g_variant_builder_end (&execstart_builder);
 
@@ -34,6 +34,7 @@ build_description (const gchar *uuid)
   const gchar *desc = g_strdup_printf ("GNOME Network Displays stream for %s", uuid);
 
   GVariant *description;
+
   description = g_variant_new_string (desc);
 
   return g_steal_pointer (&description);
@@ -70,6 +71,6 @@ build_aux ()
 
   g_variant_builder_init (&aux_builder, G_VARIANT_TYPE ("a(sa(sv))"));
   aux = g_variant_builder_end (&aux_builder);
-  
+
   return g_steal_pointer (&aux);
 }

@@ -31,20 +31,20 @@
 
 struct _NdStream
 {
-  GApplication         parent_instance;
+  GApplication  parent_instance;
 
-  GSource             *sigterm_source;
-  GSource             *sigint_source;
+  GSource      *sigterm_source;
+  GSource      *sigint_source;
 
-  XdpPortal           *portal;
-  XdpSession          *session;
-  NdPulseaudio        *pulse;
-  gboolean             use_x11;
-  gboolean             is_screencasting;
-  
-  GCancellable        *cancellable;
+  XdpPortal    *portal;
+  XdpSession   *session;
+  NdPulseaudio *pulse;
+  gboolean      use_x11;
+  gboolean      is_screencasting;
 
-  NdSink              *stream_sink;
+  GCancellable *cancellable;
+
+  NdSink       *stream_sink;
 };
 
 enum {
@@ -103,8 +103,8 @@ nd_stream_set_property (GObject      *object,
 static GstElement *
 nd_stream_get_source (NdStream *self)
 {
-  g_autoptr (GVariant) stream_properties = NULL;
-  g_autoptr (GError) error = NULL;
+  g_autoptr(GVariant) stream_properties = NULL;
+  g_autoptr(GError) error = NULL;
   GstElement *src = NULL;
   GVariant *streams = NULL;
   GVariantIter iter;
@@ -122,7 +122,7 @@ nd_stream_get_source (NdStream *self)
   //src = gnd_pw_stream_new (fd, node_id, &error);
   src = gst_element_factory_make ("pipewiresrc", "portal-pipewire-source");
   if (src == NULL)
-    g_error ("GStreamer element \"pipewiresrc\" could not be created!");                
+    g_error ("GStreamer element \"pipewiresrc\" could not be created!");
 
   g_object_set (src,
                 "fd", fd,
@@ -136,14 +136,14 @@ nd_stream_get_source (NdStream *self)
 }
 
 void
-session_closed_cb(NdStream * self, NdSink * sink)
+session_closed_cb (NdStream * self, NdSink * sink)
 {
   g_debug ("Session closed");
   if (self->stream_sink)
-  {
-    nd_sink_stop_stream (self->stream_sink);
-    self->is_screencasting = FALSE;
-  }
+    {
+      nd_sink_stop_stream (self->stream_sink);
+      self->is_screencasting = FALSE;
+    }
 
   g_clear_object (&self->session);
 }
@@ -228,34 +228,35 @@ sink_notify_state_cb (NdStream *self, GParamSpec *pspec, NdSink *sink)
   switch (state)
     {
     case ND_SINK_STATE_ENSURE_FIREWALL:
-      g_debug("Checking and installing required firewall zones.");
+      g_debug ("Checking and installing required firewall zones.");
       break;
 
     case ND_SINK_STATE_WAIT_P2P:
-      g_debug("Making P2P connection");
+      g_debug ("Making P2P connection");
       break;
 
     case ND_SINK_STATE_WAIT_SOCKET:
-      g_debug("Establishing connection to sink");
+      g_debug ("Establishing connection to sink");
       break;
 
     case ND_SINK_STATE_WAIT_STREAMING:
-      g_debug("Starting to stream");
+      g_debug ("Starting to stream");
       break;
 
     case ND_SINK_STATE_STREAMING:
-      g_debug("Streaming");
+      g_debug ("Streaming");
       break;
 
     case ND_SINK_STATE_ERROR:
-      g_warning("Sink error");
+      g_warning ("Sink error");
+
     case ND_SINK_STATE_DISCONNECTED:
-      g_warning("Sink disconnected");
+      g_warning ("Sink disconnected");
 
       /* Stop screencast stream, if necessary */
       if (self->is_screencasting)
         {
-          g_debug("NdStream: Closing screencast session");
+          g_debug ("NdStream: Closing screencast session");
           xdp_session_close (self->session);
         }
       self->is_screencasting = FALSE;
@@ -488,14 +489,16 @@ static gboolean
 on_sigterm (gpointer user_data)
 {
   NdStream *self = ND_STREAM (user_data);
-  return on_signal(self, self->sigterm_source, "SIGTERM");
+
+  return on_signal (self, self->sigterm_source, "SIGTERM");
 }
 
 static gboolean
 on_sigint (gpointer user_data)
 {
   NdStream *self = ND_STREAM (user_data);
-  return on_signal(self, self->sigint_source, "SIGINT");
+
+  return on_signal (self, self->sigint_source, "SIGINT");
 }
 
 void

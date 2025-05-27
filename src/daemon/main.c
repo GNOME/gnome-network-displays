@@ -23,9 +23,9 @@
 #include "nd-daemon.h"
 
 static void
-terminate_received_cb (GAction    *action,
-                       GVariant   *parameter,
-                       NdDaemon   *daemon)
+terminate_received_cb (GAction  *action,
+                       GVariant *parameter,
+                       NdDaemon *daemon)
 {
   g_application_release (G_APPLICATION (daemon));
 }

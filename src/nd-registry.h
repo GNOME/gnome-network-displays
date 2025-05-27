@@ -28,7 +28,8 @@ G_DECLARE_FINAL_TYPE (NdRegistry, nd_registry, ND, REGISTRY, GObject)
 
 NdRegistry * nd_registry_new (NdProvider * provider);
 
-void nd_registry_set_provider (NdRegistry *registry, NdProvider *provider);
+void nd_registry_set_provider (NdRegistry *registry,
+                               NdProvider *provider);
 
 NdProvider *nd_registry_get_provider (NdRegistry *registry);
 

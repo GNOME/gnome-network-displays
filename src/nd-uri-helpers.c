@@ -34,10 +34,12 @@
  *
  * Returns: (transfer full): a URI string or NULL if unable to generate it
  */
-gchar * nd_uri_helpers_generate_uri (GHashTable *params) {
-  g_autoptr (GError) error = NULL;
+gchar *
+nd_uri_helpers_generate_uri (GHashTable *params)
+{
+  g_autoptr(GError) error = NULL;
 
-  g_autoptr (GStrvBuilder) strv_builder = g_strv_builder_new ();
+  g_autoptr(GStrvBuilder) strv_builder = g_strv_builder_new ();
   GHashTableIter iter;
   gpointer key, value;
   gpointer key_parsed, value_parsed;
@@ -51,28 +53,30 @@ gchar * nd_uri_helpers_generate_uri (GHashTable *params) {
                           g_strdup_printf ("%s=%s", (gchar *) key_parsed, (gchar *) value_parsed));
     }
 
-  g_auto (GStrv) params_array = g_strv_builder_end (strv_builder);
+  g_auto(GStrv) params_array = g_strv_builder_end (strv_builder);
   g_autofree gchar *query = g_strjoinv ("&", params_array);
 
   GUri *guri = g_uri_build (G_URI_FLAGS_ENCODED,
-                           "gnome-network-displays",
-                           NULL,
-                           "sink",
-                           -1,
-                           "",
-                           query,
-                           NULL);
-  if (!guri) {
+                            "gnome-network-displays",
+                            NULL,
+                            "sink",
+                            -1,
+                            "",
+                            query,
+                            NULL);
+  if (!guri)
+    {
       g_warning ("Failed to build GUri: %s\n", error->message);
       return NULL;
-  }
+    }
 
   gchar *uri;
   uri = g_uri_to_string (guri);
-  if (!g_uri_is_valid (uri, G_URI_FLAGS_NONE, &error)) {
+  if (!g_uri_is_valid (uri, G_URI_FLAGS_NONE, &error))
+    {
       g_warning ("Generated URI is not valid: %s\n", error->message);
       return NULL;
-  }
+    }
 
   return uri;
 }
@@ -85,20 +89,24 @@ gchar * nd_uri_helpers_generate_uri (GHashTable *params) {
  *
  * Returns: (transfer container): a #GHashTable of parameters or NULL if unable to generate it
  */
-GHashTable * nd_uri_helpers_parse_uri (gchar *uri) {
-  g_autoptr (GError) error = NULL;
+GHashTable *
+nd_uri_helpers_parse_uri (gchar *uri)
+{
+  g_autoptr(GError) error = NULL;
 
-  if (!g_uri_is_valid (uri, G_URI_FLAGS_NONE, &error)) {
+  if (!g_uri_is_valid (uri, G_URI_FLAGS_NONE, &error))
+    {
       g_warning ("Generated URI is not valid: %s\n", error->message);
       return NULL;
-  }
+    }
 
-  g_autoptr (GUri) guri = NULL;
+  g_autoptr(GUri) guri = NULL;
   guri = g_uri_parse (uri, G_URI_FLAGS_ENCODED, &error);
-  if (!guri) {
+  if (!guri)
+    {
       g_warning ("Failed to parse URI: %s\n", error->message);
       return NULL;
-  }
+    }
 
   GHashTable *params = NULL;
   params = g_uri_parse_params (g_uri_get_query (guri),
@@ -107,10 +115,11 @@ GHashTable * nd_uri_helpers_parse_uri (gchar *uri) {
                                G_URI_PARAMS_NONE,
                                &error);
 
-  if (!params) {
+  if (!params)
+    {
       g_warning ("Failed to parse params: %s\n", error->message);
       return NULL;
-  }
+    }
 
   return params;
 }
@@ -123,45 +132,54 @@ GHashTable * nd_uri_helpers_parse_uri (gchar *uri) {
  *
  * Returns: an NdSink
  */
-NdSink * nd_uri_helpers_uri_to_sink (gchar *uri) {
+NdSink *
+nd_uri_helpers_uri_to_sink (gchar *uri)
+{
   NdSink *sink = NULL;
-  g_autoptr (GHashTable) params = NULL;
+
+  g_autoptr(GHashTable) params = NULL;
 
   g_autofree gchar *protocol_in_uri_str = NULL;
   g_autofree gchar *display_name = NULL;
 
   NdSinkProtocol protocol_in_uri;
 
-  params = nd_uri_helpers_parse_uri(uri);
+  params = nd_uri_helpers_parse_uri (uri);
 
-  protocol_in_uri_str = g_strdup(g_hash_table_lookup(params, "protocol"));
-  protocol_in_uri = g_ascii_strtoll(protocol_in_uri_str, NULL, 10);
+  protocol_in_uri_str = g_strdup (g_hash_table_lookup (params, "protocol"));
+  protocol_in_uri = g_ascii_strtoll (protocol_in_uri_str, NULL, 10);
 
-  switch (protocol_in_uri) {
+  switch (protocol_in_uri)
+    {
     case ND_SINK_PROTOCOL_META:
-      g_assert_not_reached();
+      g_assert_not_reached ();
+
     case ND_SINK_PROTOCOL_DUMMY_WFD_P2P:
-      sink = ND_SINK (nd_dummy_wfd_sink_from_uri(uri));
+      sink = ND_SINK (nd_dummy_wfd_sink_from_uri (uri));
       break;
+
     case ND_SINK_PROTOCOL_DUMMY_CC:
-      sink = ND_SINK (nd_dummy_cc_sink_from_uri(uri));
+      sink = ND_SINK (nd_dummy_cc_sink_from_uri (uri));
       break;
+
     case ND_SINK_PROTOCOL_WFD_P2P:
-      sink = ND_SINK (nd_wfd_p2p_sink_from_uri(uri));
+      sink = ND_SINK (nd_wfd_p2p_sink_from_uri (uri));
       break;
+
     case ND_SINK_PROTOCOL_WFD_MICE:
-      sink = ND_SINK (nd_wfd_mice_sink_from_uri(uri));
+      sink = ND_SINK (nd_wfd_mice_sink_from_uri (uri));
       break;
+
     case ND_SINK_PROTOCOL_CC:
-      sink = ND_SINK (nd_cc_sink_from_uri(uri));
+      sink = ND_SINK (nd_cc_sink_from_uri (uri));
       break;
-  }
+    }
 
   if (!sink)
-    g_warning("Failed to recreate sink from URI %s", uri);
+    g_warning ("Failed to recreate sink from URI %s", uri);
 
   g_object_get (sink, "display-name", &display_name, NULL);
-  g_debug("Sink \"%s\" recreated successfully", display_name);
+  g_debug ("Sink \"%s\" recreated successfully", display_name);
 
-  return g_steal_pointer(&sink);
+  return g_steal_pointer (&sink);
 }

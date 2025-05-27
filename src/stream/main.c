@@ -25,25 +25,25 @@
 
 gint
 on_open (GApplication *self,
-         GFile **files,
-         gint n_files,
-         const gchar *hint,
-         gpointer user_data)
+         GFile       **files,
+         gint          n_files,
+         const gchar  *hint,
+         gpointer      user_data)
 {
   NdSink *sink = NULL;
   gchar *uri;
 
   if (n_files != 1)
     {
-      g_warning("NdStream: Unexpected amount of command line arguments");
+      g_warning ("NdStream: Unexpected amount of command line arguments");
       return 1;
     }
 
-  uri = g_file_get_uri(files[0]);
+  uri = g_file_get_uri (files[0]);
 
   if (!uri)
     {
-      g_warning("NdStream: Unable to get URI from command line argument");
+      g_warning ("NdStream: Unable to get URI from command line argument");
       return 1;
     }
 
@@ -51,7 +51,7 @@ on_open (GApplication *self,
 
   if (!sink)
     {
-      g_warning("NdStream: Got NULL sink from command line argument");
+      g_warning ("NdStream: Got NULL sink from command line argument");
       return 1;
     }
 
@@ -71,7 +71,7 @@ main (int   argc,
 
   gst_init (&argc, &argv);
 
-  detached_stream = nd_stream_new();
+  detached_stream = nd_stream_new ();
 
   /*
    * Connect "open" signal to handle the URI command line argument

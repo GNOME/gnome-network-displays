@@ -33,16 +33,16 @@
 
 struct _NdDaemon
 {
-  GApplication parent_instance;
+  GApplication        parent_instance;
 
-  NdRegistry *registry;
+  NdRegistry         *registry;
 
-  NdManager *manager;
+  NdManager          *manager;
 
-  GaClient            *avahi_client;
-  NdMetaProvider      *meta_provider;
-  NdNMDeviceRegistry  *nm_device_registry;
-  GPtrArray           *sink_property_bindings;
+  GaClient           *avahi_client;
+  NdMetaProvider     *meta_provider;
+  NdNMDeviceRegistry *nm_device_registry;
+  GPtrArray          *sink_property_bindings;
 };
 
 enum {
@@ -79,7 +79,7 @@ nd_daemon_get_property (GObject    *object,
 }
 
 static void
-nd_daemon_set_property (GObject     *object,
+nd_daemon_set_property (GObject      *object,
                         guint         prop_id,
                         const GValue *value,
                         GParamSpec   *pspec)
@@ -148,7 +148,7 @@ nd_daemon_constructed (GObject *obj)
 }
 
 static void
-nd_daemon_finalize(GObject *obj)
+nd_daemon_finalize (GObject *obj)
 {
   NdDaemon *self = ND_DAEMON (obj);
 
@@ -221,10 +221,10 @@ nd_daemon_init (NdDaemon *self)
 
   self->nm_device_registry = nd_nm_device_registry_new (self->meta_provider);
 
-  self->registry = nd_registry_new(NULL);
+  self->registry = nd_registry_new (NULL);
   nd_registry_set_provider (self->registry, ND_PROVIDER (self->meta_provider));
 
-  self->manager = nd_manager_new(ND_PROVIDER(self->meta_provider));
+  self->manager = nd_manager_new (ND_PROVIDER (self->meta_provider));
 
   if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_DUMMY"), "1") == 0)
     {

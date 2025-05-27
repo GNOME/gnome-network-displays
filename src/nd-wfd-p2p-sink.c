@@ -727,6 +727,7 @@ nd_wfd_p2p_sink_from_uri (gchar *uri)
   const gchar *protocol_in_uri_str = g_hash_table_lookup (params, "protocol");
 
   NdSinkProtocol protocol_in_uri = g_ascii_strtoll (protocol_in_uri_str, NULL, 10);
+
   if (protocol != protocol_in_uri)
     {
       g_warning ("NdWFDP2PSink: Attempted to create sink whose protocol (%s) doesn't match the URI (%s)",

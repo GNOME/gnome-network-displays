@@ -24,12 +24,12 @@
 
 struct _NdRegistry
 {
-  GObject parent_instance;
+  GObject         parent_instance;
 
-  NdProvider *provider;
+  NdProvider     *provider;
 
   NdDBusRegistry *dbus_interface;
-  guint dbus_name_id;
+  guint           dbus_name_id;
 };
 
 enum {
@@ -82,7 +82,7 @@ nd_registry_sink_to_variant (NdSink *sink, GVariantBuilder *sinks_builder)
 }
 
 void
-nd_registry_update_exposed_sinks (NdRegistry  *registry)
+nd_registry_update_exposed_sinks (NdRegistry *registry)
 {
   GVariantBuilder *sinks_builder;
   GVariant *value;
@@ -92,35 +92,35 @@ nd_registry_update_exposed_sinks (NdRegistry  *registry)
 
   sinks_builder = g_variant_builder_new (G_VARIANT_TYPE ("aa{sv}"));
 
-  g_list_foreach(sinks, (GFunc) nd_registry_sink_to_variant, sinks_builder);
+  g_list_foreach (sinks, (GFunc) nd_registry_sink_to_variant, sinks_builder);
 
   value = g_variant_new ("aa{sv}", sinks_builder);
-  nd_dbus_registry_set_sinks(registry->dbus_interface, value);
+  nd_dbus_registry_set_sinks (registry->dbus_interface, value);
 }
 
 static void
-sink_added_cb (NdRegistry  *registry,
+sink_added_cb (NdRegistry *registry,
                NdSink     *sink,
                NdProvider *provider)
 {
-  nd_registry_update_exposed_sinks(registry);
+  nd_registry_update_exposed_sinks (registry);
   g_debug ("NdRegistry: Adding a sink");
 }
 
 static void
-sink_removed_cb (NdRegistry  *registry,
+sink_removed_cb (NdRegistry *registry,
                  NdSink     *sink,
                  NdProvider *provider)
 {
-  nd_registry_update_exposed_sinks(registry);
+  nd_registry_update_exposed_sinks (registry);
   g_debug ("NdRegistry: Removing a sink");
 }
 
 static void
 nd_registry_get_property (GObject    *object,
-                         guint       prop_id,
-                         GValue     *value,
-                         GParamSpec *pspec)
+                          guint       prop_id,
+                          GValue     *value,
+                          GParamSpec *pspec)
 {
   NdRegistry *registry = ND_REGISTRY (object);
 
@@ -138,9 +138,9 @@ nd_registry_get_property (GObject    *object,
 
 static void
 nd_registry_set_property (GObject      *object,
-                           guint         prop_id,
-                           const GValue *value,
-                           GParamSpec   *pspec)
+                          guint         prop_id,
+                          const GValue *value,
+                          GParamSpec   *pspec)
 {
   NdRegistry *registry = ND_REGISTRY (object);
 
@@ -256,7 +256,7 @@ nd_registry_get_provider (NdRegistry *registry)
 {
   return registry->provider;
 }
- 
+
 /**
  * nd_registry_set_provider
  * @registry: a #NdRegistry
@@ -266,7 +266,7 @@ nd_registry_get_provider (NdRegistry *registry)
  */
 void
 nd_registry_set_provider (NdRegistry *registry,
-                         NdProvider *provider)
+                          NdProvider *provider)
 {
   if (registry->provider)
     {
