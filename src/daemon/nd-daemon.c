@@ -34,71 +34,13 @@ struct _NdDaemon
 {
   GApplication        parent_instance;
 
-  NdManager          *manager;
-
   GaClient           *avahi_client;
-  NdMetaProvider     *meta_provider;
   NdNMDeviceRegistry *nm_device_registry;
-  GPtrArray          *sink_property_bindings;
-};
-
-enum {
-  PROP_MANAGER = 1,
-
-  PROP_LAST,
+  NdMetaProvider     *meta_provider;
+  NdManager          *manager;
 };
 
 G_DEFINE_TYPE (NdDaemon, nd_daemon, G_TYPE_APPLICATION)
-
-static void
-nd_daemon_get_property (GObject    *object,
-                        guint       prop_id,
-                        GValue     *value,
-                        GParamSpec *pspec)
-{
-  NdDaemon *self = ND_DAEMON (object);
-
-  switch (prop_id)
-    {
-    case PROP_MANAGER:
-      g_value_set_object (value, self->manager);
-      break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-    }
-}
-
-static void
-nd_daemon_set_property (GObject      *object,
-                        guint         prop_id,
-                        const GValue *value,
-                        GParamSpec   *pspec)
-{
-  NdDaemon *self = ND_DAEMON (object);
-
-  switch (prop_id)
-    {
-    case PROP_MANAGER:
-      self->manager = g_value_get_object (value);
-      break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-    }
-}
-
-static void
-on_meta_provider_has_provider_changed_cb (NdDaemon *self)
-{
-  gboolean has_providers;
-
-  g_object_get (self->meta_provider,
-                "has-providers", &has_providers,
-                NULL);
-}
 
 static void
 nd_daemon_constructed (GObject *obj)
@@ -154,8 +96,6 @@ nd_daemon_finalize (GObject *obj)
   g_clear_object (&self->avahi_client);
   g_clear_object (&self->meta_provider);
 
-  g_clear_pointer (&self->sink_property_bindings, g_ptr_array_unref);
-
   G_OBJECT_CLASS (nd_daemon_parent_class)->finalize (obj);
 }
 
@@ -196,9 +136,6 @@ nd_daemon_class_init (NdDaemonClass *klass)
   g_application_class->startup = nd_daemon_startup;
   g_application_class->shutdown = nd_daemon_shutdown;
 
-  object_class->get_property = nd_daemon_get_property;
-  object_class->set_property = nd_daemon_set_property;
-
   object_class->constructed = nd_daemon_constructed;
   object_class->finalize = nd_daemon_finalize;
   object_class->dispose = nd_daemon_dispose;
@@ -209,13 +146,5 @@ static void
 nd_daemon_init (NdDaemon *self)
 {
   self->meta_provider = nd_meta_provider_new ();
-  g_signal_connect_object (self->meta_provider,
-                           "notify::has-providers",
-                           (GCallback) on_meta_provider_has_provider_changed_cb,
-                           self,
-                           G_CONNECT_SWAPPED);
-
   self->manager = nd_manager_new (ND_PROVIDER (self->meta_provider));
-
-  self->sink_property_bindings = g_ptr_array_new_full (0, (GDestroyNotify) g_binding_unbind);
 }
