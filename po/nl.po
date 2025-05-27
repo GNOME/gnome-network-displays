@@ -6,99 +6,148 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues\n"
-"POT-Creation-Date: 2020-08-25 19:21+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: 2020-08-25 22:01+0200\n"
+"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
 "Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
 "X-Generator: Poedit 2.4.1\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Gnome Netwerkschermen"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
-msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Stream het bureaublad naar apparaten compatibel met Wi-Fi Display"
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr ""
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr ""
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#, fuzzy
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
-"Currently implemented is support for casting to Wi-Fi Display capable "
-"devices (a.k.a. Miracast)."
+"Supports the Miracast and Chromecast protocols."
 msgstr ""
 "Gnome Netwerkschermen laat u uw bureaublad streamen naar een extern "
 "beeldscherm. Momenteel wordt enkel streamen naar apparaten compatibel met Wi-"
 "Fi Display ('Miracast') ondersteund."
 
-#: src/nd-codec-install.c:54
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "GStreamer OpenH264-video-encoder (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264-video-encoder (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/app/nd-codec-install.c:64
+#, fuzzy, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "GStreamer VA-API H264-video-encoder (%s)"
+
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264-video-encoder (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/app/nd-codec-install.c:68
+#, fuzzy, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "GStreamer OpenH264-video-encoder (%s)"
+
+#: src/app/nd-codec-install.c:70
+#, fuzzy, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "GStreamer OpenH264-video-encoder (%s)"
+
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "GStreamer FDK AAC-audio-encoder (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "GStreamer libav AAC-audio-encoder (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC-audio-encoder (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/app/nd-codec-install.c:79
+#, fuzzy, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "GStreamer Free AAC-audio-encoder (%s)"
+
+#: src/app/nd-codec-install.c:81
+#, fuzzy, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "GStreamer FDK AAC-audio-encoder (%s)"
+
+#: src/app/nd-codec-install.c:84
+#, fuzzy, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "GStreamer x264-video-encoder (%s)"
+
+#: src/app/nd-codec-install.c:86
+#, fuzzy, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "GStreamer FDK AAC-audio-encoder (%s)"
+
+#: src/app/nd-codec-install.c:88
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr ""
+
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer-element ‘%s’"
 
-#: src/nd-codec-install.c:170
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Installeer een van de volgende GStreamer-plug-ins door hieronder te klikken"
 
-#: src/nd-window.c:158
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr "Vereiste firewallzones worden gecontroleerd en geïnstalleerd."
 
-#: src/nd-window.c:165
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr "P2P-verbinding wordt opgezet"
 
-#: src/nd-window.c:172
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr "Verbinding maken met sink"
 
-#: src/nd-window.c:179
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr "Beginnen met streamen"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
+#: src/nd-window.ui:6
+#, fuzzy
+msgid "Network Displays"
+msgstr "Gnome Netwerkschermen"
+
+#: src/nd-window.ui:28
+#, fuzzy
+msgid "No Wi‑Fi P2P Adapter Found"
 msgstr "Geen wifi-p2p-adapters gevonden"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -108,47 +157,49 @@ msgstr ""
 "ingeschakeld is en wifi-p2p-bewerkingen beschikbaar zijn in zowel "
 "NetworkManager als wpa_supplicant."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Beschikbare videosinks"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "Bezig met verbinden"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Bezig met streamen"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Een van de volgende videocodecplug-ins is vereist.\n"
-"Erop klikken zal het installatieproces ervan beginnen."
+#: src/nd-window.ui:276
+msgid "Error"
+msgstr "Fout"
 
-#: src/nd-window.ui:603 src/nd-window.ui:802
+#: src/nd-window.ui:299
+msgid "Return"
+msgstr "Terug"
+
+#: src/nd-window.ui:308
+#, fuzzy
 msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
+"One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
 "Een van de volgende audiocodecplug-ins is vereist voor audio-ondersteuning.\n"
 "Erop klikken zal het installatieproces ervan beginnen."
 
-#: src/nd-window.ui:700
-msgid "Error"
-msgstr "Fout"
+#: src/nd-window.ui:314
+#, fuzzy
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Een van de volgende audiocodecplug-ins is vereist voor audio-ondersteuning.\n"
+"Erop klikken zal het installatieproces ervan beginnen."
 
-#: src/nd-window.ui:762
-msgid "Return"
-msgstr "Terug"
-
-#: src/nd-window.ui:830
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -157,3 +208,13 @@ msgstr ""
 "Een vereiste firewallzone is niet beschikbaar en kon niet geïnstalleerd "
 "worden. Probeer het opnieuw en voer het wachtwoord in wanneer erom wordt "
 "gevraagd, of neem contact op met uw systeembeheerder."
+
+#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
+#~ msgstr "Stream het bureaublad naar apparaten compatibel met Wi-Fi Display"
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Een van de volgende videocodecplug-ins is vereist.\n"
+#~ "Erop klikken zal het installatieproces ervan beginnen."

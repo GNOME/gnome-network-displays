@@ -6,9 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues/\n"
-"POT-Creation-Date: 2024-08-07 14:38+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: 2024-08-25 13:09+0300\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos+l10n@iki.fi>\n"
 "Language-Team: Finnish <lokalisointi-lista@googlegroups.com>\n"
@@ -19,14 +18,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.4.4\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Gnomen verkkonäytöt"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "Näyttöpeilausta Gnomelle"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr ""
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:24
 msgid ""
@@ -36,99 +39,98 @@ msgstr ""
 "Gnome-verkkonäytöt mahdollistaa työpöydän suoratoistamisen etänäyttöön. "
 "Tukee Miracast- ja Chromecast-yhteyskäytäntöjä."
 
-#: src/nd-codec-install.c:60
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "GStreamer OpenH264 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/app/nd-codec-install.c:64
 #, c-format
-#| msgid "GStreamer VA-API H264 video encoder (%s)"
 msgid "GStreamer VA H264 video encoder (%s)"
 msgstr "GStreamer VA H264 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:68
+#: src/app/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr "GStreamer On2 VP8 -videokooderi (%s)"
 
-#: src/nd-codec-install.c:70
+#: src/app/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr "GStreamer On2 VP9 -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:73
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "GStreamer FDK AAC -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:75
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "GStreamer libav AAC -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:77
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:79
+#: src/app/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr "GStreamer Vorbis -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:81
+#: src/app/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr "GStreamer Opus -äänikooderi (%s)"
 
-#: src/nd-codec-install.c:84
+#: src/app/nd-codec-install.c:84
 #, c-format
 msgid "GStreamer WebM muxer (%s)"
 msgstr "GStreamer WebM -mukseri (%s)"
 
-#: src/nd-codec-install.c:86
+#: src/app/nd-codec-install.c:86
 #, c-format
 msgid "GStreamer Matroska muxer (%s)"
 msgstr "GStreamer Matroska -mukseri (%s)"
 
-#: src/nd-codec-install.c:88
+#: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr "GStreamer MPEG -kuljetusvirran mukseri (%s)"
 
-#: src/nd-codec-install.c:90
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer-elementti “%s”"
 
-#: src/nd-codec-install.c:196
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Asenna yksi seuraavista GStreamer-liitännäisistä napsauttamalla alta"
 
-#: src/nd-window.c:201
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr "Tarkistetaan ja asennetaan vaadittuja palomuurin alueita."
 
-#: src/nd-window.c:208
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr "Muodostetaan vertaisyhteys"
 
-#: src/nd-window.c:215
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr "Muodostetaan yhteyttä kohteeseen"
 
-#: src/nd-window.c:222
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr "Käynnistetään suoratoistoa"
 

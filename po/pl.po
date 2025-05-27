@@ -7,9 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues/\n"
-"POT-Creation-Date: 2024-08-07 14:38+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: 2024-03-03 16:44+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
@@ -20,14 +19,18 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Ekrany sieciowe GNOME"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "Udostępnianie ekranu w środowisku GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr ""
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:24
 msgid ""
@@ -37,100 +40,100 @@ msgstr ""
 "Program Ekrany sieciowe GNOME umożliwia wyświetlanie pulpitu na zdalnym "
 "ekranie. Obsługuje protokoły Miracast i Chromecast."
 
-#: src/nd-codec-install.c:60
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "Enkoder wideo OpenH264 biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "Enkoder wideo x264 biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/app/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
 msgstr "Enkoder wideo H.264 za pomocą VA biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Enkoder wideo H.264 za pomocą VA-API biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:68
+#: src/app/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr "Enkoder wideo VP8 On2 biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:70
+#: src/app/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr "Enkoder wideo VP9 On2 biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:73
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "Enkoder dźwięku AAC FDK biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:75
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "Enkoder dźwięku AAC libav biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:77
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Wolny enkoder dźwięku AAC biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:79
+#: src/app/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr "Enkoder dźwięku Vorbis biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:81
+#: src/app/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr "Enkoder dźwięku Opus biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:84
+#: src/app/nd-codec-install.c:84
 #, c-format
 msgid "GStreamer WebM muxer (%s)"
 msgstr "Multiplekser WebM biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:86
+#: src/app/nd-codec-install.c:86
 #, c-format
 msgid "GStreamer Matroska muxer (%s)"
 msgstr "Multiplekser Matroska biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:88
+#: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr "Multiplekser strumienia przesyłania MPEG biblioteki GStreamer (%s)"
 
-#: src/nd-codec-install.c:90
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "Element biblioteki GStreamer „%s”"
 
-#: src/nd-codec-install.c:196
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Proszę zainstalować jedną z tych wtyczek biblioteki GStreamer klikając "
 "poniżej"
 
-#: src/nd-window.c:201
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr "Sprawdzanie i instalowanie wymaganych stref zapory sieciowej."
 
-#: src/nd-window.c:208
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr "Tworzenie połączenia P2P"
 
-#: src/nd-window.c:215
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr "Nawiązywanie połączenia z odpływem"
 
-#: src/nd-window.c:222
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr "Rozpoczynanie wysyłania"
 

@@ -6,9 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues/\n"
-"POT-Creation-Date: 2024-08-07 14:38+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: 2025-01-12 17:11+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -19,14 +18,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.5\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "צגי רשת של GNOME"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "שידור מסך ל־GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr ""
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:24
 msgid ""
@@ -36,100 +39,98 @@ msgstr ""
 "צגי הרשת של GNOME מאפשר לך לשדר את המסך של לתצוגה מרוחקת. תומך בפרוטוקולים "
 "Miracast ו־Chromecast."
 
-#: src/nd-codec-install.c:60
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "מקודד וידאו GStreamer OpenH264‏ (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "מקודד וידאו GStreamer x264‏ (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/app/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
 msgstr "מקודד וידאו GStreamer VA H264‏ (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "מקודד וידאו GStreamer VA-API H264‏ (%s)"
 
-#: src/nd-codec-install.c:68
+#: src/app/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr "מקודד וידאו GStreamer On2 VP8‏ (%s)"
 
-#: src/nd-codec-install.c:70
+#: src/app/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr "מקודד וידאו GStreamer On2 VP9 (%s)"
 
-#: src/nd-codec-install.c:73
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "מקודד שמע GStreamer FDK AAC‏ (%s)"
 
-#: src/nd-codec-install.c:75
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "מקודד שמע GStreamer libav AAC‏ (%s)"
 
-#: src/nd-codec-install.c:77
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "מקודד שמע GStreamer Free AAC‏ (%s)"
 
-#: src/nd-codec-install.c:79
+#: src/app/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr "מקודד שמע GStreamer Vorbis‏ (%s)"
 
-#: src/nd-codec-install.c:81
+#: src/app/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr "מקודד שמע GStreamer Opus‏ (%s)"
 
-#: src/nd-codec-install.c:84
+#: src/app/nd-codec-install.c:84
 #, c-format
-#| msgid "GStreamer x264 video encoder (%s)"
 msgid "GStreamer WebM muxer (%s)"
 msgstr "מרבב GStreamer WebM‏ (%s)"
 
-#: src/nd-codec-install.c:86
+#: src/app/nd-codec-install.c:86
 #, c-format
-#| msgid "GStreamer FDK AAC audio encoder (%s)"
 msgid "GStreamer Matroska muxer (%s)"
 msgstr "מרבב GStreamer Matroska‏ (%s)"
 
-#: src/nd-codec-install.c:88
+#: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr "מרבב תזרים תעבורת MPEG של GStreamer ‏(%s)"
 
-#: src/nd-codec-install.c:90
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "רכיב GStreamer‏ „%s”"
 
-#: src/nd-codec-install.c:196
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "נא להתקין את אחד מתוספי ה־GStreamer הבאים בלחיצה להלן"
 
-#: src/nd-window.c:201
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr "מתבצעת בדיקה והתקנה של האזורים הנחוצים בחומת האש."
 
-#: src/nd-window.c:208
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr "נוצר חיבור עמית לעמית"
 
-#: src/nd-window.c:215
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr "נוצר חיבור למקלט"
 
-#: src/nd-window.c:222
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr "ההזרמה מתחילה"
 

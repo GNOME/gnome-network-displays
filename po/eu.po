@@ -4,9 +4,10 @@
 # Asier Sarasua Garmendia <asiersarasua@ni.eus>, 2020, 2021, 2024.
 #
 msgid ""
-msgstr "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/issues/\n"
-"POT-Creation-Date: 2024-01-30 19:30+0000\n"
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: 2024-03-09 10:00+0100\n"
 "Last-Translator: Asier Sarasua Garmendia <asier.sarasua@ni.eus>\n"
 "Language-Team: Basque <librezale@librezale.eus>\n"
@@ -15,8 +16,8 @@ msgstr "Project-Id-Version: gnome-network-displays master\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "GNOME Sareko Bistaratzeak"
 
@@ -24,99 +25,110 @@ msgstr "GNOME Sareko Bistaratzeak"
 msgid "Screencasting for GNOME"
 msgstr "Partekatu pantaila GNOMEn"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:25
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr ""
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
-msgstr "GNOME Sareko Bistaratzeak aplikazioaren bidez, mahaigaina urruneko pantaila batean bistaratu daiteke. Miracast eta Chromecast protokoloak onartzen ditu."
+msgstr ""
+"GNOME Sareko Bistaratzeak aplikazioaren bidez, mahaigaina urruneko pantaila "
+"batean bistaratu daiteke. Miracast eta Chromecast protokoloak onartzen ditu."
 
-#: src/nd-codec-install.c:59
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "GStreamer OpenH264 bideo-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:61
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264 bideo-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:63
+#: src/app/nd-codec-install.c:64
+#, fuzzy, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "GStreamer VA-API H264 bideo-kodetzailea (%s)"
+
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264 bideo-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:65
+#: src/app/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr "GStreamer On2 VP8 bideo-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:67
+#: src/app/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr "GStreamer On2 VP9 bideo-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:70
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "GStreamer FDK AAC audio-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:72
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "GStreamer libav AAC audio-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:74
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC audio-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:76
+#: src/app/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr "GStreamer Vorbis audio-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:78
+#: src/app/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr "GStreamer Opus audio-kodetzailea (%s)"
 
-#: src/nd-codec-install.c:81
+#: src/app/nd-codec-install.c:84
 #, c-format
 msgid "GStreamer WebM muxer (%s)"
 msgstr "GStreamer WebM muxerra (%s)"
 
-#: src/nd-codec-install.c:83
+#: src/app/nd-codec-install.c:86
 #, c-format
 msgid "GStreamer Matroska muxer (%s)"
 msgstr "GStreamer Matroska muxerra (%s)"
 
-#: src/nd-codec-install.c:85
+#: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr "GStreamer MPEG Transport Stream muxerrra (%s)"
 
-#: src/nd-codec-install.c:87
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "“%s” GStreamer elementua"
 
-#: src/nd-codec-install.c:193
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Instalatu hurrengo GStreamer pluginak behean klik eginda"
 
-#: src/nd-window.c:201
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr "Beharrezkoak diren suebaki-zonak egiaztatzen eta instalatzen."
 
-#: src/nd-window.c:208
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr "P2P konexioa sortzen"
 
-#: src/nd-window.c:215
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr "Kolektorearekin konexioa ezartzen"
 
-#: src/nd-window.c:222
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr "Korrontea bidaltzen"
 
@@ -133,7 +145,10 @@ msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
 "wpa_supplicant."
-msgstr "Ez da haririk gabeko moldagailu erabilgarririk aurkitu. Egiaztatu wifia gaitua dagoela eta wifi P2P eragiketak erabilgarri daudela bai NetworkManager bai wpa_supplicant aplikazioetan."
+msgstr ""
+"Ez da haririk gabeko moldagailu erabilgarririk aurkitu. Egiaztatu wifia "
+"gaitua dagoela eta wifi P2P eragiketak erabilgarri daudela bai "
+"NetworkManager bai wpa_supplicant aplikazioetan."
 
 #: src/nd-window.ui:63
 msgid "Available Video Sinks"
@@ -163,14 +178,16 @@ msgstr "Itzuli"
 msgid ""
 "One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
-msgstr "Hurrengo kodek-pluginetako bat behar da audioa erabili ahal izateko.\n"
+msgstr ""
+"Hurrengo kodek-pluginetako bat behar da audioa erabili ahal izateko.\n"
 "Klik egiten baduzu, instalazio-prozesuari ekingo zaio."
 
 #: src/nd-window.ui:314
 msgid ""
 "One of the following codec plugins is required for video support.\n"
 "Clicking will start the installation process."
-msgstr "Hurrengo kodek-pluginetako bat behar da bideoa erabili ahal izateko.\n"
+msgstr ""
+"Hurrengo kodek-pluginetako bat behar da bideoa erabili ahal izateko.\n"
 "Klik egiten baduzu, instalazio-prozesuari ekingo zaio."
 
 #: src/nd-window.ui:327
@@ -178,7 +195,10 @@ msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
 "administrator."
-msgstr "Beharrezkoa den suebaki-zona bat ez dago erabilgarri eta ezin izan da instalatu. Saiatu berriro eta sartu pasahitza eskatzen denean, edo kontaktatu sistema-administratzaile batekin."
+msgstr ""
+"Beharrezkoa den suebaki-zona bat ez dago erabilgarri eta ezin izan da "
+"instalatu. Saiatu berriro eta sartu pasahitza eskatzen denean, edo "
+"kontaktatu sistema-administratzaile batekin."
 
 #~ msgid "Stream the desktop to Wi-Fi Display capable devices"
 #~ msgstr ""

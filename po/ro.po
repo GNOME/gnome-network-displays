@@ -6,10 +6,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues\n"
-"POT-Creation-Date: 2020-07-10 08:27+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: 2020-07-12 14:43+0300\n"
+"Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -17,89 +17,138 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2);;\n"
-"Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
 "X-Generator: Poedit 2.3.1\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:6
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Afișaje de rețea GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7
-msgid "Stream the desktop to Wi-Fi Display capable devices"
-msgstr "Streaming a desktopului la dispozitivele capabile de afișaj Wi-Fi"
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr ""
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:16
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr ""
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#, fuzzy
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
-"Currently implemented is support for casting to Wi-Fi Display capable "
-"devices (a.k.a. Miracast)."
+"Supports the Miracast and Chromecast protocols."
 msgstr ""
 "Afișajele de rețea GNOME vă permite să vă proiectați desktop-ul la un afișaj "
 "de la distanță. Implementat în mod curent este suport pentru proiectarea la "
 "dispozitive capabile de afișaj Wi-Fi (adică Miracast)."
 
-#: src/nd-codec-install.c:54
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "Codor de video OpenH264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:56
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "Codor de video x264 GStreamer (%s)"
 
-#: src/nd-codec-install.c:58
+#: src/app/nd-codec-install.c:64
+#, fuzzy, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "Codor video H264 VA-API GStreamer (%s)"
+
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Codor video H264 VA-API GStreamer (%s)"
 
-#: src/nd-codec-install.c:60
+#: src/app/nd-codec-install.c:68
+#, fuzzy, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "Codor de video OpenH264 GStreamer (%s)"
+
+#: src/app/nd-codec-install.c:70
+#, fuzzy, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "Codor de video OpenH264 GStreamer (%s)"
+
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "Codor audio AAC FDK GStreamer (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "Codor audio AAC libav GStreamer (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Codor audio AAC Free GStreamer (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/app/nd-codec-install.c:79
+#, fuzzy, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "Codor audio AAC Free GStreamer (%s)"
+
+#: src/app/nd-codec-install.c:81
+#, fuzzy, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "Codor audio AAC FDK GStreamer (%s)"
+
+#: src/app/nd-codec-install.c:84
+#, fuzzy, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "Codor de video x264 GStreamer (%s)"
+
+#: src/app/nd-codec-install.c:86
+#, fuzzy, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "Codor audio AAC FDK GStreamer (%s)"
+
+#: src/app/nd-codec-install.c:88
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr ""
+
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "Element GStreamer „%s”"
 
-#: src/nd-codec-install.c:170
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Instalați unul din următoarele module GSteamer prin apăsarea clic mai jos"
 
-#: src/nd-window.c:158
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr "Se verifică și se instalează zonele de firewall necesare."
 
-#: src/nd-window.c:165
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr "Se construiește conexiunea P2P"
 
-#: src/nd-window.c:172
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr "Se stabilește conexiunea la sink"
 
-#: src/nd-window.c:179
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr "Se începe streamingul"
 
-#: src/nd-window.ui:75
-msgid "No Wi‑Fi P2P adapters found"
+#: src/nd-window.ui:6
+#, fuzzy
+msgid "Network Displays"
+msgstr "Afișaje de rețea GNOME"
+
+#: src/nd-window.ui:28
+#, fuzzy
+msgid "No Wi‑Fi P2P Adapter Found"
 msgstr "Nu s-au găsit adaptoare P2P Wi-Fi"
 
-#: src/nd-window.ui:90
+#: src/nd-window.ui:29
 msgid ""
 "No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
@@ -109,48 +158,51 @@ msgstr ""
 "activat și că operațiile P2P Wi-Fi sunt disponibile în amândouă "
 "NetworkManager și wpa_supplicant."
 
-#: src/nd-window.ui:176
+#: src/nd-window.ui:63
 msgid "Available Video Sinks"
 msgstr "Sink-uri video disponibile"
 
-#: src/nd-window.ui:337
+#: src/nd-window.ui:137
 msgid "Connecting"
 msgstr "Se conectează"
 
-#: src/nd-window.ui:396 src/nd-window.ui:579
+#: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
 msgstr "Anulează"
 
-#: src/nd-window.ui:501
+#: src/nd-window.ui:205
 msgid "Streaming"
 msgstr "Streaming"
 
-#: src/nd-window.ui:558 src/nd-window.ui:786
-msgid ""
-"One of the following video codec plugins is required.\n"
-"Clicking will start the installation process."
-msgstr ""
-"Unul din următoarele module de codec video este necesar.\n"
-"Apăsând clic va începe procesul de instalare."
+#: src/nd-window.ui:276
+msgid "Error"
+msgstr "Eroare"
 
-#: src/nd-window.ui:603 src/nd-window.ui:802
+#: src/nd-window.ui:299
+msgid "Return"
+msgstr "Întoarce"
+
+#: src/nd-window.ui:308
+#, fuzzy
 msgid ""
-"One of the following audio codec plugins is required for audio support.\n"
+"One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
 "Unul din următoarele module de codec audio este necesar pentru suportul "
 "audio.\n"
 "Apăsând clic va începe procesul de instalare."
 
-#: src/nd-window.ui:700
-msgid "Error"
-msgstr "Eroare"
+#: src/nd-window.ui:314
+#, fuzzy
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Unul din următoarele module de codec audio este necesar pentru suportul "
+"audio.\n"
+"Apăsând clic va începe procesul de instalare."
 
-#: src/nd-window.ui:762
-msgid "Return"
-msgstr "Întoarce"
-
-#: src/nd-window.ui:830
+#: src/nd-window.ui:327
 msgid ""
 "A required firewall zone is not available and could not be installed. Please "
 "try again and enter the password when prompted or contact a system "
@@ -159,3 +211,13 @@ msgstr ""
 "O zonă de firewall necesară nu este disponibilă și nu a putut fi instalată. "
 "Încercați din nou și introduceți parola când sunteți solicitat sau "
 "contactați administratorul de sistem."
+
+#~ msgid "Stream the desktop to Wi-Fi Display capable devices"
+#~ msgstr "Streaming a desktopului la dispozitivele capabile de afișaj Wi-Fi"
+
+#~ msgid ""
+#~ "One of the following video codec plugins is required.\n"
+#~ "Clicking will start the installation process."
+#~ msgstr ""
+#~ "Unul din următoarele module de codec video este necesar.\n"
+#~ "Apăsând clic va începe procesul de instalare."

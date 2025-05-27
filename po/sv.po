@@ -6,9 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
-"issues/\n"
-"POT-Creation-Date: 2024-08-07 14:38+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: 2024-08-07 19:02+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -19,14 +18,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.4.4\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "GNOME Nätverksskärmar"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "Skärmöverföring för GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr ""
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:24
 msgid ""
@@ -36,99 +39,99 @@ msgstr ""
 "GNOME Nätverksskärmar låter dig överföra ditt skrivbord till en fjärrskärm. "
 "Det har stöd för Miracast- och Chromecast-protokollen."
 
-#: src/nd-codec-install.c:60
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr "GStreamer OpenH264-videokodare (%s)"
 
-#: src/nd-codec-install.c:62
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264-videokodare (%s)"
 
-#: src/nd-codec-install.c:64
+#: src/app/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
 msgstr "GStreamer VA H264-videokodare (%s)"
 
-#: src/nd-codec-install.c:66
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264-videokodare (%s)"
 
-#: src/nd-codec-install.c:68
+#: src/app/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr "GStreamer On2 VP8-videokodare (%s)"
 
-#: src/nd-codec-install.c:70
+#: src/app/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr "GStreamer On2 VP9-videokodare (%s)"
 
-#: src/nd-codec-install.c:73
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr "GStreamer FDK AAC-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:75
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr "GStreamer libav AAC-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:77
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:79
+#: src/app/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr "GStreamer Vorbis-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:81
+#: src/app/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr "GStreamer Opus-ljudkodare (%s)"
 
-#: src/nd-codec-install.c:84
+#: src/app/nd-codec-install.c:84
 #, c-format
 msgid "GStreamer WebM muxer (%s)"
 msgstr "GStreamer WebM-multiplexor (%s)"
 
-#: src/nd-codec-install.c:86
+#: src/app/nd-codec-install.c:86
 #, c-format
 msgid "GStreamer Matroska muxer (%s)"
 msgstr "GStreamer Matroska-multiplexor (%s)"
 
-#: src/nd-codec-install.c:88
+#: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr "GStreamer MPEG Transport Stream-multiplexor (%s)"
 
-#: src/nd-codec-install.c:90
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr "GStreamer-element ”%s”"
 
-#: src/nd-codec-install.c:196
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Installera en av följande GStreamer-insticksmoduler genom att klicka nedan"
 
-#: src/nd-window.c:201
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr "Kontrollerar och installerar brandväggszoner som krävs."
 
-#: src/nd-window.c:208
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr "Skapar P2P-anslutning"
 
-#: src/nd-window.c:215
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr "Etablerar anslutning till utgång"
 
-#: src/nd-window.c:222
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr "Börjar strömma"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-12 22:40+0100\n"
+"POT-Creation-Date: 2025-05-27 18:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:3
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr ""
 
@@ -36,98 +36,98 @@ msgid ""
 "Supports the Miracast and Chromecast protocols."
 msgstr ""
 
-#: src/nd-codec-install.c:60
+#: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:62
+#: src/app/nd-codec-install.c:62
 #, c-format
 msgid "GStreamer x264 video encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:64
+#: src/app/nd-codec-install.c:64
 #, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:66
+#: src/app/nd-codec-install.c:66
 #, c-format
 msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:68
+#: src/app/nd-codec-install.c:68
 #, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:70
+#: src/app/nd-codec-install.c:70
 #, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:73
+#: src/app/nd-codec-install.c:73
 #, c-format
 msgid "GStreamer FDK AAC audio encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:75
+#: src/app/nd-codec-install.c:75
 #, c-format
 msgid "GStreamer libav AAC audio encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:77
+#: src/app/nd-codec-install.c:77
 #, c-format
 msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:79
+#: src/app/nd-codec-install.c:79
 #, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:81
+#: src/app/nd-codec-install.c:81
 #, c-format
 msgid "GStreamer Opus audio encoder (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:84
+#: src/app/nd-codec-install.c:84
 #, c-format
 msgid "GStreamer WebM muxer (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:86
+#: src/app/nd-codec-install.c:86
 #, c-format
 msgid "GStreamer Matroska muxer (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:88
+#: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
 msgstr ""
 
-#: src/nd-codec-install.c:90
+#: src/app/nd-codec-install.c:90
 #, c-format
 msgid "GStreamer Element “%s”"
 msgstr ""
 
-#: src/nd-codec-install.c:196
+#: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 
-#: src/nd-window.c:233
+#: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
 msgstr ""
 
-#: src/nd-window.c:240
+#: src/app/nd-window.c:240
 msgid "Making P2P connection"
 msgstr ""
 
-#: src/nd-window.c:247
+#: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
 msgstr ""
 
-#: src/nd-window.c:254
+#: src/app/nd-window.c:254
 msgid "Starting to stream"
 msgstr ""
 
