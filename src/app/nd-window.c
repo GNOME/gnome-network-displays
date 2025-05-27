@@ -711,7 +711,7 @@ gnome_nd_window_init (NdWindow *self)
       g_debug ("NdWindow: Creating portal session!");
     }
 
-  pulse = nd_pulseaudio_new ();
+  pulse = nd_pulseaudio_new ("GNOME Network Displays", "gnome-network-displays");
   g_async_initable_init_async (G_ASYNC_INITABLE (pulse),
                                G_PRIORITY_LOW,
                                self->cancellable,

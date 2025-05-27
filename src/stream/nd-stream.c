@@ -108,8 +108,11 @@ nd_stream_get_source (NdStream *self)
   GstElement *src = NULL;
   GVariant *streams = NULL;
   GVariantIter iter;
+  gchar *uuid = NULL;
   guint32 node_id;
   int fd;
+
+  g_debug ("NdStream: Getting a source");
 
   fd = xdp_session_open_pipewire_remote (self->session);
   streams = xdp_session_get_streams (self->session);
@@ -117,10 +120,12 @@ nd_stream_get_source (NdStream *self)
   g_variant_iter_init (&iter, streams);
   g_variant_iter_loop (&iter, "(u@a{sv})", &node_id, &stream_properties);
 
-  g_debug ("Got a stream with node ID: %d", node_id);
+  g_debug ("NdStream: Got a stream with node ID: %d", node_id);
+  g_assert (ND_IS_SINK (self->sink));
 
-  //src = gnd_pw_stream_new (fd, node_id, &error);
-  src = gst_element_factory_make ("pipewiresrc", "portal-pipewire-source");
+  g_object_get (self->sink, "uuid", &uuid, NULL);
+
+  src = gst_element_factory_make ("pipewiresrc", g_strdup_printf ("portal-pipewire-source-%.8s", uuid));
   if (src == NULL)
     g_error ("GStreamer element \"pipewiresrc\" could not be created!");
 
@@ -138,8 +143,9 @@ nd_stream_get_source (NdStream *self)
 void
 session_closed_cb (NdStream * self, NdSink * sink)
 {
-  g_debug ("Session closed");
-  if (self->stream_sink)
+  g_debug ("NdStream: Session closed cb");
+
+  if (self->sink)
     {
       nd_sink_stop_stream (self->sink);
       self->is_screencasting = FALSE;
@@ -154,21 +160,23 @@ sink_create_source_cb (NdStream * self, NdSink * sink)
   GstBin *bin;
   GstElement *src, *dst, *res;
 
+  g_debug ("NdStream: Sink create source cb");
+
   bin = GST_BIN (gst_bin_new ("screencast source bin"));
-  g_debug ("use x11: %d", self->use_x11);
+  g_debug ("NdStream: Use x11: %d", self->use_x11);
   if (self->use_x11)
     src = gst_element_factory_make ("ximagesrc", "X11 screencast source");
   else
     src = nd_stream_get_source (self);
 
   if (!src)
-    g_error ("Error creating video source element, likely a missing dependency!");
+    g_error ("NdStream: Error creating video source element, likely a missing dependency!");
 
   gst_bin_add (bin, src);
 
   dst = gst_element_factory_make ("intervideosink", "inter video sink");
   if (!dst)
-    g_error ("Error creating intervideosink, missing dependency!");
+    g_error ("NdStream: Error creating intervideosink, missing dependency!");
   g_object_set (dst,
                 "channel", "nd-inter-video",
                 "max-lateness", (gint64) - 1,
@@ -200,6 +208,8 @@ static GstElement *
 sink_create_audio_source_cb (NdStream * self, NdSink * sink)
 {
   GstElement *res;
+
+  g_debug ("NdStream: Sink create audio source cb");
 
   if (!self->pulse)
     return NULL;
@@ -252,6 +262,7 @@ nd_stream_cleanup (GApplication *app)
 static void
 nd_stream_startup (GApplication *app)
 {
+  g_debug ("NdStream: Startup");
   /* Run indefinitely, until told to exit. */
   g_application_hold (app);
 
@@ -347,29 +358,31 @@ nd_screencast_started_cb (GObject      *source_object,
   XdpSession *session = (XdpSession *) source_object;
   NdStream *self = ND_STREAM (user_data);
 
+  g_debug ("NdStream: Screencast started cb");
+
   self->session = session;
   if (!xdp_session_start_finish (self->session, result, &error))
     {
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         {
-          g_warning ("Error initializing screencast portal: %s", error->message);
+          g_warning ("NdStream: Error initializing screencast portal: %s", error->message);
 
           /* Unknown method means the portal does not exist, give a slightly
            * more specific warning then.
            */
           if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
-            g_warning ("Screencasting portal is unavailable! It is required to select the monitor to stream!");
+            g_warning ("NdStream: Screencasting portal is unavailable! It is required to select the monitor to stream!");
 
-          g_warning ("Falling back to X11! You need to fix your setup to avoid issues (XDG Portals and/or mutter screencasting support)!");
+          g_warning ("NdStream: Falling back to X11! You need to fix your setup to avoid issues (XDG Portals and/or mutter screencasting support)!");
           self->use_x11 = TRUE;
         }
 
-      g_warning ("Failed to start screencast session: %s", error->message);
+      g_warning ("NdStream: Failed to start screencast session: %s", error->message);
       g_clear_object (&self->session);
       return;
     }
 
-  g_debug ("Created screencast session");
+  g_debug ("NdStream: Created screencast session");
   g_signal_connect_object (self->session,
                            "closed",
                            (GCallback) session_closed_cb,
@@ -377,6 +390,7 @@ nd_screencast_started_cb (GObject      *source_object,
                            G_CONNECT_SWAPPED);
 
   self->is_screencasting = TRUE;
+  /* change pointer from meta_sink to current_sink */
   self->sink = nd_sink_start_stream (self->sink);
 
   if (!self->sink)
@@ -408,39 +422,19 @@ nd_screencast_started_cb (GObject      *source_object,
 }
 
 static void
-nd_screencast_init_cb (GObject      *source_object,
-                       GAsyncResult *result,
-                       gpointer      user_data)
-{
-  g_autoptr(GError) error = NULL;
-  XdpPortal *portal = XDP_PORTAL (source_object);
-  NdStream *self = ND_STREAM (user_data);
-
-  self->portal = portal;
-  self->session = xdp_portal_create_screencast_session_finish (self->portal, result, &error);
-  if (self->session == NULL)
-    {
-      g_warning ("Failed to create screencast session: %s", error->message);
-      self->use_x11 = TRUE;
-      return;
-    }
-
-  xdp_session_start (self->session, NULL, NULL, nd_screencast_started_cb, self);
-}
-
-static void
 nd_pulseaudio_init_async_cb (GObject      *source_object,
                              GAsyncResult *res,
                              gpointer      user_data)
 {
+  g_autoptr(GError) error = NULL;
   NdStream *self;
 
-  g_autoptr(GError) error = NULL;
+  g_debug ("NdStream: Pulseaudio init async cb");
 
   if (!g_async_initable_init_finish (G_ASYNC_INITABLE (source_object), res, &error))
     {
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-        g_warning ("Error initializing pulse audio sink: %s", error->message);
+        g_warning ("NdStream: Error initializing pulse audio sink: %s", error->message);
 
       g_object_unref (source_object);
       return;
@@ -451,39 +445,76 @@ nd_pulseaudio_init_async_cb (GObject      *source_object,
 }
 
 static void
+nd_screencast_init_cb (GObject      *source_object,
+                       GAsyncResult *result,
+                       gpointer      user_data)
+{
+  g_autoptr(GError) error = NULL;
+  XdpPortal *portal = XDP_PORTAL (source_object);
+  NdStream *self = ND_STREAM (user_data);
+  NdSink *sink = ND_SINK (self->sink);
+  gchar *name = NULL;
+  gchar *uuid = NULL;
+
+  g_debug ("NdStream: Screencast init cb");
+
+  g_assert (ND_IS_SINK (sink));
+
+  self->portal = portal;
+  self->session = xdp_portal_create_screencast_session_finish (self->portal, result, &error);
+  if (self->session == NULL)
+    {
+      g_warning ("NdStream: Failed to create screencast session: %s", error->message);
+      self->use_x11 = TRUE;
+      return;
+    }
+
+  xdp_session_start (self->session, NULL, NULL, nd_screencast_started_cb, self);
+
+  g_object_get (sink, "display-name", &name, NULL);
+  g_object_get (sink, "uuid", &uuid, NULL);
+
+  self->pulse = nd_pulseaudio_new (g_strdup (name), g_strdup (uuid));
+  g_async_initable_init_async (G_ASYNC_INITABLE (self->pulse),
+                               G_PRIORITY_LOW,
+                               self->cancellable,
+                               nd_pulseaudio_init_async_cb,
+                               self);
+}
+
+
+static void
 nd_stream_init (NdStream *self)
 {
   g_autoptr(GError) error = NULL;
-  NdPulseaudio *pulse;
-
   self->cancellable = g_cancellable_new ();
   self->is_screencasting = FALSE;
 
   self->portal = xdp_portal_initable_new (&error);
   if (error)
     {
-      g_warning ("Failed to create screencast portal: %s", error->message);
+      g_warning ("NdStream: Failed to create screencast portal: %s", error->message);
       self->use_x11 = TRUE;
       g_clear_object (&self->portal);
     }
 
-  if (self->portal)
-    xdp_portal_create_screencast_session (self->portal,
-                                          XDP_OUTPUT_MONITOR | XDP_OUTPUT_WINDOW | XDP_OUTPUT_VIRTUAL,
-                                          XDP_SCREENCAST_FLAG_NONE,
-                                          XDP_CURSOR_MODE_EMBEDDED,
-                                          XDP_PERSIST_MODE_NONE,
-                                          NULL,
-                                          self->cancellable,
-                                          nd_screencast_init_cb,
-                                          self);
+  if (!self->portal)
+    {
+      g_debug ("NdStream: Couldn't aquire portal. Quitting...");
+      g_application_quit (G_APPLICATION (self));
+      return;
+    }
 
-  pulse = nd_pulseaudio_new ();
-  g_async_initable_init_async (G_ASYNC_INITABLE (pulse),
-                               G_PRIORITY_LOW,
-                               self->cancellable,
-                               nd_pulseaudio_init_async_cb,
-                               self);
+  xdp_portal_create_screencast_session (self->portal,
+                                        XDP_OUTPUT_MONITOR | XDP_OUTPUT_WINDOW | XDP_OUTPUT_VIRTUAL,
+                                        XDP_SCREENCAST_FLAG_NONE,
+                                        XDP_CURSOR_MODE_EMBEDDED,
+                                        XDP_PERSIST_MODE_NONE,
+                                        NULL,
+                                        self->cancellable,
+                                        nd_screencast_init_cb,
+                                        self);
+  g_debug ("NdStream: Got a portal");
 }
 
 static gboolean

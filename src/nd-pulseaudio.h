@@ -10,7 +10,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (NdPulseaudio, nd_pulseaudio, ND, PULSEAUDIO, GObject)
 
-NdPulseaudio *nd_pulseaudio_new (void);
+NdPulseaudio *nd_pulseaudio_new (gchar * name, gchar * uuid);
 
 GstElement           *nd_pulseaudio_get_source (NdPulseaudio *self);
 
