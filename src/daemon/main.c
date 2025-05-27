@@ -49,7 +49,7 @@ main (int   argc,
   gst_init (&argc, &argv);
 
   daemon = g_object_new (ND_TYPE_DAEMON,
-                         "application-id", "org.gnome.NetworkDisplays.daemon",
+                         "application-id", "org.gnome.NetworkDisplays.Daemon",
                          "flags", G_APPLICATION_IS_SERVICE,
                          NULL);
 
