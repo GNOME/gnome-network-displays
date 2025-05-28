@@ -21,7 +21,7 @@
 #include <gst/gst.h>
 #include <glib-object.h>
 
-
+#include "gnome-network-displays-config.h"
 #include "nd-daemon.h"
 #include "nd-manager.h"
 #include "nd-meta-provider.h"
@@ -145,6 +145,7 @@ nd_daemon_class_init (NdDaemonClass *klass)
 static void
 nd_daemon_init (NdDaemon *self)
 {
+  g_debug ("GNOME Network Displays Daemon v%s started", PACKAGE_VERSION);
   self->meta_provider = nd_meta_provider_new ();
   self->manager = nd_manager_new (ND_PROVIDER (self->meta_provider));
 }
