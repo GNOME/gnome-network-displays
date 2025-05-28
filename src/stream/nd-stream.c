@@ -25,24 +25,26 @@
 #include <gst/base/base.h>
 #include <gst/gst.h>
 
+#include "gnome-network-displays-config.h"
 #include "nd-stream.h"
 #include "nd-pulseaudio.h"
 #include "nd-sink.h"
 
 struct _NdStream
 {
-  GApplication  parent_instance;
+  GApplication           parent_instance;
 
-  GSource      *sigterm_source;
-  GSource      *sigint_source;
+  GSource               *sigterm_source;
+  GSource               *sigint_source;
 
-  XdpPortal    *portal;
-  XdpSession   *session;
-  NdPulseaudio *pulse;
+  XdpPortal             *portal;
+  XdpSession            *session;
+  NdPulseaudio          *pulse;
+  NdScreenCastSourceType screencast_type;
 
-  GCancellable *cancellable;
+  GCancellable          *cancellable;
 
-  NdSink       *sink;
+  NdSink                *sink;
 };
 
 enum {
@@ -108,17 +110,36 @@ nd_stream_get_source (NdStream *self)
   GVariantIter iter;
   gchar *uuid = NULL;
   guint32 node_id;
-  int fd;
+  guint32 screencast_type;
 
   g_debug ("NdStream: Getting a source");
 
-  fd = xdp_session_open_pipewire_remote (self->session);
+  if (!self->session)
+    g_error ("NdStream: XDP session not found!");
+
   streams = xdp_session_get_streams (self->session);
+  if (streams == NULL)
+    g_error ("NdStream: XDP session streams not found!");
 
   g_variant_iter_init (&iter, streams);
   g_variant_iter_loop (&iter, "(u@a{sv})", &node_id, &stream_properties);
+  g_variant_lookup (stream_properties, "source_type", "u", &screencast_type);
 
   g_debug ("NdStream: Got a stream with node ID: %d", node_id);
+  g_debug ("NdStream: Got a stream of type: %d", screencast_type);
+
+  switch (screencast_type)
+    {
+    case ND_SCREEN_CAST_SOURCE_TYPE_MONITOR:
+    case ND_SCREEN_CAST_SOURCE_TYPE_WINDOW:
+    case ND_SCREEN_CAST_SOURCE_TYPE_VIRTUAL:
+      self->screencast_type = screencast_type;
+      break;
+
+    default:
+      g_assert_not_reached ();
+    }
+
   g_assert (ND_IS_SINK (self->sink));
 
   g_object_get (self->sink, "uuid", &uuid, NULL);
@@ -128,7 +149,7 @@ nd_stream_get_source (NdStream *self)
     g_error ("GStreamer element \"pipewiresrc\" could not be created!");
 
   g_object_set (src,
-                "fd", fd,
+                "fd", xdp_session_open_pipewire_remote (self->session),
                 "path", g_strdup_printf ("%u", node_id),
                 "do-timestamp", TRUE,
                 NULL);
@@ -152,8 +173,9 @@ session_closed_cb (NdStream * self, NdSink * sink)
 static GstElement *
 sink_create_source_cb (NdStream * self, NdSink * sink)
 {
+  g_autoptr(GstCaps) caps = NULL;
   GstBin *bin;
-  GstElement *src, *dst, *res;
+  GstElement *src, *filter, *dst, *res;
 
   g_debug ("NdStream: Sink create source cb");
 
@@ -175,7 +197,25 @@ sink_create_source_cb (NdStream * self, NdSink * sink)
                 NULL);
   gst_bin_add (bin, dst);
 
-  gst_element_link_many (src, dst, NULL);
+  if (self->screencast_type == ND_SCREEN_CAST_SOURCE_TYPE_VIRTUAL)
+    {
+      /* Initial caps for virtual display */
+      caps = gst_caps_new_simple ("video/x-raw",
+                                  "max-framerate", GST_TYPE_FRACTION, 30, 1,
+                                  "width", G_TYPE_INT, 1920,
+                                  "height", G_TYPE_INT, 1080,
+                                  NULL);
+      filter = gst_element_factory_make ("capsfilter", "srcfilter");
+      gst_bin_add (bin, filter);
+      g_object_set (filter,
+                    "caps", caps,
+                    NULL);
+      g_clear_pointer (&caps, gst_caps_unref);
+
+      gst_element_link_many (src, filter, dst, NULL);
+    }
+  else
+    gst_element_link_many (src, dst, NULL);
 
   res = gst_element_factory_make ("intervideosrc", "screencastsrc");
   g_object_set (res,
@@ -222,8 +262,10 @@ nd_stream_cleanup (GApplication *app)
     {
       g_debug ("NdStream: Closing screencast session");
       xdp_session_close (self->session);
-      g_clear_object (&self->session);
     }
+
+  if (self->session)
+    g_clear_object (&self->session);
 
   if (self->pulse)
     {
@@ -345,13 +387,12 @@ nd_screencast_started_cb (GObject      *source_object,
                           gpointer      user_data)
 {
   g_autoptr(GError) error = NULL;
-  XdpSession *session = (XdpSession *) source_object;
+  XdpSession *session = XDP_SESSION (source_object);
   NdStream *self = ND_STREAM (user_data);
 
   g_debug ("NdStream: Screencast started cb");
 
-  self->session = session;
-  if (!xdp_session_start_finish (self->session, result, &error))
+  if (!xdp_session_start_finish (session, result, &error))
     {
       if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         {
@@ -475,6 +516,8 @@ nd_stream_init (NdStream *self)
 {
   g_autoptr(GError) error = NULL;
   self->cancellable = g_cancellable_new ();
+
+  g_debug ("GNOME Network Displays Stream v%s started", PACKAGE_VERSION);
 
   self->portal = xdp_portal_initable_new (&error);
   if (error)
