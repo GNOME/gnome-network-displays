@@ -52,7 +52,9 @@ screenshots or screencasts related, please provide them here.
 -->
 
 <details>
+
 ```
 <!-- Paste logs here -->
 ```
+
 </details>
