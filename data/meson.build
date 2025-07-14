@@ -18,8 +18,8 @@ if build_app
   endif
 
   appstream_file = i18n.merge_file(
-    input: 'org.gnome.NetworkDisplays.appdata.xml.in',
-    output: 'org.gnome.NetworkDisplays.appdata.xml',
+    input: 'org.gnome.NetworkDisplays.metainfo.xml.in',
+    output: 'org.gnome.NetworkDisplays.metainfo.xml',
     po_dir: '../po',
     install: true,
     install_dir: join_paths(get_option('datadir'), 'metainfo')
