@@ -1,49 +1,46 @@
 # Japanese translation for gnome-network-displays.
-# Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
+# Copyright (C) 2020, 2025 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
 # Hiroshi Miura <miurahr@linux.com>, 2020.
+# Makoto Sakaguchi <ycco34vx@gmail.com>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-network-displays\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2020-08-28 12:59+0900\n"
-"Last-Translator: Hiroshi Miura <miurahr@osmf.jp>\n"
-"Language-Team: \n"
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2025-06-05 12:54+0000\n"
+"PO-Revision-Date: 2025-07-17 07:21+0900\n"
+"Last-Translator: Makoto Sakaguchi <ycco34vx@gmail.com>\n"
+"Language-Team: Japanese <https://l10n.gnome.org/teams/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.3\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.6\n"
 
-#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.desktop.in:3
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
-msgstr "GNOME ネットワークディスプレイ\t"
+msgstr "GNOME ネットワークディスプレイ"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Screencasting for GNOME"
-msgstr ""
-
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
-msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
+msgstr "GNOME 向けスクリーンキャスト"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:24
-#, fuzzy
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
 msgstr ""
-"GNOMEネットワークディスプレイは、あなたのデスクトップをリモートのディスプレイ"
-"に配信することができます。現在、Wi-Fi ディスプレイ対応デバイス(別名 "
-"Miracast, ミラーリング)に対応しています。"
+"GNOME ネットワークディスプレイは、デスクトップをリモートディスプレイにキャス"
+"トできます。Miracast および Chromecast プロトコルに対応しています。"
 
 #: src/app/nd-codec-install.c:60
 #, c-format
 msgid "GStreamer OpenH264 video encoder (%s)"
-msgstr "GStreamer OpenH264ビデオエンコーダー(%s)"
+msgstr "GStreamer OpenH264 ビデオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:62
 #, c-format
@@ -51,9 +48,9 @@ msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264 ビデオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:64
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
-msgstr "GStreamer VA-API H264 ビデオエンコーダー (%s)"
+msgstr "GStreamer VA H264 ビデオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:66
 #, c-format
@@ -61,14 +58,14 @@ msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264 ビデオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:68
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
-msgstr "GStreamer OpenH264ビデオエンコーダー(%s)"
+msgstr "GStreamer On2 VP8 ビデオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:70
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
-msgstr "GStreamer OpenH264ビデオエンコーダー(%s)"
+msgstr "GStreamer On2 VP9 ビデオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:73
 #, c-format
@@ -86,29 +83,29 @@ msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC オーディオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
-msgstr "GStreamer Free AAC オーディオエンコーダー (%s)"
+msgstr "GStreamer Vorbis オーディオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:81
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Opus audio encoder (%s)"
-msgstr "GStreamer FDK AAC オーディオエンコーダー (%s)"
+msgstr "GStreamer Opus オーディオエンコーダー (%s)"
 
 #: src/app/nd-codec-install.c:84
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer WebM muxer (%s)"
-msgstr "GStreamer x264 ビデオエンコーダー (%s)"
+msgstr "GStreamer WebM マルチプレクサ (%s)"
 
 #: src/app/nd-codec-install.c:86
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Matroska muxer (%s)"
-msgstr "GStreamer FDK AAC オーディオエンコーダー (%s)"
+msgstr "GStreamer Matroska マルチプレクサ (%s)"
 
 #: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
-msgstr ""
+msgstr "GStreamer MPEG Transport Stream マルチプレクサ (%s)"
 
 #: src/app/nd-codec-install.c:90
 #, c-format
@@ -118,33 +115,32 @@ msgstr "GStreamer Element “%s”"
 #: src/app/nd-codec-install.c:196
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
-"次をクリックして以下に示したGStreamerプラグインのうち一つを導入してください。"
+"以下をクリックして、次の GStreamer プラグインのいずれかをインストールしてくだ"
+"さい"
 
 #: src/app/nd-window.c:233
 msgid "Checking and installing required firewall zones."
-msgstr "チェックとインストールには、ファイアウオールゾーンが必要です。"
+msgstr "必要なファイアウォールゾーンを確認してインストールしています。"
 
 #: src/app/nd-window.c:240
 msgid "Making P2P connection"
-msgstr "P2Pコネクションを張っています。"
+msgstr "P2P 接続を確立しています"
 
 #: src/app/nd-window.c:247
 msgid "Establishing connection to sink"
-msgstr "デバイスに接続しています。"
+msgstr "表示先への接続を確立しています"
 
 #: src/app/nd-window.c:254
 msgid "Starting to stream"
-msgstr "配信を開始します。"
+msgstr "ストリーミングを開始しています"
 
 #: src/nd-window.ui:6
-#, fuzzy
 msgid "Network Displays"
-msgstr "GNOME ネットワークディスプレイ\t"
+msgstr "ネットワークディスプレイ"
 
 #: src/nd-window.ui:28
-#, fuzzy
 msgid "No Wi‑Fi P2P Adapter Found"
-msgstr "Wi-Fi P2Pアダプターがみつかりません。"
+msgstr "Wi-Fi P2P アダプターが見つかりません"
 
 #: src/nd-window.ui:29
 msgid ""
@@ -152,17 +148,17 @@ msgid ""
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
 "wpa_supplicant."
 msgstr ""
-"利用可能なワイヤレスアダプターがありません。Wi-Fiが有効化されていることや、"
-"Wi-Fi P2Pに対応していることを、NetworkManagerとwpa_supplicantの双方に対して確"
-"認してください。"
+"利用可能なワイヤレスアダプターが見つかりません。Wi-Fi が有効になっており、"
+"NetworkManager と wpa_supplicant の両方で Wi-Fi P2P 操作が利用可能であること"
+"を確認してください。"
 
 #: src/nd-window.ui:63
 msgid "Available Video Sinks"
-msgstr "利用可能なビデオデバイス"
+msgstr "利用可能な映像出力先"
 
 #: src/nd-window.ui:137
 msgid "Connecting"
-msgstr "接続中\t"
+msgstr "接続中"
 
 #: src/nd-window.ui:160 src/nd-window.ui:231
 msgid "Cancel"
@@ -181,22 +177,20 @@ msgid "Return"
 msgstr "戻る"
 
 #: src/nd-window.ui:308
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"次のオーディオコーデックのうち一つが必要です。\n"
-"クリックして導入してください。"
+"音声サポートには、次のコーデックプラグインのいずれかが必要です。\n"
+"クリックするとインストール処理が開始されます。"
 
 #: src/nd-window.ui:314
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for video support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"次のオーディオコーデックのうち一つが必要です。\n"
-"クリックして導入してください。"
+"映像サポートには、次のコーデックプラグインのいずれかが必要です。\n"
+"クリックするとインストール処理が開始されます。"
 
 #: src/nd-window.ui:327
 msgid ""
@@ -204,8 +198,9 @@ msgid ""
 "try again and enter the password when prompted or contact a system "
 "administrator."
 msgstr ""
-"要求されるファイアウォールゾーンが存在せず、導入もできませんでした。再試行し"
-"てパスワード要求へ対応するか、システム管理者の助けを借りてください。"
+"必要なファイアウォールゾーンが利用できず、インストールできませんでした。再度"
+"お試しいただき、パスワードの入力を求められた場合は入力するか、システム管理者"
+"にお問い合わせください。"
 
 #~ msgid "Stream the desktop to Wi-Fi Display capable devices"
 #~ msgstr ""
