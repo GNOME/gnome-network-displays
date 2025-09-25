@@ -1,0 +1,202 @@
+# Bulgarian translation for gnome-network-displays.
+# Copyright (C) 2025 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# twlvnn kraftwerk <kraft_werk@tutanota.com>,  2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2025-08-10 18:11+0000\n"
+"PO-Revision-Date: 2025-09-12 18:18+0200\n"
+"Last-Translator: twlvnn kraftwerk <kraft_werk@tutanota.com>\n"
+"Language-Team: Bulgarian <dict-notifications@fsa-bg.org>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.7\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
+msgid "GNOME Network Displays"
+msgstr "GNOME мрежови дисплеи"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Програма за записване на екрана за GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Supports the Miracast and Chromecast protocols."
+msgstr ""
+"GNOME Network Displays ви позволява да предавате вашата работна среда към "
+"отдалечен екран. Поддържа протоколите Miracast и Chromecast."
+
+#: src/app/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "GStreamer OpenH264 видео кодер (%s)"
+
+#: src/app/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "GStreamer x264 видео кодер (%s)"
+
+#: src/app/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "GStreamer VA H264 видео кодер (%s)"
+
+#: src/app/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "GStreamer VA-API H264 видео кодер (%s)"
+
+#: src/app/nd-codec-install.c:68
+#, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "GStreamer On2 VP8 видео кодер (%s)"
+
+#: src/app/nd-codec-install.c:70
+#, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "GStreamer On2 VP9 видео кодер (%s)"
+
+#: src/app/nd-codec-install.c:73
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "GStreamer FDK AAC аудио кодер (%s)"
+
+#: src/app/nd-codec-install.c:75
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "GStreamer libav AAC аудио кодер (%s)"
+
+#: src/app/nd-codec-install.c:77
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "GStreamer Free AAC аудио кодер (%s)"
+
+#: src/app/nd-codec-install.c:79
+#, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "GStreamer Vorbis аудио кодер (%s)"
+
+#: src/app/nd-codec-install.c:81
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "GStreamer Opus аудио кодер (%s)"
+
+#: src/app/nd-codec-install.c:84
+#, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "GStreamer WebM muxer (%s)"
+
+#: src/app/nd-codec-install.c:86
+#, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "GStreamer Matroska muxer (%s)"
+
+#: src/app/nd-codec-install.c:88
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "GStreamer MPEG Transport Stream muxer (%s)"
+
+#: src/app/nd-codec-install.c:90
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "GStreamer елемент „%s“"
+
+#: src/app/nd-codec-install.c:196
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+"Моля, инсталирайте една от следните GStreamer приставки, като натиснете по-"
+"долу"
+
+#: src/app/nd-window.c:233
+msgid "Checking and installing required firewall zones."
+msgstr "Проверяване и инсталиране на необходимите зони на защитната стена."
+
+#: src/app/nd-window.c:240
+msgid "Making P2P connection"
+msgstr "Създаване на равноправна връзка"
+
+#: src/app/nd-window.c:247
+msgid "Establishing connection to sink"
+msgstr "Установяване на връзка с приемника"
+
+#: src/app/nd-window.c:254
+msgid "Starting to stream"
+msgstr "Започване на предаването"
+
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Мрежови дисплеи"
+
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
+msgstr "Няма намерен равноправен Wi‑Fi адаптер"
+
+#: src/nd-window.ui:29
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Няма намерени използваеми безжични адаптери. Проверете дали Wi‑Fi е включен "
+"и дали равноправните Wi‑Fi операциите са достъпни както в NetworkManager, "
+"така и в wpa_supplicant."
+
+#: src/nd-window.ui:63
+msgid "Available Video Sinks"
+msgstr "Налични видео приемници"
+
+#: src/nd-window.ui:137
+msgid "Connecting"
+msgstr "Свързване"
+
+#: src/nd-window.ui:160 src/nd-window.ui:231
+msgid "Cancel"
+msgstr "Отказване"
+
+#: src/nd-window.ui:205
+msgid "Streaming"
+msgstr "Предаване"
+
+#: src/nd-window.ui:276
+msgid "Error"
+msgstr "Грешка"
+
+#: src/nd-window.ui:299
+msgid "Return"
+msgstr "Назад"
+
+#: src/nd-window.ui:308
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"За поддръжка на аудио е необходим един от следните аудио кодери.\n"
+"Натиснете, за да започнете процеса на инсталиране."
+
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"За поддръжка на аудио е необходим един от следните видео кодери.\n"
+"Натиснете, за да започнете процеса на инсталиране."
+
+#: src/nd-window.ui:327
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"Необходимата зона на защитната стена не е налична и не може да бъде "
+"инсталирана. Опитайте отново и въведете паролата, когато бъдете подканени, "
+"или се свържете със системния администратор."
