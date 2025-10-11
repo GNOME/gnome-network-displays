@@ -1,45 +1,42 @@
 # Dutch translation for gnome-network-displays.
 # Copyright (C) 2020 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
-# Nathan Follens <nthn@unseen.is>, 2020.
+# Nathan Follens <nfollens@gnome.org>, 2020, 2025.
+# Dick Groskamp <dikgro@yahoo.co.uk>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2020-08-25 22:01+0200\n"
-"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
-"Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2025-08-10 18:11+0000\n"
+"PO-Revision-Date: 2025-10-11 22:13+0200\n"
+"Last-Translator: Nathan Follens <nfollens@gnome.org>\n"
+"Language-Team: GNOME-NL https://matrix.to/#/#nl:gnome.org\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 3.6\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
-msgstr "Gnome Netwerkschermen"
+msgstr "GNOME Netwerkschermen"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Screencasting for GNOME"
-msgstr ""
-
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
-msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
+msgstr "Screencasten voor GNOME"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:24
-#, fuzzy
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
 msgstr ""
-"Gnome Netwerkschermen laat u uw bureaublad streamen naar een extern "
-"beeldscherm. Momenteel wordt enkel streamen naar apparaten compatibel met Wi-"
-"Fi Display ('Miracast') ondersteund."
+"GNOME Netwerkschermen stelt u in staat uw bureaublad naar een scherm op "
+"afstand te casten, met ondersteuning voor de Miracast- en Chromecast-"
+"protocollen."
 
 #: src/app/nd-codec-install.c:60
 #, c-format
@@ -52,9 +49,9 @@ msgid "GStreamer x264 video encoder (%s)"
 msgstr "GStreamer x264-video-encoder (%s)"
 
 #: src/app/nd-codec-install.c:64
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
-msgstr "GStreamer VA-API H264-video-encoder (%s)"
+msgstr "GStreamer VA H264-video-encoder (%s)"
 
 #: src/app/nd-codec-install.c:66
 #, c-format
@@ -62,14 +59,14 @@ msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "GStreamer VA-API H264-video-encoder (%s)"
 
 #: src/app/nd-codec-install.c:68
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
-msgstr "GStreamer OpenH264-video-encoder (%s)"
+msgstr "GStreamer On2 VP8-video-encoder (%s)"
 
 #: src/app/nd-codec-install.c:70
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
-msgstr "GStreamer OpenH264-video-encoder (%s)"
+msgstr "GStreamer On2 VP9-video-encoder (%s)"
 
 #: src/app/nd-codec-install.c:73
 #, c-format
@@ -87,29 +84,29 @@ msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "GStreamer Free AAC-audio-encoder (%s)"
 
 #: src/app/nd-codec-install.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
-msgstr "GStreamer Free AAC-audio-encoder (%s)"
+msgstr "GStreamer Vorbis-audio-encoder (%s)"
 
 #: src/app/nd-codec-install.c:81
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Opus audio encoder (%s)"
-msgstr "GStreamer FDK AAC-audio-encoder (%s)"
+msgstr "GStreamer Opus-audio-encoder (%s)"
 
 #: src/app/nd-codec-install.c:84
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer WebM muxer (%s)"
-msgstr "GStreamer x264-video-encoder (%s)"
+msgstr "GStreamer WebM-muxer (%s)"
 
 #: src/app/nd-codec-install.c:86
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Matroska muxer (%s)"
-msgstr "GStreamer FDK AAC-audio-encoder (%s)"
+msgstr "GStreamer Matroska-muxer (%s)"
 
 #: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
-msgstr ""
+msgstr "GStreamer MPEG Transport Stream-muxer (%s)"
 
 #: src/app/nd-codec-install.c:90
 #, c-format
@@ -138,12 +135,10 @@ msgid "Starting to stream"
 msgstr "Beginnen met streamen"
 
 #: src/nd-window.ui:6
-#, fuzzy
 msgid "Network Displays"
-msgstr "Gnome Netwerkschermen"
+msgstr "Netwerkschermen"
 
 #: src/nd-window.ui:28
-#, fuzzy
 msgid "No Wi‑Fi P2P Adapter Found"
 msgstr "Geen wifi-p2p-adapters gevonden"
 
@@ -153,7 +148,7 @@ msgid ""
 "and Wi‑Fi P2P operations are available in both NetworkManager and "
 "wpa_supplicant."
 msgstr ""
-"Er zijn geen bruikbare draadloze adapters gevonden. Controleer of wifi "
+"Kon geen bruikbare draadloze adapters vinden. Controleer of wifi "
 "ingeschakeld is en wifi-p2p-bewerkingen beschikbaar zijn in zowel "
 "NetworkManager als wpa_supplicant."
 
@@ -182,22 +177,20 @@ msgid "Return"
 msgstr "Terug"
 
 #: src/nd-window.ui:308
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Een van de volgende audiocodecplug-ins is vereist voor audio-ondersteuning.\n"
-"Erop klikken zal het installatieproces ervan beginnen."
+"Een van de volgende codecplug-ins is vereist voor audio-ondersteuning.\n"
+"Klik erop om het installatieproces te starten."
 
 #: src/nd-window.ui:314
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for video support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Een van de volgende audiocodecplug-ins is vereist voor audio-ondersteuning.\n"
-"Erop klikken zal het installatieproces ervan beginnen."
+"Een van de volgende codecplug-ins is vereist voor video-ondersteuning.\n"
+"Klik erop om het installatieproces te starten."
 
 #: src/nd-window.ui:327
 msgid ""
