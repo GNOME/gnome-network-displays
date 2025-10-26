@@ -1,13 +1,14 @@
 # Serbian translation for gnome-network-displays.
 # Copyright © 2021 gnome-network-displays's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
-# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2021.
+# Мирослав Николић <miroslavnikolic@rocketmail.com>, 2021-2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2021-02-05 16:49+0200\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2025-10-11 20:14+0000\n"
+"PO-Revision-Date: 2025-10-26 17:08+0100\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: Serbian <(nothing)>\n"
 "Language: sr\n"
@@ -17,6 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=n==1? 3 : n%10==1 && n%100!=11 ? 0 : "
 "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Project-Style: gnome\n"
+"X-Generator: Poedit 3.6\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
@@ -25,21 +27,15 @@ msgstr "Гномов екран на мрежи"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:8
 msgid "Screencasting for GNOME"
-msgstr ""
-
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
-msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
+msgstr "Пренос екрана за Гном"
 
 #: data/org.gnome.NetworkDisplays.appdata.xml.in:24
-#, fuzzy
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
 msgstr ""
 "Гномов екран на мрежи вам омогућава да приказујете вашу радну површ на "
-"удаљеном екрану. Тренутно примењено је подршка за емитовање на уређаје са "
-"могућношћу бежичног приказа (тј. Миракаст)."
+"удаљеном екрану. Подржава протоколе Miracast и Chromecast."
 
 #: src/app/nd-codec-install.c:60
 #, c-format
@@ -52,9 +48,9 @@ msgid "GStreamer x264 video encoder (%s)"
 msgstr "Гстример x264 видео шифрер (%s)"
 
 #: src/app/nd-codec-install.c:64
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
-msgstr "Гстример VA-API H264 видео шифрер (%s)"
+msgstr "Гстример VA H264 видео шифрер (%s)"
 
 #: src/app/nd-codec-install.c:66
 #, c-format
@@ -62,14 +58,14 @@ msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "Гстример VA-API H264 видео шифрер (%s)"
 
 #: src/app/nd-codec-install.c:68
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
-msgstr "Гстример OpenH264 видео шифрер (%s)"
+msgstr "Гстример On2 VP8 видео шифрер (%s)"
 
 #: src/app/nd-codec-install.c:70
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
-msgstr "Гстример OpenH264 видео шифрер (%s)"
+msgstr "Гстример On2 VP9 видео шифрер (%s)"
 
 #: src/app/nd-codec-install.c:73
 #, c-format
@@ -87,29 +83,29 @@ msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "Гстример Free AAC аудио шифрер (%s)"
 
 #: src/app/nd-codec-install.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
-msgstr "Гстример Free AAC аудио шифрер (%s)"
+msgstr "Гстример Vorbis аудио шифрер (%s)"
 
 #: src/app/nd-codec-install.c:81
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Opus audio encoder (%s)"
-msgstr "Гстример FDK AAC аудио шифрер (%s)"
+msgstr "Гстример Opus аудио шифрер (%s)"
 
 #: src/app/nd-codec-install.c:84
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer WebM muxer (%s)"
-msgstr "Гстример x264 видео шифрер (%s)"
+msgstr "Гстример WebM муксер (%s)"
 
 #: src/app/nd-codec-install.c:86
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Matroska muxer (%s)"
-msgstr "Гстример FDK AAC аудио шифрер (%s)"
+msgstr "Гстример Матроска муксер (%s)"
 
 #: src/app/nd-codec-install.c:88
 #, c-format
 msgid "GStreamer MPEG Transport Stream muxer (%s)"
-msgstr ""
+msgstr "Гстример MPEG Transport Stream муксер (%s)"
 
 #: src/app/nd-codec-install.c:90
 #, c-format
@@ -137,14 +133,12 @@ msgid "Starting to stream"
 msgstr "Почињем да емитујем"
 
 #: src/nd-window.ui:6
-#, fuzzy
 msgid "Network Displays"
-msgstr "Гномов екран на мрежи"
+msgstr "Екрани на мрежи"
 
 #: src/nd-window.ui:28
-#, fuzzy
 msgid "No Wi‑Fi P2P Adapter Found"
-msgstr "Нисам нашао бежичне П2П адаптере"
+msgstr "Нисам нашао бежични П2П адаптер"
 
 #: src/nd-window.ui:29
 msgid ""
@@ -181,21 +175,19 @@ msgid "Return"
 msgstr "Врати"
 
 #: src/nd-window.ui:308
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Један од следећих прикључака аудио кодека је потребан за подршку звука.\n"
+"Један од следећих прикључака кодека је потребан за подршку звука.\n"
 "Клик ће започети поступак инсталације."
 
 #: src/nd-window.ui:314
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for video support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Један од следећих прикључака аудио кодека је потребан за подршку звука.\n"
+"Један од следећих прикључака кодека је потребан за подршку слике.\n"
 "Клик ће започети поступак инсталације."
 
 #: src/nd-window.ui:327
