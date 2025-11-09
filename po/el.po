@@ -1,0 +1,195 @@
+# Greek translation for gnome-network-displays.
+# Copyright (C) 2024 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Giannis Antypas <gianni.antypas@gmail.com>,  2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2024-07-09 16:46+0000\n"
+"PO-Revision-Date: 2024-07-09 16:46+0000\n"
+"Last-Translator: Giannis Antypas <gianni.antypas@gmail.com>\n"
+"Language-Team: Greek <team@gnome.gr>\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:3
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/main.c:68
+msgid "GNOME Network Displays"
+msgstr "Δικτυακές Προβολές GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Εκπομπή οθόνης για το GNOME"
+
+#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Supports the Miracast and Chromecast protocols."
+msgstr ""
+"Οι Δικτυακές Προβολές GNOME σάς επιτρέπουν να προβάλλετε την επιφάνεια εργασίας σας σε μια απομακρυσμένη οθόνη."
+"Υποστηρίζουν τα πρωτόκολλα Miracast και Chromecast."
+
+#: src/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "Κωδικοποιητής βίντεο GStreamer OpenH264 (%s)"
+
+#: src/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "Κωδικοποιητής βίντεο GStreamer x264 (%s)"
+
+#: src/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "Κωδικοποιητής βίντεο GStreamer VA-API H264 (%s)"
+
+#: src/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "Κωδικοποιητής βίντεο GStreamer On2 VP8 (%s)"
+
+#: src/nd-codec-install.c:68
+#, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "Κωδικοποιητής βίντεο GStreamer On2 VP9 (%s)"
+
+#: src/nd-codec-install.c:71
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "Κωδικοποιητής ήχου GStreamer FDK AAC (%s)"
+
+#: src/nd-codec-install.c:73
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "Κωδικοποιητής ήχου GStreamer libav AAC (%s)"
+
+#: src/nd-codec-install.c:75
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "Κωδικοποιητής ήχου GStreamer Free AAC (%s)"
+
+#: src/nd-codec-install.c:77
+#, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "Κωδικοποιητής ήχου GStreamer Vorbis (%s)"
+
+#: src/nd-codec-install.c:79
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "Κωδικοποιητής ήχου GStreamer Opus (%s)"
+
+#: src/nd-codec-install.c:82
+#, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "Πολυπλέκτης GStreamer WebM (%s)"
+
+#: src/nd-codec-install.c:84
+#, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "Πολυπλέκτης GStreamer Matroska (%s)"
+
+#: src/nd-codec-install.c:86
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "Πολυπλέκτης GStreamer MPEG Transport Stream (%s)"
+
+#: src/nd-codec-install.c:88
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "Στοιχείο GStreamer “%s”"
+
+#: src/nd-codec-install.c:194
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr "Παρακαλώ εγκαταστήστε ένα από τα ακόλουθα πρόσθετα GStreamer πατώντας κλικ παρακάτω"
+
+#: src/nd-window.c:201
+msgid "Checking and installing required firewall zones."
+msgstr "Γίνεται έλεγχος και εγκατάσταση των απαιτούμενων ζωνών τείχους προστασίας."
+
+#: src/nd-window.c:208
+msgid "Making P2P connection"
+msgstr "Γίνεται σύνδεση P2P"
+
+#: src/nd-window.c:215
+msgid "Establishing connection to sink"
+msgstr "Πραγματοποιείται σύνδεση με το συλλέκτη"
+
+#: src/nd-window.c:222
+msgid "Starting to stream"
+msgstr "Γίνεται εκκίνηση της μετάδοσης ροής"
+
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Δικτυακές Προβολές"
+
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
+msgstr "Δε Βρέθηκε Προσαρμογέας  Wi‑Fi P2P"
+
+#: src/nd-window.ui:29
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Δε βρέθηκαν ασύρματοι προσαρμογείς προς χρήση. Παρακαλώ βεβαιωθείτε ότι το Wi‑Fi είναι ενεργοποιημένο "
+"και ότι οι λειτουργίες Wi‑Fi P2P είναι διαθέσιμες τόσο στο NetworkManager όσο και "
+"στο wpa_supplicant."
+
+#: src/nd-window.ui:63
+msgid "Available Video Sinks"
+msgstr "Διαθέσιμοι Συλλέκτες Βίντεο"
+
+#: src/nd-window.ui:137
+msgid "Connecting"
+msgstr "Γίνεται σύνδεση"
+
+#: src/nd-window.ui:160 src/nd-window.ui:231
+msgid "Cancel"
+msgstr "Ακύρωση"
+
+#: src/nd-window.ui:205
+msgid "Streaming"
+msgstr "Μετάδοση ροής"
+
+#: src/nd-window.ui:276
+msgid "Error"
+msgstr "Σφάλμα"
+
+#: src/nd-window.ui:299
+msgid "Return"
+msgstr "Επιστροφή"
+
+#: src/nd-window.ui:308
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Για υποστήριξη ήχου απαιτείται ένα από τα ακόλουθα πρόσθετα κωδικοποίησης .\n"
+"Πατώντας κλικ θα εκκινήσει η διαδικασία εγκατάστασης."
+
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"Για υποστήριξη βίντεο απαιτείται ένα από τα ακόλουθα πρόσθετα κωδικοποίησης .\n"
+"Πατώντας κλικ θα εκκινήσει η διαδικασία εγκατάστασης."
+
+#: src/nd-window.ui:327
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"Δεν είναι διαθέσιμη μια απαιτούμενη ζώνη τείχους προστασίας και δε μπόρεσε να εγκατασταθεί. Παρακαλώ "
+"προσπαθήστε ξανά και εισάγετε τον κωδικό πρόσβασης όταν ζητηθεί ή επικοινωνήστε "
+"με ένα διαχειριστή του συστήματος."
