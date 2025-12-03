@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <avahi-gobject/ga-client.h>
-#include <avahi-gobject/ga-service-browser.h>
 #include <gst/gst.h>
 #include <glib-object.h>
 
@@ -27,14 +25,21 @@
 #include "nd-meta-provider.h"
 #include "nd-nm-device-registry.h"
 #include "nd-dummy-provider.h"
+
+#ifdef HAVE_AVAHI
+#include <avahi-gobject/ga-client.h>
+#include <avahi-gobject/ga-service-browser.h>
 #include "nd-wfd-mice-provider.h"
 #include "nd-cc-provider.h"
+#endif
 
 struct _NdDaemon
 {
   GApplication        parent_instance;
 
+#ifdef HAVE_AVAHI
   GaClient           *avahi_client;
+#endif
   NdNMDeviceRegistry *nm_device_registry;
   NdMetaProvider     *meta_provider;
   NdManager          *manager;
@@ -46,11 +51,7 @@ static void
 nd_daemon_constructed (GObject *obj)
 {
   NdDaemon *self = ND_DAEMON (obj);
-
-  g_autoptr(GError) error = NULL;
   g_autoptr(NdDummyProvider) dummy_provider = NULL;
-  g_autoptr(NdWFDMiceProvider) mice_provider = NULL;
-  g_autoptr(NdCCProvider) cc_provider = NULL;
 
   if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_DUMMY"), "1") == 0)
     {
@@ -61,30 +62,38 @@ nd_daemon_constructed (GObject *obj)
 
   self->nm_device_registry = nd_nm_device_registry_new (self->meta_provider);
 
-  self->avahi_client = ga_client_new (GA_CLIENT_FLAG_NO_FLAGS);
+#ifdef HAVE_AVAHI
+  {
+    g_autoptr(GError) error = NULL;
+    g_autoptr(NdWFDMiceProvider) mice_provider = NULL;
+    g_autoptr(NdCCProvider) cc_provider = NULL;
 
-  if (!ga_client_start (self->avahi_client, &error))
-    {
-      g_warning ("NdDaemon: Failed to start Avahi Client");
-      if (error != NULL)
-        g_warning ("NdDaemon: Error: %s", error->message);
-      return;
-    }
+    self->avahi_client = ga_client_new (GA_CLIENT_FLAG_NO_FLAGS);
 
-  g_debug ("NdDaemon: Got avahi client");
+    if (!ga_client_start (self->avahi_client, &error))
+      {
+        g_warning ("NdDaemon: Failed to start Avahi Client");
+        if (error != NULL)
+          g_warning ("NdDaemon: Error: %s", error->message);
+        return;
+      }
 
-  mice_provider = nd_wfd_mice_provider_new (self->avahi_client);
-  cc_provider = nd_cc_provider_new (self->avahi_client);
+    g_debug ("NdDaemon: Got avahi client");
 
-  if (!nd_wfd_mice_provider_browse (mice_provider, error) || !nd_cc_provider_browse (cc_provider, error))
-    {
-      g_warning ("NdDaemon: Avahi client failed to browse: %s", error->message);
-      return;
-    }
+    mice_provider = nd_wfd_mice_provider_new (self->avahi_client);
+    cc_provider = nd_cc_provider_new (self->avahi_client);
 
-  g_debug ("NdDaemon: Got avahi browser");
-  nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (mice_provider));
-  nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (cc_provider));
+    if (!nd_wfd_mice_provider_browse (mice_provider, error) || !nd_cc_provider_browse (cc_provider, error))
+      {
+        g_warning ("NdDaemon: Avahi client failed to browse: %s", error->message);
+        return;
+      }
+
+    g_debug ("NdDaemon: Got avahi browser");
+    nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (mice_provider));
+    nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (cc_provider));
+  }
+#endif
 }
 
 static void
@@ -93,12 +102,15 @@ nd_daemon_finalize (GObject *obj)
   NdDaemon *self = ND_DAEMON (obj);
 
   g_clear_object (&self->nm_device_registry);
+#ifdef HAVE_AVAHI
   g_clear_object (&self->avahi_client);
+#endif
   g_clear_object (&self->meta_provider);
 
   G_OBJECT_CLASS (nd_daemon_parent_class)->finalize (obj);
 }
 
+#ifdef HAVE_AVAHI
 static void
 nd_daemon_dispose (GObject *obj)
 {
@@ -108,6 +120,7 @@ nd_daemon_dispose (GObject *obj)
 
   G_OBJECT_CLASS (nd_daemon_parent_class)->dispose (obj);
 }
+#endif
 
 static void
 nd_daemon_startup (GApplication *app)
@@ -138,7 +151,9 @@ nd_daemon_class_init (NdDaemonClass *klass)
 
   object_class->constructed = nd_daemon_constructed;
   object_class->finalize = nd_daemon_finalize;
+#ifdef HAVE_AVAHI
   object_class->dispose = nd_daemon_dispose;
+#endif
 }
 
 

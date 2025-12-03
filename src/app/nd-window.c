@@ -16,14 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <avahi-gobject/ga-client.h>
-#include <avahi-gobject/ga-service-browser.h>
 #include <glib/gi18n.h>
 #include <gst/base/base.h>
 #include <gst/gst.h>
 #include <libportal-gtk4/portal-gtk4.h>
 #include "gnome-network-displays-config.h"
-#include "nd-cc-provider.h"
 #include "nd-codec-install.h"
 #include "nd-dummy-provider.h"
 #include "nd-meta-provider.h"
@@ -31,14 +28,22 @@
 #include "nd-pulseaudio.h"
 #include "nd-sink-list-model.h"
 #include "nd-sink-row.h"
-#include "nd-wfd-mice-provider.h"
 #include "nd-window.h"
+
+#ifdef HAVE_AVAHI
+#include <avahi-gobject/ga-client.h>
+#include <avahi-gobject/ga-service-browser.h>
+#include "nd-cc-provider.h"
+#include "nd-wfd-mice-provider.h"
+#endif
 
 struct _NdWindow
 {
   AdwApplicationWindow   parent_instance;
 
+#ifdef HAVE_AVAHI
   GaClient              *avahi_client;
+#endif
   NdMetaProvider        *meta_provider;
   NdNMDeviceRegistry    *nm_device_registry;
 
@@ -466,36 +471,10 @@ gnome_nd_window_constructed (GObject *obj)
 {
   G_OBJECT_CLASS (gnome_nd_window_parent_class)->constructed (obj);
 
-  g_autoptr(GError) error = NULL;
-  g_autoptr(NdWFDMiceProvider) mice_provider = NULL;
-  g_autoptr(NdCCProvider) cc_provider = NULL;
   NdWindow *self = ND_WINDOW (obj);
 
   self->cancellable = g_cancellable_new ();
-  self->avahi_client = ga_client_new (GA_CLIENT_FLAG_NO_FLAGS);
 
-  if (!ga_client_start (self->avahi_client, &error))
-    {
-      g_warning ("NdWindow: Failed to start Avahi Client");
-      if (error != NULL)
-        g_warning ("NdWindow: Error: %s", error->message);
-      return;
-    }
-
-  g_debug ("NdWindow: Got avahi client");
-
-  mice_provider = nd_wfd_mice_provider_new (self->avahi_client);
-  cc_provider = nd_cc_provider_new (self->avahi_client);
-
-  if (!nd_wfd_mice_provider_browse (mice_provider, error) || !nd_cc_provider_browse (cc_provider, error))
-    {
-      g_warning ("NdWindow: Avahi client failed to browse: %s", error->message);
-      return;
-    }
-
-  g_debug ("NdWindow: Got avahi browser");
-  nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (mice_provider));
-  nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (cc_provider));
   if (g_strcmp0 (g_getenv ("NETWORK_DISPLAYS_DUMMY"), "1") == 0)
     {
       g_autoptr(NdDummyProvider) dummy_provider = NULL;
@@ -504,6 +483,41 @@ gnome_nd_window_constructed (GObject *obj)
       dummy_provider = nd_dummy_provider_new ();
       nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (dummy_provider));
     }
+
+#ifdef HAVE_AVAHI
+  /* --- Avahi providers --- */
+  {
+    g_autoptr(GError) error = NULL;
+    g_autoptr(NdWFDMiceProvider) mice_provider = NULL;
+    g_autoptr(NdCCProvider) cc_provider = NULL;
+
+    self->avahi_client = ga_client_new (GA_CLIENT_FLAG_NO_FLAGS);
+    if (!ga_client_start (self->avahi_client, &error))
+      {
+        g_warning ("NdWindow: Failed to start Avahi Client");
+        if (error != NULL)
+          g_warning ("NdWindow: Error: %s", error->message);
+        return;
+      }
+
+    g_debug ("NdWindow: Got avahi client");
+
+    mice_provider = nd_wfd_mice_provider_new (self->avahi_client);
+    cc_provider = nd_cc_provider_new (self->avahi_client);
+
+    if (!nd_wfd_mice_provider_browse (mice_provider, error) || !nd_cc_provider_browse (cc_provider, error))
+      {
+        g_warning ("NdWindow: Avahi client failed to browse: %s", error->message);
+        return;
+      }
+
+    g_debug ("NdWindow: Got avahi browser");
+    nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (mice_provider));
+    nd_meta_provider_add_provider (self->meta_provider, ND_PROVIDER (cc_provider));
+    
+    g_debug ("NdWindow: Added avahi providers");
+  }
+#endif
 }
 
 static void
@@ -521,7 +535,9 @@ gnome_nd_window_finalize (GObject *obj)
 
   g_clear_object (&self->meta_provider);
   g_clear_object (&self->nm_device_registry);
+#ifdef HAVE_AVAHI
   g_clear_object (&self->avahi_client);
+#endif
 
   g_clear_pointer (&self->sink_property_bindings, g_ptr_array_unref);
 
@@ -539,7 +555,9 @@ gnome_nd_window_dispose (GObject *obj)
 {
   NdWindow *self = ND_WINDOW (obj);
 
+#ifdef HAVE_AVAHI
   g_object_run_dispose (G_OBJECT (self->avahi_client));
+#endif
 
   G_OBJECT_CLASS (gnome_nd_window_parent_class)->dispose (obj);
 }

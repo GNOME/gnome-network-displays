@@ -9,9 +9,7 @@ gnome_nd_common_sources = [
   'nd-meta-sink.c',
   'nd-meta-provider.c',
   'nd-wfd-mice-sink.c',
-  'nd-wfd-mice-provider.c',
   'nd-cc-sink.c',
-  'nd-cc-provider.c',
   'nd-wfd-p2p-sink.c',
   'nd-wfd-p2p-provider.c',
   'nd-nm-device-registry.c',
@@ -22,6 +20,15 @@ gnome_nd_common_sources = [
   'nd-uri-helpers.c',
 ]
 
+avahi_sources = [
+  'nd-wfd-mice-provider.c',
+  'nd-cc-provider.c',
+]
+
+if get_option('avahi')
+  gnome_nd_common_sources += avahi_sources
+endif
+
 enum_headers = files('nd-sink.h')
 
 gnome_nd_common_sources += gnome.mkenums_simple(
@@ -30,8 +37,6 @@ gnome_nd_common_sources += gnome.mkenums_simple(
 )
 
 gnome_nd_common_deps = [
-  dependency('avahi-client'),
-  dependency('avahi-gobject'),
   dependency('gio-2.0', version: '>= 2.50'),
   dependency('gstreamer-1.0', version: '>= 1.14'),
   dependency('gstreamer-pbutils-1.0', version: '>= 1.14'),
@@ -43,6 +48,14 @@ gnome_nd_common_deps = [
   dependency('libpulse-mainloop-glib'),
   dependency('libadwaita-1', version: '>= 1.0.0'),
 ]
+
+# Conditional Avahi dependencies
+if get_option('avahi')
+  gnome_nd_common_deps += [
+    dependency('avahi-client'),
+    dependency('avahi-gobject'),
+  ]
+endif
 
 gnome_nd_common_deps += wfd_server_deps
 gnome_nd_common_deps += cc_deps

@@ -12,3 +12,8 @@ option('build_app',
        type: 'boolean',
        value: true,
        description: 'Build a graphical client app')
+
+option('avahi',
+       type: 'boolean',
+       value: true,
+       description: 'Enable Avahi mDNS service discovery for MICE and Chromecast')
