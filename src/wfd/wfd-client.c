@@ -372,7 +372,7 @@ wfd_client_timeout_session_filter_func (GstRTSPClient  *client,
 
   g_debug ("WfdClient: Doing keep-alive");
 
-  gst_rtsp_message_init_request (&msg, GST_RTSP_GET_PARAMETER, "rtsp://localhost/wfd1.0/streamid=0");
+  gst_rtsp_message_init_request (&msg, GST_RTSP_GET_PARAMETER, "rtsp://localhost/wfd1.0");
 
   gst_rtsp_client_send_message (client, sess, &msg);
 
