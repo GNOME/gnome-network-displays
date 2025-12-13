@@ -10,6 +10,18 @@ variables:
   FLATPAK_MODULE: "gnome-network-displays"
   TARBALL_ARTIFACT_PATH: ".flatpak-builder/build/${FLATPAK_MODULE}/_flatpak_build/meson-dist/${CI_PROJECT_NAME}-${CI_COMMIT_TAG}.tar.xz"
 
+build-native:
+  variables:
+    MESON_BUILD_DIR: "_build"
+  before_script:
+    - dnf -y install git meson ninja-build
+    - dnf -y builddep gnome-network-displays
+  script:
+    - meson setup "${MESON_BUILD_DIR}"
+    - meson compile -C "${MESON_BUILD_DIR}" gnome-network-displays-pot
+    - git diff --exit-code --ignore-matching-lines='^"POT-Creation-Date:' po/gnome-network-displays.pot || (echo "Potfile is out of date. Please run 'meson compile gnome-network-displays-pot' and commit the changes." && exit 1)
+    - meson compile -C "${MESON_BUILD_DIR}"
+
 flatpak:
   extends: '.flatpak'
   variables:
