@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
+"POT-Creation-Date: 2025-12-14 23:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr ""
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr ""
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:14
 msgid "Benjamin Berg, Christian Glombek"
 msgstr ""
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -115,19 +115,19 @@ msgstr ""
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 
-#: src/app/nd-window.c:233
+#: src/app/nd-window.c:238
 msgid "Checking and installing required firewall zones."
 msgstr ""
 
-#: src/app/nd-window.c:240
+#: src/app/nd-window.c:245
 msgid "Making P2P connection"
 msgstr ""
 
-#: src/app/nd-window.c:247
+#: src/app/nd-window.c:252
 msgid "Establishing connection to sink"
 msgstr ""
 
-#: src/app/nd-window.c:254
+#: src/app/nd-window.c:259
 msgid "Starting to stream"
 msgstr ""
 
