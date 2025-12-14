@@ -1,3 +1,10 @@
+GNOME Network Displays 0.98.0
+=============================
+* Add a dbus daemon program (@pesader)
+* Use correct URL for WFD keep-alive (@apcaus)
+* Add systemd-resolved-based mDNS providers as alternatives to Avahi-based providers (@lorbus)
+* Various updates related to daemon improvements, metadata and translations
+
 GNOME Network Displays 0.97.0
 =============================
 * p2p: correct p2p peer add and remove
