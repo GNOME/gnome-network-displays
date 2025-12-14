@@ -14,7 +14,9 @@ config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
 config_h.set_quoted('GETTEXT_PACKAGE', 'gnome-network-displays')
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
 
-if get_option('avahi')
+if get_option('systemd_resolved')
+  config_h.set('HAVE_SYSTEMD_RESOLVED', 1)
+else
   config_h.set('HAVE_AVAHI', 1)
 endif
 

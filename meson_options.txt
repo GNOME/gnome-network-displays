@@ -13,7 +13,7 @@ option('build_app',
        value: true,
        description: 'Build a graphical client app')
 
-option('avahi',
+option('systemd_resolved',
        type: 'boolean',
-       value: true,
-       description: 'Enable Avahi mDNS service discovery for MICE and Chromecast')
+       value: false,
+       description: 'Enable systemd-resolved based mDNS discovery')

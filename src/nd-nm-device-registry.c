@@ -16,10 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <NetworkManager.h>
+
 #include "gnome-network-displays-config.h"
-#include "NetworkManager.h"
 #include "nd-nm-device-registry.h"
 #include "nd-wfd-p2p-provider.h"
+
+#ifdef HAVE_SYSTEMD_RESOLVED
+#include "nd-sd-wfd-mice-provider.h"
+#include "nd-sd-cc-provider.h"
+#endif
 
 struct _NdNMDeviceRegistry
 {
@@ -42,41 +48,346 @@ G_DEFINE_TYPE (NdNMDeviceRegistry, nd_nm_device_registry, G_TYPE_OBJECT)
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
 static void
+add_p2p_provider (NdNMDeviceRegistry *registry, NMDevice *device)
+{
+  /* Check if we already have a provider for this device */
+  for (gint i = 0; i < registry->providers->len; i++)
+    {
+      NdProvider *provider = g_ptr_array_index (registry->providers, i);
+      if (!ND_IS_WFD_P2P_PROVIDER (provider))
+        continue;
+
+      if (nd_wfd_p2p_provider_get_device (ND_WFD_P2P_PROVIDER (provider)) == device)
+        return; /* Already have a provider for this device */
+    }
+
+  g_debug ("NdNMDeviceRegistry: Creating Wi-Fi P2P provider: "
+           "iface=%s, driver=%s, udi=%s",
+           nm_device_get_iface (device),
+           nm_device_get_driver (device),
+           nm_device_get_udi (device));
+
+  NdWFDP2PProvider *wfd_p2p_provider = nd_wfd_p2p_provider_new (registry->nm_client, device);
+
+  g_ptr_array_add (registry->providers, g_object_ref (wfd_p2p_provider));
+  nd_meta_provider_add_provider (registry->meta_provider,
+                                 ND_PROVIDER (wfd_p2p_provider));
+}
+
+static void
+remove_p2p_provider (NdNMDeviceRegistry *registry, NMDevice *device)
+{
+  for (gint i = 0; i < registry->providers->len; i++)
+    {
+      NdProvider *provider = g_ptr_array_index (registry->providers, i);
+      if (!ND_IS_WFD_P2P_PROVIDER (provider))
+        continue;
+
+      if (nd_wfd_p2p_provider_get_device (ND_WFD_P2P_PROVIDER (provider)) != device)
+        continue;
+
+      g_debug ("NdNMDeviceRegistry: Removing Wi-Fi P2P provider: "
+               "iface=%s, driver=%s, udi=%s",
+               nm_device_get_iface (device),
+               nm_device_get_driver (device),
+               nm_device_get_udi (device));
+
+      nd_meta_provider_remove_provider (registry->meta_provider, provider);
+      g_ptr_array_remove_index (registry->providers, i);
+      break;
+    }
+}
+
+static void
+p2p_device_state_changed_cb (NdNMDeviceRegistry *registry,
+                             NMDeviceState       new_state,
+                             NMDeviceState       old_state,
+                             NMDeviceStateReason reason,
+                             NMDevice           *device)
+{
+  g_debug ("NdNMDeviceRegistry: P2P device state changed: %s (%d -> %d, reason: %d)",
+           nm_device_get_iface (device), old_state, new_state, reason);
+
+  if (new_state > NM_DEVICE_STATE_UNAVAILABLE)
+    add_p2p_provider (registry, device);
+  else
+    remove_p2p_provider (registry, device);
+}
+
+#ifdef HAVE_SYSTEMD_RESOLVED
+static void
+add_sd_wfd_mice_provider (NdNMDeviceRegistry *registry, NMDevice *device)
+{
+  const char *device_type = NM_IS_DEVICE_WIFI (device) ? "Wi-Fi" : "Ethernet";
+
+  /* Check if we already have a provider for this device */
+  for (gint i = 0; i < registry->providers->len; i++)
+    {
+      NdProvider *provider = g_ptr_array_index (registry->providers, i);
+      if (!ND_IS_SD_WFD_MICE_PROVIDER (provider))
+        continue;
+
+      NMDevice *provider_device = NULL;
+      g_object_get (ND_SD_WFD_MICE_PROVIDER (provider), "device", &provider_device, NULL);
+      if (provider_device == device)
+        return; /* Already have a provider for this device */
+    }
+
+  g_debug ("NdNMDeviceRegistry: Creating %s systemd-resolved MICE provider: "
+           "iface=%s, driver=%s, udi=%s",
+           device_type,
+           nm_device_get_iface (device),
+           nm_device_get_driver (device),
+           nm_device_get_udi (device));
+
+  g_autoptr(GError) error = NULL;
+  g_autoptr(NdSdWfdMiceProvider) sd_wfd_mice_provider = nd_sd_wfd_mice_provider_new (device);
+
+  if (!sd_wfd_mice_provider)
+    {
+      g_warning ("NdNMDeviceRegistry: Failed to create systemd-resolved MICE provider");
+      return;
+    }
+
+  g_ptr_array_add (registry->providers, g_object_ref (sd_wfd_mice_provider));
+  nd_meta_provider_add_provider (registry->meta_provider, ND_PROVIDER (sd_wfd_mice_provider));
+  if (!nd_sd_wfd_mice_provider_browse (sd_wfd_mice_provider, &error))
+    {
+      g_warning ("NdNMDeviceRegistry: systemd-resolved provider failed to browse: %s",
+                 error ? error->message : "unknown error");
+      return;
+    }
+
+  g_debug ("NdNMDeviceRegistry: Using systemd-resolved mDNS browser for WFD MICE");
+}
+
+static void
+remove_sd_wfd_mice_provider (NdNMDeviceRegistry *registry, NMDevice *device)
+{
+  const char *device_type = NM_IS_DEVICE_WIFI (device) ? "Wi-Fi" : "Ethernet";
+
+  for (gint i = 0; i < registry->providers->len; i++)
+    {
+      NdProvider *provider = g_ptr_array_index (registry->providers, i);
+      if (!ND_IS_SD_WFD_MICE_PROVIDER (provider))
+        continue;
+
+      NMDevice *provider_device = NULL;
+      g_object_get (ND_SD_WFD_MICE_PROVIDER (provider), "device", &provider_device, NULL);
+      if (provider_device != device)
+        continue;
+
+      g_debug ("NdNMDeviceRegistry: Removing %s systemd-resolved MICE provider: "
+               "iface=%s, driver=%s, udi=%s",
+               device_type,
+               nm_device_get_iface (device),
+               nm_device_get_driver (device),
+               nm_device_get_udi (device));
+
+      nd_meta_provider_remove_provider (registry->meta_provider, provider);
+      g_ptr_array_remove_index (registry->providers, i);
+      break;
+    }
+}
+
+static void
+add_sd_cc_provider (NdNMDeviceRegistry *registry, NMDevice *device)
+{
+  const char *device_type = NM_IS_DEVICE_WIFI (device) ? "Wi-Fi" : "Ethernet";
+
+  /* Check if we already have a provider for this device */
+  for (gint i = 0; i < registry->providers->len; i++)
+    {
+      NdProvider *provider = g_ptr_array_index (registry->providers, i);
+      if (!ND_IS_SD_CC_PROVIDER (provider))
+        continue;
+
+      NMDevice *provider_device = NULL;
+      g_object_get (ND_SD_CC_PROVIDER (provider), "nm-device", &provider_device, NULL);
+      if (provider_device == device)
+        return; /* Already have a provider for this device */
+    }
+
+  g_debug ("NdNMDeviceRegistry: Creating %s systemd-resolved Chromecast provider: "
+           "iface=%s, driver=%s, udi=%s",
+           device_type,
+           nm_device_get_iface (device),
+           nm_device_get_driver (device),
+           nm_device_get_udi (device));
+
+  g_autoptr(GError) error = NULL;
+  g_autoptr(NdSdCCProvider) sd_cc_provider = nd_sd_cc_provider_new (device);
+
+  if (!sd_cc_provider)
+    {
+      g_warning ("NdNMDeviceRegistry: Failed to create systemd-resolved Chromecast provider");
+      return;
+    }
+
+  g_ptr_array_add (registry->providers, g_object_ref (sd_cc_provider));
+  nd_meta_provider_add_provider (registry->meta_provider, ND_PROVIDER (sd_cc_provider));
+  if (!nd_sd_cc_provider_browse (sd_cc_provider, &error))
+    {
+      g_warning ("NdNMDeviceRegistry: systemd-resolved provider failed to browse for Chromecast: %s",
+                 error ? error->message : "unknown error");
+      return;
+    }
+
+  g_debug ("NdNMDeviceRegistry: Using systemd-resolved mDNS browser for Chromecast");
+}
+
+static void
+remove_sd_cc_provider (NdNMDeviceRegistry *registry, NMDevice *device)
+{
+  const char *device_type = NM_IS_DEVICE_WIFI (device) ? "Wi-Fi" : "Ethernet";
+
+  for (gint i = 0; i < registry->providers->len; i++)
+    {
+      NdProvider *provider = g_ptr_array_index (registry->providers, i);
+      if (!ND_IS_SD_CC_PROVIDER (provider))
+        continue;
+
+      NMDevice *provider_device = NULL;
+      g_object_get (ND_SD_CC_PROVIDER (provider), "nm-device", &provider_device, NULL);
+      if (provider_device != device)
+        continue;
+
+      g_debug ("NdNMDeviceRegistry: Removing %s systemd-resolved Chromecast provider: "
+               "iface=%s, driver=%s, udi=%s",
+               device_type,
+               nm_device_get_iface (device),
+               nm_device_get_driver (device),
+               nm_device_get_udi (device));
+
+      nd_meta_provider_remove_provider (registry->meta_provider, provider);
+      g_ptr_array_remove_index (registry->providers, i);
+      break;
+    }
+}
+
+static void
+mdns_device_state_changed_cb (NdNMDeviceRegistry *registry,
+                               NMDeviceState       new_state,
+                               NMDeviceState       old_state,
+                               NMDeviceStateReason reason,
+                               NMDevice           *device)
+{
+  const char *device_type = NM_IS_DEVICE_WIFI (device) ? "Wi-Fi" : "Ethernet";
+  g_debug ("NdNMDeviceRegistry: %s device state changed: %s (%d -> %d, reason: %d)",
+           device_type, nm_device_get_iface (device), old_state, new_state, reason);
+
+  /* WiFi/Ethernet devices need to be connected (state > DISCONNECTED) for mDNS to work */
+  if (new_state > NM_DEVICE_STATE_DISCONNECTED)
+    {
+      add_sd_wfd_mice_provider (registry, device);
+      add_sd_cc_provider (registry, device);
+    }
+  else
+    {
+      remove_sd_wfd_mice_provider (registry, device);
+      remove_sd_cc_provider (registry, device);
+    }
+
+  /* Update has_adapters since WiFi/Ethernet device state changed */
+  nd_nm_device_registry_update_has_adapters (registry);
+}
+#endif
+
+static void
 device_added_cb (NdNMDeviceRegistry *registry, NMDevice *device, NMClient *client)
 {
-  g_autoptr(NdWFDP2PProvider) provider = NULL;
+  if (NM_IS_DEVICE_WIFI_P2P (device))
+    {
+      NMDeviceState state = nm_device_get_state (device);
 
-  if (!NM_IS_DEVICE_WIFI_P2P (device))
-    return;
+      g_debug ("NdNMDeviceRegistry: Found a new Wi-Fi P2P device: "
+               "iface=%s, driver=%s, udi=%s, state=%d",
+               nm_device_get_iface (device),
+               nm_device_get_driver (device),
+               nm_device_get_udi (device),
+               state);
 
-  g_debug ("NdNMDeviceRegistry: Found a new device, creating provider");
+      /* Connect to state changes to add/remove provider based on availability */
+      g_signal_connect_object (device,
+                               "state-changed",
+                               (GCallback) p2p_device_state_changed_cb,
+                               registry,
+                               G_CONNECT_SWAPPED);
 
-  provider = nd_wfd_p2p_provider_new (client, device);
+      /* Only create provider if device is available */
+      if (state > NM_DEVICE_STATE_UNAVAILABLE)
+        add_p2p_provider (registry, device);
+      else
+        g_debug ("NdNMDeviceRegistry: Wi-Fi P2P device not yet available (state=%d), waiting...", state);
+    }
 
-  g_ptr_array_add (registry->providers, g_object_ref (provider));
-  nd_meta_provider_add_provider (registry->meta_provider,
-                                 ND_PROVIDER (g_steal_pointer (&provider)));
+#ifdef HAVE_SYSTEMD_RESOLVED
+  if (NM_IS_DEVICE_WIFI (device) || NM_IS_DEVICE_ETHERNET (device))
+    {
+      NMDeviceState state = nm_device_get_state (device);
+      const char *device_type = NM_IS_DEVICE_WIFI (device) ? "Wi-Fi" : "Ethernet";
+
+      g_debug ("NdNMDeviceRegistry: Found a new %s device: "
+               "iface=%s, driver=%s, udi=%s, state=%d",
+               device_type,
+               nm_device_get_iface (device),
+               nm_device_get_driver (device),
+               nm_device_get_udi (device),
+               state);
+
+      /* Connect to state changes to add/remove provider based on availability */
+      g_signal_connect_object (device,
+                               "state-changed",
+                               (GCallback) mdns_device_state_changed_cb,
+                               registry,
+                               G_CONNECT_SWAPPED);
+
+      /* Only create provider if device is available */
+      if (state > NM_DEVICE_STATE_DISCONNECTED)
+        {
+          add_sd_wfd_mice_provider (registry, device);
+          add_sd_cc_provider (registry, device);
+        }
+      else
+        g_debug ("NdNMDeviceRegistry: %s device not yet available (state=%d), waiting...",
+                 device_type, state);
+    }
+#endif
 }
 
 static void
 device_removed_cb (NdNMDeviceRegistry *registry, NMDevice *device, NMClient *client)
 {
-  if (!NM_IS_DEVICE_WIFI_P2P (device))
-    return;
-
-  g_debug ("NdNMDeviceRegistry: Lost a device, removing provider");
-
-  for (gint i = 0; i < registry->providers->len; i++)
+  if (NM_IS_DEVICE_WIFI_P2P (device))
     {
-      NdWFDP2PProvider *provider = g_ptr_array_index (registry->providers, i);
+      g_debug ("NdNMDeviceRegistry: Lost Wi-Fi P2P device: iface=%s, driver=%s, udi=%s",
+               nm_device_get_iface (device),
+               nm_device_get_driver (device),
+               nm_device_get_udi (device));
 
-      if (nd_wfd_p2p_provider_get_device (provider) != device)
-        continue;
+      /* Disconnect state change handler */
+      g_signal_handlers_disconnect_by_func (device, p2p_device_state_changed_cb, registry);
 
-      nd_meta_provider_remove_provider (registry->meta_provider, ND_PROVIDER (provider));
-      g_ptr_array_remove_index (registry->providers, i);
-      break;
+      remove_p2p_provider (registry, device);
     }
+
+#ifdef HAVE_SYSTEMD_RESOLVED
+  if (NM_IS_DEVICE_WIFI (device) || NM_IS_DEVICE_ETHERNET (device))
+    {
+      const char *device_type = NM_IS_DEVICE_WIFI (device) ? "Wi-Fi" : "Ethernet";
+      g_debug ("NdNMDeviceRegistry: Lost %s device: iface=%s, driver=%s, udi=%s",
+               device_type,
+               nm_device_get_iface (device),
+               nm_device_get_driver (device),
+               nm_device_get_udi (device));
+
+      /* Disconnect state change handler */
+      g_signal_handlers_disconnect_by_func (device, mdns_device_state_changed_cb, registry);
+
+      remove_sd_wfd_mice_provider (registry, device);
+      remove_sd_cc_provider (registry, device);
+    }
+#endif
 }
 
 static void
