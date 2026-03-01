@@ -6,31 +6,28 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2023-04-22 10:23+0200\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2026-01-23 05:57+0000\n"
+"PO-Revision-Date: 2026-03-01 08:47+0100\n"
 "Last-Translator: Quentin PAGÈS\n"
 "Language-Team: Occitan <totenoc@gmail.com>\n"
 "Language: oc\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.8\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Afichatge ret GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
 msgid "Screencasting for GNOME"
-msgstr ""
+msgstr "Projeccion d’ecran per GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
-msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
-
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
 #, fuzzy
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
@@ -52,9 +49,9 @@ msgid "GStreamer x264 video encoder (%s)"
 msgstr "encodador vidèo GStreamer x264 (%s)"
 
 #: src/app/nd-codec-install.c:64
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer VA H264 video encoder (%s)"
-msgstr "encodador vidèo GStreamer VA-API H264 (%s)"
+msgstr "encodador vidèo GStreamer VA H264 (%s)"
 
 #: src/app/nd-codec-install.c:66
 #, c-format
@@ -62,14 +59,14 @@ msgid "GStreamer VA-API H264 video encoder (%s)"
 msgstr "encodador vidèo GStreamer VA-API H264 (%s)"
 
 #: src/app/nd-codec-install.c:68
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP8 video encoder (%s)"
-msgstr "encodador vidèo GStreamer OpenH264 (%s)"
+msgstr "encodador vidèo GStreamer On2 VP8 (%s)"
 
 #: src/app/nd-codec-install.c:70
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer On2 VP9 video encoder (%s)"
-msgstr "encodador vidèo GStreamer OpenH264 (%s)"
+msgstr "encodador vidèo GStreamer On2 VP9 (%s)"
 
 #: src/app/nd-codec-install.c:73
 #, c-format
@@ -87,14 +84,14 @@ msgid "GStreamer Free AAC audio encoder (%s)"
 msgstr "encodador àudio GStreamer Free AAC (%s)"
 
 #: src/app/nd-codec-install.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Vorbis audio encoder (%s)"
-msgstr "encodador àudio GStreamer Free AAC (%s)"
+msgstr "encodador àudio GStreamer Vorbis (%s)"
 
 #: src/app/nd-codec-install.c:81
-#, fuzzy, c-format
+#, c-format
 msgid "GStreamer Opus audio encoder (%s)"
-msgstr "encodador àudio GStreamer FDK AAC (%s)"
+msgstr "encodador àudio GStreamer Opus (%s)"
 
 #: src/app/nd-codec-install.c:84
 #, fuzzy, c-format
@@ -121,29 +118,27 @@ msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Mercés d’installar un dels empeutons GStreamer seguents en clicant çai jos"
 
-#: src/app/nd-window.c:233
+#: src/app/nd-window.c:239
 msgid "Checking and installing required firewall zones."
 msgstr "Verificacion e installacion de las zònas de para-fuòc requeridas"
 
-#: src/app/nd-window.c:240
+#: src/app/nd-window.c:246
 msgid "Making P2P connection"
 msgstr "Realizacion de la connexion P2P"
 
-#: src/app/nd-window.c:247
+#: src/app/nd-window.c:253
 msgid "Establishing connection to sink"
 msgstr "Establiment de la connexion al collector"
 
-#: src/app/nd-window.c:254
+#: src/app/nd-window.c:260
 msgid "Starting to stream"
 msgstr "Comença la difusion"
 
 #: src/nd-window.ui:6
-#, fuzzy
 msgid "Network Displays"
-msgstr "Afichatge ret GNOME"
+msgstr "Afichatge ret"
 
 #: src/nd-window.ui:28
-#, fuzzy
 msgid "No Wi‑Fi P2P Adapter Found"
 msgstr "Cap d'adaptator Wi-Fi P2P pas trobat"
 
@@ -182,24 +177,22 @@ msgid "Return"
 msgstr "Retorn"
 
 #: src/nd-window.ui:308
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for audio support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Un des empeutons de codèc àudio seguents es requerit per la presa en carga "
-"del son.\n"
-"clicar lançarà lo processús d’installacion."
+"Un des empeutons de codèc seguents es requerit per la presa en carga del "
+"son.\n"
+"Clicar lançarà lo procèssus d’installacion."
 
 #: src/nd-window.ui:314
-#, fuzzy
 msgid ""
 "One of the following codec plugins is required for video support.\n"
 "Clicking will start the installation process."
 msgstr ""
-"Un des empeutons de codèc àudio seguents es requerit per la presa en carga "
-"del son.\n"
-"clicar lançarà lo processús d’installacion."
+"Un des empeutons de codèc seguents es requerit per la presa en carga del "
+"son.\n"
+"Clicar lançarà lo procèssus d’installacion."
 
 #: src/nd-window.ui:327
 msgid ""
