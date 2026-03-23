@@ -1,0 +1,202 @@
+# Portuguese translation for gnome-network-displays.
+# Copyright (C) 2026 gnome-network-displays's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-network-displays package.
+# André Moreira <afrmscb@gmail.com>, 2026.
+# Hugo Carvalho <hugokarvalho@hotmail.com>, 2020-2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-network-displays master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2026-01-23 05:57+0000\n"
+"PO-Revision-Date: 2026-03-23 15:03+0000\n"
+"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>\n"
+"Language-Team: Portuguese <pt@li.org>\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+
+#: data/org.gnome.NetworkDisplays.desktop.in:2
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:7 src/app/main.c:68
+msgid "GNOME Network Displays"
+msgstr "Ecrãs de Rede do GNOME"
+
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
+msgid "Screencasting for GNOME"
+msgstr "Transmissão de ecrã para o GNOME"
+
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
+msgid ""
+"GNOME Network Displays allows you to cast your desktop to a remote display. "
+"Supports the Miracast and Chromecast protocols."
+msgstr ""
+"O Ecrãs de Rede do GNOME permite-lhe transmitir o seu ambiente de trabalho "
+"para um ecrã remoto. Suporta os protocolos Miracast e Chromecast."
+
+#: src/app/nd-codec-install.c:60
+#, c-format
+msgid "GStreamer OpenH264 video encoder (%s)"
+msgstr "Emissor de vídeo GStreamer OpenH264 (%s)"
+
+#: src/app/nd-codec-install.c:62
+#, c-format
+msgid "GStreamer x264 video encoder (%s)"
+msgstr "Emissor de vídeo GStreamer x264 (%s)"
+
+#: src/app/nd-codec-install.c:64
+#, c-format
+msgid "GStreamer VA H264 video encoder (%s)"
+msgstr "Emissor de vídeo GStreamer VA H264 (%s)"
+
+#: src/app/nd-codec-install.c:66
+#, c-format
+msgid "GStreamer VA-API H264 video encoder (%s)"
+msgstr "Emissor de vídeo GStreamer VA-API H264 (%s)"
+
+#: src/app/nd-codec-install.c:68
+#, c-format
+msgid "GStreamer On2 VP8 video encoder (%s)"
+msgstr "Emissor de vídeo GStreamer On2 VP8 (%s)"
+
+#: src/app/nd-codec-install.c:70
+#, c-format
+msgid "GStreamer On2 VP9 video encoder (%s)"
+msgstr "Emissor de vídeo GStreamer On2 VP9 (%s)"
+
+#: src/app/nd-codec-install.c:73
+#, c-format
+msgid "GStreamer FDK AAC audio encoder (%s)"
+msgstr "Emissor de áudio GStreamer FDK AAC (%s)"
+
+#: src/app/nd-codec-install.c:75
+#, c-format
+msgid "GStreamer libav AAC audio encoder (%s)"
+msgstr "Emissor de áudio GStreamer libav AAC (%s)"
+
+#: src/app/nd-codec-install.c:77
+#, c-format
+msgid "GStreamer Free AAC audio encoder (%s)"
+msgstr "Emissor de áudio GStreamer Free AAC (%s)"
+
+#: src/app/nd-codec-install.c:79
+#, c-format
+msgid "GStreamer Vorbis audio encoder (%s)"
+msgstr "Emissor de áudio GStreamer Vorbis (%s)"
+
+#: src/app/nd-codec-install.c:81
+#, c-format
+msgid "GStreamer Opus audio encoder (%s)"
+msgstr "Emissor de áudio GStreamer Opus (%s)"
+
+#: src/app/nd-codec-install.c:84
+#, c-format
+msgid "GStreamer WebM muxer (%s)"
+msgstr "Muxer GStreamer WebM (%s)"
+
+#: src/app/nd-codec-install.c:86
+#, c-format
+msgid "GStreamer Matroska muxer (%s)"
+msgstr "Muxer GStreamer Matroska (%s)"
+
+#: src/app/nd-codec-install.c:88
+#, c-format
+msgid "GStreamer MPEG Transport Stream muxer (%s)"
+msgstr "Muxer GStreamer MPEG Transport Stream (%s)"
+
+#: src/app/nd-codec-install.c:90
+#, c-format
+msgid "GStreamer Element “%s”"
+msgstr "Elemento GStreamer “%s”"
+
+#: src/app/nd-codec-install.c:196
+msgid "Please install one of the following GStreamer plugins by clicking below"
+msgstr ""
+"Por favor, instale um dos seguintes complementos do GStreamer clicando abaixo"
+
+#: src/app/nd-window.c:239
+msgid "Checking and installing required firewall zones."
+msgstr "A verificar e a instalar as zonas de firewall necessárias."
+
+#: src/app/nd-window.c:246
+msgid "Making P2P connection"
+msgstr "A estabelecer ligação P2P"
+
+#: src/app/nd-window.c:253
+msgid "Establishing connection to sink"
+msgstr "A estabelecer ligação ao destino (sink)"
+
+#: src/app/nd-window.c:260
+msgid "Starting to stream"
+msgstr "A iniciar transmissão"
+
+#: src/nd-window.ui:6
+msgid "Network Displays"
+msgstr "Ecrãs de Rede"
+
+#: src/nd-window.ui:28
+msgid "No Wi‑Fi P2P Adapter Found"
+msgstr "Nenhum adaptador Wi-Fi P2P encontrado"
+
+#: src/nd-window.ui:29
+msgid ""
+"No usable wireless adapters were found. Please verify that Wi‑Fi is enabled "
+"and Wi‑Fi P2P operations are available in both NetworkManager and "
+"wpa_supplicant."
+msgstr ""
+"Não foram encontrados adaptadores sem fios utilizáveis. Verifique se o Wi-Fi "
+"está ativado e se as operações Wi-Fi P2P estão disponíveis tanto no "
+"NetworkManager como no wpa_supplicant."
+
+#: src/nd-window.ui:63
+msgid "Available Video Sinks"
+msgstr "Destinos de vídeo (sinks) disponíveis"
+
+#: src/nd-window.ui:137
+msgid "Connecting"
+msgstr "A ligar"
+
+#: src/nd-window.ui:160 src/nd-window.ui:231
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/nd-window.ui:205
+msgid "Streaming"
+msgstr "A transmitir"
+
+#: src/nd-window.ui:276
+msgid "Error"
+msgstr "Erro"
+
+#: src/nd-window.ui:299
+msgid "Return"
+msgstr "Voltar"
+
+#: src/nd-window.ui:308
+msgid ""
+"One of the following codec plugins is required for audio support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"É necessário um dos seguintes complementos de codec para suporte de áudio.\n"
+"Ao clicar, iniciará o processo de instalação."
+
+#: src/nd-window.ui:314
+msgid ""
+"One of the following codec plugins is required for video support.\n"
+"Clicking will start the installation process."
+msgstr ""
+"É necessário um dos seguintes complementos de codec para suporte de vídeo.\n"
+"Ao clicar, iniciará o processo de instalação."
+
+#: src/nd-window.ui:327
+msgid ""
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
+"administrator."
+msgstr ""
+"Uma zona de firewall necessária não está disponível e não pôde ser "
+"instalada. Por favor, tente novamente e introduza a palavra-passe quando "
+"solicitado ou contacte um administrador de sistema."
