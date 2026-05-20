@@ -264,16 +264,18 @@ nd_pulseaudio_state_cb (pa_context *context,
       break;
 
     case PA_CONTEXT_READY:
-      if (!self->init_task)
-        return;
+      {
+        if (!self->init_task)
+          return;
 
-      g_debug ("NdPulseaudio: Querying sink info by name");
-      g_autofree gchar *sink_name = g_strdup_printf (ND_PA_SINK "_%.8s", self->uuid);
-      self->operation = pa_context_get_sink_info_by_name (self->context,
-                                                          sink_name,
-                                                          on_pa_nd_sink_got_info,
-                                                          self);
-      break;
+        g_debug ("NdPulseaudio: Querying sink info by name");
+        g_autofree gchar *sink_name = g_strdup_printf (ND_PA_SINK "_%.8s", self->uuid);
+        self->operation = pa_context_get_sink_info_by_name (self->context,
+                                                            sink_name,
+                                                            on_pa_nd_sink_got_info,
+                                                            self);
+        break;
+      }
 
     case PA_CONTEXT_FAILED:
     case PA_CONTEXT_TERMINATED:
