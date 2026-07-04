@@ -31,6 +31,30 @@ static const gchar *params_m3_query_extra[] = {
   "microsoft_cursor",
 };
 
+const gchar *
+wfd_params_audio_preference (void)
+{
+  const gchar *env = g_getenv ("GND_WFD_AUDIO");
+
+  if (!env || *env == '\0')
+    return "none";
+
+  return env;
+}
+
+gboolean
+wfd_params_audio_disabled (void)
+{
+  const gchar *preference = wfd_params_audio_preference ();
+
+  return g_ascii_strcasecmp (preference, "none") == 0 ||
+         g_ascii_strcasecmp (preference, "off") == 0 ||
+         g_ascii_strcasecmp (preference, "disabled") == 0 ||
+         g_ascii_strcasecmp (preference, "0") == 0 ||
+         g_ascii_strcasecmp (preference, "false") == 0 ||
+         g_ascii_strcasecmp (preference, "no") == 0;
+}
+
 /**
  * wfd_params_new:
  *

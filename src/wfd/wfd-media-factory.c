@@ -10,6 +10,7 @@ static const gchar * wfd_gst_elements[ELEMENT_NONE + 1] = {
   [ELEMENT_VIDEO_NONE] = NULL,
 
   [ELEMENT_AAC_FDK] = "fdkaacenc",
+  [ELEMENT_AAC_VO] = "voaacenc",
   [ELEMENT_AAC_AVENC] = "avenc_aac",
   [ELEMENT_AAC_FAAC] = "faac",
   [ELEMENT_AUDIO_NONE] = NULL,
@@ -32,6 +33,12 @@ typedef struct
 {
   GstSegment *segment;
 } QOSData;
+
+typedef struct
+{
+  gchar  *label;
+  guint64 count;
+} BufferCountData;
 
 enum {
   SIGNAL_CREATE_SOURCE,
@@ -117,6 +124,78 @@ free_qos_data (QOSData *qos_data)
   g_free (qos_data);
 }
 
+static void
+buffer_count_handoff_cb (GstElement *elem, GstBuffer *buf, gpointer user_data)
+{
+  BufferCountData *data = user_data;
+
+  data->count++;
+
+  if (data->count <= 5 || data->count % 30 == 0)
+    g_debug ("WfdMediaFactory: %s buffer #%" G_GUINT64_FORMAT " pts=%" GST_TIME_FORMAT " size=%" G_GSIZE_FORMAT,
+             data->label,
+             data->count,
+             GST_TIME_ARGS (GST_BUFFER_PTS (buf)),
+             gst_buffer_get_size (buf));
+}
+
+static void
+free_buffer_count_data (BufferCountData *data)
+{
+  g_free (data->label);
+  g_free (data);
+}
+
+static GstElement *
+create_buffer_counter (const gchar *name, const gchar *label)
+{
+  GstElement *identity;
+  BufferCountData *data;
+  const gchar *debug_buffers = g_getenv ("GND_WFD_DEBUG_BUFFERS");
+
+  identity = gst_element_factory_make ("identity", name);
+  if (!identity)
+    return NULL;
+
+  g_object_set (identity,
+                "silent", TRUE,
+                NULL);
+
+  if (!debug_buffers ||
+      (*debug_buffers == '\0') ||
+      g_ascii_strcasecmp (debug_buffers, "0") == 0 ||
+      g_ascii_strcasecmp (debug_buffers, "false") == 0 ||
+      g_ascii_strcasecmp (debug_buffers, "no") == 0)
+    return identity;
+
+  data = g_new0 (BufferCountData, 1);
+  data->label = g_strdup (label);
+
+  g_object_set (identity,
+                "signal-handoffs", TRUE,
+                NULL);
+  g_object_set_data_full (G_OBJECT (identity),
+                          "wfd-buffer-count-data",
+                          data,
+                          (GDestroyNotify) free_buffer_count_data);
+  g_signal_connect (identity, "handoff", G_CALLBACK (buffer_count_handoff_cb), data);
+
+  return identity;
+}
+
+static const gchar *
+wfd_aac_stream_format (void)
+{
+  const gchar *env = g_getenv ("GND_WFD_AAC_STREAM_FORMAT");
+
+  if (env &&
+      (g_ascii_strcasecmp (env, "adts") == 0 ||
+       g_ascii_strcasecmp (env, "raw") == 0))
+    return env;
+
+  return "raw";
+}
+
 GstElement *
 wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
 {
@@ -127,6 +206,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
   QOSData *qos_data;
 
   GstElement *scale;
+  GstElement *source_counter;
   GstElement *sinkfilter;
   GstElement *convert;
   GstElement *queue_pre_encoder;
@@ -135,6 +215,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
   GstElement *encoding_perf;
   GstElement *parse;
   GstElement *codecfilter;
+  GstElement *encoded_counter;
   GstElement *queue_mpegmux_video;
 
   gboolean success = TRUE;
@@ -143,6 +224,9 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
   g_signal_emit (self, signals[SIGNAL_CREATE_SOURCE], 0, &source);
   g_assert (source);
   success &= gst_bin_add (bin, source);
+
+  source_counter = create_buffer_counter ("wfd-source-counter", "source");
+  success &= gst_bin_add (bin, source_counter);
 
   scale = gst_element_factory_make ("videoscale", "wfd-scale");
   g_object_set (scale,
@@ -303,6 +387,9 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
   g_clear_pointer (&caps, gst_caps_unref);
   success &= gst_bin_add (bin, codecfilter);
 
+  encoded_counter = create_buffer_counter ("wfd-encoded-counter", "encoded");
+  success &= gst_bin_add (bin, encoded_counter);
+
   queue_mpegmux_video = gst_element_factory_make ("queue", "wfd-mpegmux-video-queue");
   success &= gst_bin_add (bin, queue_mpegmux_video);
   g_object_set (queue_mpegmux_video,
@@ -311,6 +398,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
                 NULL);
 
   success &= gst_element_link_many (source,
+                                    source_counter,
                                     scale,
                                     sinkfilter,
                                     convert,
@@ -319,6 +407,7 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
                                     encoding_perf,
                                     parse,
                                     codecfilter,
+                                    encoded_counter,
                                     queue_mpegmux_video,
                                     NULL);
 
@@ -342,25 +431,73 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self)
   if (wfd_media_factory_profiles[self->factory_profile].audio_encoder == ELEMENT_AUDIO_NONE)
     return NULL;
 
-  g_signal_emit (self, signals[SIGNAL_CREATE_AUDIO_SOURCE], 0, &audio_source);
+  if (g_strcmp0 (g_getenv ("GND_WFD_AUDIO_SOURCE"), "test") == 0)
+    {
+      audio_source = gst_element_factory_make ("audiotestsrc", "wfd-audio-test-source");
+      if (audio_source)
+        {
+          g_object_set (audio_source,
+                        "is-live", TRUE,
+                        "do-timestamp", TRUE,
+                        "freq", 440.0,
+                        "volume", 0.2,
+                        NULL);
+          g_debug ("WfdMediaFactory: Using audiotestsrc as WFD audio source");
+        }
+    }
+  else
+    g_signal_emit (self, signals[SIGNAL_CREATE_AUDIO_SOURCE], 0, &audio_source);
 
   if (!audio_source)
     return NULL;
 
-  g_autoptr(GstCaps) caps = NULL;
+  g_autoptr(GstCaps) raw_caps = NULL;
+  g_autoptr(GstCaps) encoded_caps = NULL;
   g_autoptr(GstBin) audio_pipeline = NULL;
 
   GstElement *audioencoder;
+  GstElement *audioparse;
+  GstElement *audio_counter;
+  GstElement *audio_mixer;
+  GstElement *audio_source_element;
+  GstElement *audio_source_queue;
   GstElement *audioresample;
   GstElement *audioconvert;
   GstElement *queue_mpegmux_audio;
+  GstElement *silence_source;
+  GstElement *silence_queue;
+  const gchar *aac_stream_format;
 
   audio_pipeline = GST_BIN (gst_bin_new ("wfd-audio"));
   /* The audio pipeline is disabled by default, we hook it up and
    * enable it during configuration. */
   gst_element_set_locked_state (GST_ELEMENT (audio_pipeline), TRUE);
 
-  success &= gst_bin_add (audio_pipeline, audio_source);
+  audio_source_element = audio_source;
+  success &= gst_bin_add (audio_pipeline, g_steal_pointer (&audio_source));
+
+  audio_source_queue = gst_element_factory_make ("queue", "wfd-audio-source-queue");
+  success &= gst_bin_add (audio_pipeline, audio_source_queue);
+
+  silence_source = gst_element_factory_make ("audiotestsrc", "wfd-audio-silence-source");
+  if (silence_source)
+    g_object_set (silence_source,
+                  "is-live", TRUE,
+                  "do-timestamp", TRUE,
+                  "volume", 0.0,
+                  NULL);
+  success &= gst_bin_add (audio_pipeline, silence_source);
+
+  silence_queue = gst_element_factory_make ("queue", "wfd-audio-silence-queue");
+  success &= gst_bin_add (audio_pipeline, silence_queue);
+
+  audio_mixer = gst_element_factory_make ("audiomixer", "wfd-audio-mixer");
+  if (audio_mixer)
+    g_object_set (audio_mixer,
+                  "ignore-inactive-pads", TRUE,
+                  "output-buffer-duration", (guint64) (20 * GST_MSECOND),
+                  NULL);
+  success &= gst_bin_add (audio_pipeline, audio_mixer);
 
   audioresample = gst_element_factory_make ("audioresample", "wfd-audio-resample");
   success &= gst_bin_add (audio_pipeline, audioresample);
@@ -372,6 +509,18 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self)
     {
     case ELEMENT_AAC_FDK:
       audioencoder = gst_element_factory_make ("fdkaacenc", "wfd-audio-aac-enc");
+      if (audioencoder)
+        g_object_set (audioencoder,
+                      "bitrate", (gint) 128000,
+                      NULL);
+      break;
+
+    case ELEMENT_AAC_VO:
+      audioencoder = gst_element_factory_make ("voaacenc", "wfd-audio-aac-enc");
+      if (audioencoder)
+        g_object_set (audioencoder,
+                      "bitrate", (gint) 128000,
+                      NULL);
       break;
 
     case ELEMENT_AAC_FAAC:
@@ -380,12 +529,26 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self)
 
     case ELEMENT_AAC_AVENC:
       audioencoder = gst_element_factory_make ("avenc_aac", "wfd-audio-aac-enc");
+      if (audioencoder)
+        g_object_set (audioencoder,
+                      "bitrate", (gint) 128000,
+                      NULL);
       break;
 
     default:
       g_assert_not_reached ();
     }
   success &= gst_bin_add (audio_pipeline, audioencoder);
+
+  audioparse = gst_element_factory_make ("aacparse", "wfd-audio-aac-parse");
+  if (audioparse)
+    g_object_set (audioparse,
+                  "disable-passthrough", TRUE,
+                  NULL);
+  success &= gst_bin_add (audio_pipeline, audioparse);
+
+  audio_counter = create_buffer_counter ("wfd-audio-counter", "audio-aac");
+  success &= gst_bin_add (audio_pipeline, audio_counter);
 
   queue_mpegmux_audio = gst_element_factory_make ("queue", "wfd-mpegmux-audio-queue");
   g_object_set (queue_mpegmux_audio,
@@ -395,15 +558,29 @@ wfd_media_factory_create_audio_element (WfdMediaFactory *self)
                 NULL);
   success &= gst_bin_add (audio_pipeline, queue_mpegmux_audio);
 
-  caps = gst_caps_new_simple ("audio/mpeg",
-                              "channels", G_TYPE_INT, 2,
-                              "rate", G_TYPE_INT, 48000,
-                              NULL);
+  raw_caps = gst_caps_new_simple ("audio/x-raw",
+                                  "channels", G_TYPE_INT, 2,
+                                  "rate", G_TYPE_INT, 48000,
+                                  NULL);
 
-  success &= gst_element_link_many (audio_source, audioresample, audioconvert, NULL);
-  success &= gst_element_link (audioconvert, audioencoder);
-  success &= gst_element_link_filtered (audioencoder, queue_mpegmux_audio, caps);
-  g_clear_pointer (&caps, gst_caps_unref);
+  aac_stream_format = wfd_aac_stream_format ();
+  g_debug ("WfdMediaFactory: Using AAC stream-format=%s", aac_stream_format);
+
+  encoded_caps = gst_caps_new_simple ("audio/mpeg",
+                                      "mpegversion", G_TYPE_INT, 4,
+                                      "stream-format", G_TYPE_STRING, aac_stream_format,
+                                      "framed", G_TYPE_BOOLEAN, TRUE,
+                                      "channels", G_TYPE_INT, 2,
+                                      "rate", G_TYPE_INT, 48000,
+                                      NULL);
+
+  success &= gst_element_link_many (audio_source_element, audio_source_queue, audio_mixer, NULL);
+  success &= gst_element_link_many (silence_source, silence_queue, audio_mixer, NULL);
+  success &= gst_element_link_many (audio_mixer, audioresample, audioconvert, NULL);
+  success &= gst_element_link_filtered (audioconvert, audioencoder, raw_caps);
+  success &= gst_element_link (audioencoder, audioparse);
+  success &= gst_element_link_filtered (audioparse, audio_counter, encoded_caps);
+  success &= gst_element_link (audio_counter, queue_mpegmux_audio);
 
   gst_element_add_pad (GST_ELEMENT (audio_pipeline),
                        gst_ghost_pad_new ("src",
@@ -431,6 +608,7 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   GstElement *queue_mpegmux_video;
   GstElement *mpegmux;
   GstElement *queue_pre_payloader;
+  GstElement *ts_counter;
   GstElement *payloader;
   gboolean success = TRUE;
 
@@ -458,6 +636,9 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
                 "leaky", 0,
                 NULL);
 
+  ts_counter = create_buffer_counter ("wfd-ts-counter", "mpegts");
+  success &= gst_bin_add (bin, ts_counter);
+
   payloader = gst_element_factory_make ("rtpmp2tpay", "pay0");
   success &= gst_bin_add (bin, payloader);
   g_object_set (payloader,
@@ -473,6 +654,7 @@ wfd_media_factory_create_element (GstRTSPMediaFactory *factory, const GstRTSPUrl
   success &= gst_element_link_pads (queue_mpegmux_video, "src", mpegmux, "sink_4113");
   success &= gst_element_link_many (mpegmux,
                                     queue_pre_payloader,
+                                    ts_counter,
                                     payloader,
                                     NULL);
 
@@ -791,6 +973,54 @@ wfd_gst_element_present (WfdGstElement element)
   return FALSE;
 }
 
+static gboolean
+video_encoder_allowed (WfdGstElement element)
+{
+  const gchar *env = g_getenv ("GND_WFD_VIDEO_ENCODER");
+
+  if (!env || *env == '\0' || g_ascii_strcasecmp (env, "auto") == 0)
+    return TRUE;
+
+  if (element == ELEMENT_OPENH264 && g_ascii_strcasecmp (env, "openh264") == 0)
+    return TRUE;
+  if (element == ELEMENT_X264 && g_ascii_strcasecmp (env, "x264") == 0)
+    return TRUE;
+  if (element == ELEMENT_VAH264 && g_ascii_strcasecmp (env, "vah264") == 0)
+    return TRUE;
+  if (element == ELEMENT_VAAPIH264 && g_ascii_strcasecmp (env, "vaapih264") == 0)
+    return TRUE;
+
+  return FALSE;
+}
+
+static gboolean
+audio_encoder_allowed (WfdGstElement element)
+{
+  const gchar *env = wfd_params_audio_preference ();
+
+  if (wfd_params_audio_disabled ())
+    return element == ELEMENT_AUDIO_NONE;
+
+  if (g_ascii_strcasecmp (env, "auto") == 0 ||
+      g_ascii_strcasecmp (env, "on") == 0 ||
+      g_ascii_strcasecmp (env, "enabled") == 0 ||
+      g_ascii_strcasecmp (env, "1") == 0 ||
+      g_ascii_strcasecmp (env, "true") == 0 ||
+      g_ascii_strcasecmp (env, "yes") == 0)
+    return TRUE;
+
+  if (element == ELEMENT_AAC_FDK && g_ascii_strcasecmp (env, "fdkaac") == 0)
+    return TRUE;
+  if (element == ELEMENT_AAC_VO && g_ascii_strcasecmp (env, "voaac") == 0)
+    return TRUE;
+  if (element == ELEMENT_AAC_AVENC && g_ascii_strcasecmp (env, "avenc") == 0)
+    return TRUE;
+  if (element == ELEMENT_AAC_FAAC && g_ascii_strcasecmp (env, "faac") == 0)
+    return TRUE;
+
+  return FALSE;
+}
+
 static gint
 wfd_gst_media_profile_present (WfdMediaProfile media_profile)
 {
@@ -803,12 +1033,19 @@ wfd_gst_media_profile_present (WfdMediaProfile media_profile)
 
   for (factory_profile = 0; factory_profile < (sizeof (wfd_media_factory_profiles) / sizeof (wfd_media_factory_profiles[0])); ++factory_profile)
     {
-      if (wfd_media_factory_profiles[factory_profile].media_profile == media_profile &&
-          wfd_gst_element_present (wfd_media_factory_profiles[factory_profile].video_encoder) &&
-          wfd_gst_element_present (wfd_media_factory_profiles[factory_profile].audio_encoder) &&
-          wfd_gst_element_present (wfd_media_factory_profiles[factory_profile].muxer))
+      const WfdMediaFactoryProfile *profile = &wfd_media_factory_profiles[factory_profile];
+
+      if (profile->media_profile == media_profile &&
+          video_encoder_allowed (profile->video_encoder) &&
+          audio_encoder_allowed (profile->audio_encoder) &&
+          wfd_gst_element_present (profile->video_encoder) &&
+          wfd_gst_element_present (profile->audio_encoder) &&
+          wfd_gst_element_present (profile->muxer))
         {
-          g_debug ("WfdMediaFactory: Found elements for media profile: %d", media_profile);
+          g_debug ("WfdMediaFactory: Found elements for media profile: %d using video=%s audio=%s",
+                   media_profile,
+                   wfd_gst_elements[profile->video_encoder] ?: "none",
+                   wfd_gst_elements[profile->audio_encoder] ?: "none");
           return factory_profile;
         }
     }
@@ -903,10 +1140,12 @@ missing_elements:
     }
 
   if (!wfd_gst_element_present (ELEMENT_AAC_FDK) &&
+      !wfd_gst_element_present (ELEMENT_AAC_VO) &&
       !wfd_gst_element_present (ELEMENT_AAC_AVENC) &&
       !wfd_gst_element_present (ELEMENT_AAC_FAAC))
     {
-      gchar *missing[4] = { (gchar *) wfd_gst_elements[ELEMENT_AAC_FDK],
+      gchar *missing[5] = { (gchar *) wfd_gst_elements[ELEMENT_AAC_FDK],
+                            (gchar *) wfd_gst_elements[ELEMENT_AAC_VO],
                             (gchar *) wfd_gst_elements[ELEMENT_AAC_AVENC],
                             (gchar *) wfd_gst_elements[ELEMENT_AAC_FAAC],
                             NULL };

@@ -38,6 +38,9 @@ wfd_audio_codec_copy (WfdAudioCodec *self)
   g_return_val_if_fail (self->ref_count, NULL);
 
   copy = wfd_audio_codec_new ();
+  copy->type = self->type;
+  copy->modes = self->modes;
+  copy->latency_ms = self->latency_ms;
 
   return copy;
 }

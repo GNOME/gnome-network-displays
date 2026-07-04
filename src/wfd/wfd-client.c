@@ -169,6 +169,12 @@ wfd_client_select_codec_and_resolution (WfdClient *self, WfdH264ProfileFlags pro
 #endif
   g_debug ("selected resolution %i, %i @%i", self->params->selected_resolution->width, self->params->selected_resolution->height, self->params->selected_resolution->refresh_rate);
 
+  if (wfd_params_audio_disabled ())
+    {
+      g_debug ("WfdClient: Audio disabled for WFD stream");
+      return;
+    }
+
   /* We currently only support AAC with two channels  */
   for (i = 0; i < self->params->audio_codecs->len; i++)
     {

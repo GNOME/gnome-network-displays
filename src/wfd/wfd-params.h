@@ -42,6 +42,8 @@ gchar         *wfd_params_m3_query_params (WfdParams *self);
 void           wfd_params_from_sink (WfdParams    *self,
                                      const guint8 *body,
                                      gsize         body_size);
+const gchar   *wfd_params_audio_preference (void);
+gboolean       wfd_params_audio_disabled (void);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (WfdParams, wfd_params_free)
 
