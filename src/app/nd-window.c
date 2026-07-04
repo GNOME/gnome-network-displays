@@ -273,6 +273,8 @@ sink_notify_state_cb (NdWindow *self, GParamSpec *pspec, NdSink *sink)
       break;
 
     case ND_SINK_STATE_ERROR:
+      nd_pulseaudio_restore_audio (self->pulse);
+
       g_list_store_remove_all (self->connect_sink_list_model);
       g_list_store_remove_all (self->stream_sink_list_model);
       g_list_store_remove_all (self->error_sink_list_model);
@@ -283,6 +285,8 @@ sink_notify_state_cb (NdWindow *self, GParamSpec *pspec, NdSink *sink)
       break;
 
     case ND_SINK_STATE_DISCONNECTED:
+      nd_pulseaudio_restore_audio (self->pulse);
+
       g_list_store_remove_all (self->connect_sink_list_model);
       g_list_store_remove_all (self->stream_sink_list_model);
       g_list_store_remove_all (self->error_sink_list_model);

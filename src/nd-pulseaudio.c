@@ -16,8 +16,12 @@ struct _NdPulseaudio
   pa_mainloop_api      *mainloop_api;
   pa_context           *context;
   guint                 null_module_idx;
+  guint                 sink_idx;
   gchar                *name;
   gchar                *uuid;
+  gchar                *sink_name;
+  gchar                *previous_default_sink;
+  gboolean              audio_routed;
 
   pa_operation         *operation;
 };
@@ -31,6 +35,186 @@ static void      nd_pulseaudio_async_initable_init_async (GAsyncInitable     *in
 static gboolean nd_pulseaudio_async_initable_init_finish (GAsyncInitable *initable,
                                                           GAsyncResult   *res,
                                                           GError        **error);
+
+static const gchar *
+nd_pulseaudio_get_sink_name (NdPulseaudio *self)
+{
+  if (!self->sink_name)
+    self->sink_name = g_strdup_printf (ND_PA_SINK "_%.8s", self->uuid);
+
+  return self->sink_name;
+}
+
+static gboolean
+nd_pulseaudio_audio_routing_enabled (void)
+{
+  const gchar *route = g_getenv ("GND_WFD_AUDIO_ROUTE");
+  const gchar *audio = g_getenv ("GND_WFD_AUDIO");
+
+  if (route && *route)
+    return g_ascii_strcasecmp (route, "0") != 0 &&
+           g_ascii_strcasecmp (route, "false") != 0 &&
+           g_ascii_strcasecmp (route, "no") != 0 &&
+           g_ascii_strcasecmp (route, "off") != 0;
+
+  if (!audio || !*audio)
+    return FALSE;
+
+  return g_ascii_strcasecmp (audio, "none") != 0 &&
+         g_ascii_strcasecmp (audio, "off") != 0 &&
+         g_ascii_strcasecmp (audio, "disabled") != 0 &&
+         g_ascii_strcasecmp (audio, "0") != 0 &&
+         g_ascii_strcasecmp (audio, "false") != 0 &&
+         g_ascii_strcasecmp (audio, "no") != 0;
+}
+
+static void
+unref_operation (pa_operation *operation)
+{
+  if (operation)
+    pa_operation_unref (operation);
+}
+
+static void
+on_pa_move_sink_input_finished (pa_context *c, int success, void *userdata)
+{
+  if (!success)
+    g_debug ("NdPulseaudio: Failed to move a sink input");
+}
+
+static void
+on_pa_default_sink_changed (pa_context *c, int success, void *userdata)
+{
+  if (success)
+    g_debug ("NdPulseaudio: Default sink changed for screencast audio routing");
+  else
+    g_debug ("NdPulseaudio: Failed to change default sink for screencast audio routing");
+}
+
+static void
+on_pa_sink_input_info_for_route (pa_context                *c,
+                                 const pa_sink_input_info *i,
+                                 int                       eol,
+                                 void                     *userdata)
+{
+  NdPulseaudio *self = ND_PULSEAUDIO (userdata);
+
+  if (eol > 0)
+    return;
+
+  if (eol < 0)
+    {
+      g_debug ("NdPulseaudio: Error listing sink inputs for audio routing");
+      return;
+    }
+
+  g_debug ("NdPulseaudio: Moving sink input %u to %s", i->index, nd_pulseaudio_get_sink_name (self));
+  unref_operation (pa_context_move_sink_input_by_name (c,
+                                                       i->index,
+                                                       nd_pulseaudio_get_sink_name (self),
+                                                       on_pa_move_sink_input_finished,
+                                                       self));
+}
+
+static void
+on_pa_server_info_for_route (pa_context           *c,
+                             const pa_server_info *i,
+                             void                 *userdata)
+{
+  NdPulseaudio *self = ND_PULSEAUDIO (userdata);
+
+  if (!i)
+    return;
+
+  g_clear_pointer (&self->previous_default_sink, g_free);
+  if (i->default_sink_name &&
+      !g_str_equal (i->default_sink_name, nd_pulseaudio_get_sink_name (self)))
+    self->previous_default_sink = g_strdup (i->default_sink_name);
+
+  g_debug ("NdPulseaudio: Routing system audio to %s", nd_pulseaudio_get_sink_name (self));
+  unref_operation (pa_context_set_default_sink (c,
+                                                nd_pulseaudio_get_sink_name (self),
+                                                on_pa_default_sink_changed,
+                                                self));
+  unref_operation (pa_context_get_sink_input_info_list (c,
+                                                        on_pa_sink_input_info_for_route,
+                                                        self));
+
+  self->audio_routed = TRUE;
+}
+
+static void
+nd_pulseaudio_route_audio (NdPulseaudio *self)
+{
+  if (!nd_pulseaudio_audio_routing_enabled () || self->audio_routed)
+    return;
+
+  unref_operation (pa_context_get_server_info (self->context,
+                                               on_pa_server_info_for_route,
+                                               self));
+}
+
+static void
+on_pa_default_sink_restored (pa_context *c, int success, void *userdata)
+{
+  if (success)
+    g_debug ("NdPulseaudio: Restored previous default sink");
+  else
+    g_debug ("NdPulseaudio: Failed to restore previous default sink");
+}
+
+static void
+on_pa_sink_input_info_for_restore (pa_context                *c,
+                                   const pa_sink_input_info *i,
+                                   int                       eol,
+                                   void                     *userdata)
+{
+  NdPulseaudio *self = ND_PULSEAUDIO (userdata);
+
+  if (eol > 0)
+    return;
+
+  if (eol < 0)
+    {
+      g_debug ("NdPulseaudio: Error listing sink inputs for audio restore");
+      return;
+    }
+
+  if (!self->previous_default_sink)
+    return;
+
+  g_debug ("NdPulseaudio: Moving sink input %u back to %s", i->index, self->previous_default_sink);
+  unref_operation (pa_context_move_sink_input_by_name (c,
+                                                       i->index,
+                                                       self->previous_default_sink,
+                                                       on_pa_move_sink_input_finished,
+                                                       self));
+}
+
+void
+nd_pulseaudio_restore_audio (NdPulseaudio *self)
+{
+  if (!self || !self->audio_routed || !self->context ||
+      !PA_CONTEXT_IS_GOOD (pa_context_get_state (self->context)))
+    return;
+
+  if (!self->previous_default_sink)
+    {
+      self->audio_routed = FALSE;
+      return;
+    }
+
+  g_debug ("NdPulseaudio: Restoring system audio to %s", self->previous_default_sink);
+  unref_operation (pa_context_set_default_sink (self->context,
+                                                self->previous_default_sink,
+                                                on_pa_default_sink_restored,
+                                                self));
+  unref_operation (pa_context_get_sink_input_info_list (self->context,
+                                                        on_pa_sink_input_info_for_restore,
+                                                        self));
+
+  self->audio_routed = FALSE;
+}
 
 enum {
   PROP_NAME = 1,
@@ -194,6 +378,7 @@ on_pa_nd_sink_got_info (pa_context         *c,
       g_debug ("NdPulseaudio: Error querying sink info");
       g_debug ("NdPulseaudio: Got a sink info for the expected name");
       self->null_module_idx = i->owner_module;
+      self->sink_idx = i->index;
       return_idle_success (self->init_task);
       g_clear_object (&self->init_task);
       return;
@@ -235,6 +420,9 @@ nd_pulseaudio_unload (NdPulseaudio *self)
     return;
   while (pa_context_get_state (self->context) != PA_CONTEXT_READY)
     pa_threaded_mainloop_wait (self->mainloop);
+
+  nd_pulseaudio_restore_audio (self);
+
   pa_operation *operation = pa_context_unload_module (self->context,
                                                       self->null_module_idx,
                                                       nd_pulseaudio_unload_module_cb,
@@ -388,6 +576,8 @@ nd_pulseaudio_finalize (GObject *object)
   g_clear_pointer (&self->mainloop, pa_threaded_mainloop_free);
   g_clear_pointer (&self->name, g_free);
   g_clear_pointer (&self->uuid, g_free);
+  g_clear_pointer (&self->sink_name, g_free);
+  g_clear_pointer (&self->previous_default_sink, g_free);
 
   G_OBJECT_CLASS (nd_pulseaudio_parent_class)->finalize (object);
 }
@@ -420,6 +610,7 @@ static void
 nd_pulseaudio_init (NdPulseaudio *self)
 {
   self->null_module_idx = PA_INVALID_INDEX;
+  self->sink_idx = PA_INVALID_INDEX;
 }
 
 GstElement *
@@ -432,10 +623,12 @@ nd_pulseaudio_get_source (NdPulseaudio *self)
   g_assert (self->init_task == NULL);
   g_assert (self->context != NULL);
 
+  nd_pulseaudio_route_audio (self);
+
   g_autofree gchar *element_name = g_strdup_printf ("pulseaudio-source-%s", self->uuid);
   src = gst_element_factory_make ("pulsesrc", element_name);
 
-  g_autofree gchar *device_name = g_strdup_printf (ND_PA_SINK "_%.8s.monitor", self->uuid);
+  g_autofree gchar *device_name = g_strdup_printf ("%s.monitor", nd_pulseaudio_get_sink_name (self));
   g_autofree gchar *client_name = g_strdup_printf ("GNOME Network Displays Audio Grabber for %s", self->name);
   g_object_set (src,
                 "device", device_name,
