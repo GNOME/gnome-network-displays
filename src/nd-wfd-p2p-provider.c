@@ -20,6 +20,27 @@
 #include "nd-wfd-p2p-provider.h"
 #include "nd-wfd-p2p-sink.h"
 
+#define WPA_SUPPLICANT_DBUS_NAME "fi.w1.wpa_supplicant1"
+#define WPA_SUPPLICANT_DBUS_PATH "/fi/w1/wpa_supplicant1"
+#define WPA_SUPPLICANT_DBUS_INTERFACE "fi.w1.wpa_supplicant1"
+#define WPA_SUPPLICANT_INTERFACE "fi.w1.wpa_supplicant1.Interface"
+#define WPA_SUPPLICANT_WPS_INTERFACE "fi.w1.wpa_supplicant1.Interface.WPS"
+#define WPA_SUPPLICANT_P2P_DEVICE_INTERFACE "fi.w1.wpa_supplicant1.Interface.P2PDevice"
+#define DBUS_PROPERTIES_INTERFACE "org.freedesktop.DBus.Properties"
+#define P2P_DEVICE_IFACE_PREFIX "p2p-dev-"
+
+static const guint8 wfd_discovery_ies[] = {
+  0x00, 0x00, 0x06, 0x01, 0x10, 0x1c, 0x44, 0x00, 0x32
+};
+
+static const guint8 wps_primary_device_type[] = {
+  0x00, 0x0a, 0x00, 0x50, 0xf2, 0x04, 0x00, 0x05
+};
+
+static const guint8 wfd_sink_device_type[] = {
+  0x00, 0x07, 0x00, 0x50, 0xf2, 0x04, 0x00, 0x01
+};
+
 struct _NdWFDP2PProvider
 {
   GObject    parent_instance;
@@ -55,6 +76,263 @@ G_DEFINE_TYPE_EXTENDED (NdWFDP2PProvider, nd_wfd_p2p_provider, G_TYPE_OBJECT, 0,
                        )
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
+
+static gboolean
+set_supplicant_property (GDBusConnection  *connection,
+                         const gchar      *object_path,
+                         const gchar      *interface_name,
+                         const gchar      *property_name,
+                         GVariant         *value,
+                         GError          **error)
+{
+  g_autoptr(GVariant) ret = NULL;
+
+  ret = g_dbus_connection_call_sync (connection,
+                                     WPA_SUPPLICANT_DBUS_NAME,
+                                     object_path,
+                                     DBUS_PROPERTIES_INTERFACE,
+                                     "Set",
+                                     g_variant_new ("(ssv)",
+                                                    interface_name,
+                                                    property_name,
+                                                    value),
+                                     NULL,
+                                     G_DBUS_CALL_FLAGS_NONE,
+                                     -1,
+                                     NULL,
+                                     error);
+
+  return ret != NULL;
+}
+
+static gchar *
+get_supplicant_iface_name (NMDevice *nm_device)
+{
+  const gchar *ifname = nm_device_get_iface (nm_device);
+
+  if (!ifname)
+    return NULL;
+
+  if (g_str_has_prefix (ifname, P2P_DEVICE_IFACE_PREFIX))
+    return g_strdup (ifname + strlen (P2P_DEVICE_IFACE_PREFIX));
+
+  return g_strdup (ifname);
+}
+
+static gchar *
+get_supplicant_interface_path (GDBusConnection  *connection,
+                               NMDevice         *nm_device,
+                               GError          **error)
+{
+  g_autoptr(GVariant) ret = NULL;
+  g_autofree gchar *supplicant_iface = NULL;
+  gchar *supplicant_path = NULL;
+
+  supplicant_iface = get_supplicant_iface_name (nm_device);
+  if (!supplicant_iface)
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_FAILED,
+                           "Could not determine the supplicant interface name");
+      return NULL;
+    }
+
+  ret = g_dbus_connection_call_sync (connection,
+                                     WPA_SUPPLICANT_DBUS_NAME,
+                                     WPA_SUPPLICANT_DBUS_PATH,
+                                     WPA_SUPPLICANT_DBUS_INTERFACE,
+                                     "GetInterface",
+                                     g_variant_new ("(s)", supplicant_iface),
+                                     G_VARIANT_TYPE ("(o)"),
+                                     G_DBUS_CALL_FLAGS_NONE,
+                                     -1,
+                                     NULL,
+                                     error);
+  if (!ret)
+    return NULL;
+
+  g_variant_get (ret, "(o)", &supplicant_path);
+
+  return supplicant_path;
+}
+
+static void
+warn_and_clear (const gchar *message, GError **error)
+{
+  if (error && *error)
+    {
+      g_warning ("%s: %s", message, (*error)->message);
+      g_clear_error (error);
+    }
+  else
+    {
+      g_warning ("%s", message);
+    }
+}
+
+static void
+configure_supplicant_wfd_discovery (NdWFDP2PProvider *provider)
+{
+  g_autoptr(GDBusConnection) connection = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree gchar *supplicant_path = NULL;
+  GVariantBuilder p2p_config;
+
+  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
+  if (!connection)
+    {
+      warn_and_clear ("WFDP2PProvider: Could not connect to the system bus", &error);
+      return;
+    }
+
+  if (!set_supplicant_property (connection,
+                                WPA_SUPPLICANT_DBUS_PATH,
+                                WPA_SUPPLICANT_DBUS_INTERFACE,
+                                "WFDIEs",
+                                g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE,
+                                                           wfd_discovery_ies,
+                                                           G_N_ELEMENTS (wfd_discovery_ies),
+                                                           sizeof (guint8)),
+                                &error))
+    warn_and_clear ("WFDP2PProvider: Could not set wpa_supplicant WFDIEs", &error);
+
+  supplicant_path = get_supplicant_interface_path (connection, provider->nm_device, &error);
+  if (!supplicant_path)
+    {
+      warn_and_clear ("WFDP2PProvider: Could not resolve the supplicant interface", &error);
+      return;
+    }
+
+  if (!set_supplicant_property (connection,
+                                supplicant_path,
+                                WPA_SUPPLICANT_WPS_INTERFACE,
+                                "DeviceName",
+                                g_variant_new_string ("GNOME-Network-Displays"),
+                                &error))
+    warn_and_clear ("WFDP2PProvider: Could not set WPS device name", &error);
+
+  if (!set_supplicant_property (connection,
+                                supplicant_path,
+                                WPA_SUPPLICANT_WPS_INTERFACE,
+                                "Manufacturer",
+                                g_variant_new_string ("GNOME"),
+                                &error))
+    warn_and_clear ("WFDP2PProvider: Could not set WPS manufacturer", &error);
+
+  if (!set_supplicant_property (connection,
+                                supplicant_path,
+                                WPA_SUPPLICANT_WPS_INTERFACE,
+                                "ModelName",
+                                g_variant_new_string ("Network-Displays"),
+                                &error))
+    warn_and_clear ("WFDP2PProvider: Could not set WPS model name", &error);
+
+  if (!set_supplicant_property (connection,
+                                supplicant_path,
+                                WPA_SUPPLICANT_WPS_INTERFACE,
+                                "ConfigMethods",
+                                g_variant_new_string ("virtual_push_button physical_display keypad ext_nfc_token nfc_interface"),
+                                &error))
+    warn_and_clear ("WFDP2PProvider: Could not set WPS config methods", &error);
+
+  if (!set_supplicant_property (connection,
+                                supplicant_path,
+                                WPA_SUPPLICANT_WPS_INTERFACE,
+                                "DeviceType",
+                                g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE,
+                                                           wps_primary_device_type,
+                                                           G_N_ELEMENTS (wps_primary_device_type),
+                                                           sizeof (guint8)),
+                                &error))
+    warn_and_clear ("WFDP2PProvider: Could not set WPS device type", &error);
+
+  g_variant_builder_init (&p2p_config, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (&p2p_config,
+                         "{sv}",
+                         "DeviceName",
+                         g_variant_new_string ("GNOME-Network-Displays"));
+  g_variant_builder_add (&p2p_config,
+                         "{sv}",
+                         "PrimaryDeviceType",
+                         g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE,
+                                                    wps_primary_device_type,
+                                                    G_N_ELEMENTS (wps_primary_device_type),
+                                                    sizeof (guint8)));
+  g_variant_builder_add (&p2p_config, "{sv}", "GOIntent", g_variant_new_uint32 (7));
+  g_variant_builder_add (&p2p_config, "{sv}", "PersistentReconnect", g_variant_new_boolean (FALSE));
+
+  if (!set_supplicant_property (connection,
+                                supplicant_path,
+                                WPA_SUPPLICANT_P2P_DEVICE_INTERFACE,
+                                "P2PDeviceConfig",
+                                g_variant_builder_end (&p2p_config),
+                                &error))
+    warn_and_clear ("WFDP2PProvider: Could not set P2P device config", &error);
+}
+
+static gboolean
+start_supplicant_wfd_find (NdWFDP2PProvider *provider,
+                           guint             timeout)
+{
+  g_autoptr(GDBusConnection) connection = NULL;
+  g_autoptr(GVariant) ret = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree gchar *supplicant_path = NULL;
+  GVariantBuilder options;
+  GVariantBuilder requested_device_types;
+
+  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
+  if (!connection)
+    {
+      warn_and_clear ("WFDP2PProvider: Could not connect to the system bus", &error);
+      return FALSE;
+    }
+
+  supplicant_path = get_supplicant_interface_path (connection, provider->nm_device, &error);
+  if (!supplicant_path)
+    {
+      warn_and_clear ("WFDP2PProvider: Could not resolve the supplicant interface", &error);
+      return FALSE;
+    }
+
+  g_variant_builder_init (&requested_device_types, G_VARIANT_TYPE ("aay"));
+  g_variant_builder_add (&requested_device_types,
+                         "@ay",
+                         g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE,
+                                                    wfd_sink_device_type,
+                                                    G_N_ELEMENTS (wfd_sink_device_type),
+                                                    sizeof (guint8)));
+
+  g_variant_builder_init (&options, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (&options, "{sv}", "Timeout", g_variant_new_int32 (timeout));
+  g_variant_builder_add (&options, "{sv}", "DiscoveryType", g_variant_new_string ("social"));
+  g_variant_builder_add (&options,
+                         "{sv}",
+                         "RequestedDeviceTypes",
+                         g_variant_builder_end (&requested_device_types));
+
+  ret = g_dbus_connection_call_sync (connection,
+                                     WPA_SUPPLICANT_DBUS_NAME,
+                                     supplicant_path,
+                                     WPA_SUPPLICANT_P2P_DEVICE_INTERFACE,
+                                     "Find",
+                                     g_variant_new ("(a{sv})", &options),
+                                     G_VARIANT_TYPE ("()"),
+                                     G_DBUS_CALL_FLAGS_NONE,
+                                     -1,
+                                     NULL,
+                                     &error);
+  if (!ret)
+    {
+      warn_and_clear ("WFDP2PProvider: Could not start targeted supplicant P2P discovery", &error);
+      return FALSE;
+    }
+
+  g_debug ("WFDP2PProvider: Started targeted supplicant P2P discovery");
+
+  return TRUE;
+}
 
 static void
 on_peer_wfd_ie_notify_cb (NdWFDP2PProvider *provider,
@@ -186,13 +464,41 @@ log_start_find_error (GObject *source, GAsyncResult *res, gpointer user_data)
     g_debug ("WFDP2PProvider: Started P2P discovery");
 }
 
+static GVariant *
+build_p2p_find_options (void)
+{
+  GVariantBuilder options;
+
+  g_variant_builder_init (&options, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (&options, "{sv}", "timeout", g_variant_new_int32 (30));
+
+  return g_variant_ref_sink (g_variant_builder_end (&options));
+}
+
+static void
+start_p2p_find (NdWFDP2PProvider *provider)
+{
+  configure_supplicant_wfd_discovery (provider);
+
+  if (start_supplicant_wfd_find (provider, 30))
+    return;
+
+  g_autoptr(GVariant) options = build_p2p_find_options ();
+
+  nm_device_wifi_p2p_start_find (NM_DEVICE_WIFI_P2P (provider->nm_device),
+                                 options,
+                                 NULL,
+                                 log_start_find_error,
+                                 NULL);
+}
+
 static gboolean
 device_restart_find_timeout (gpointer user_data)
 {
   NdWFDP2PProvider *provider = ND_WFD_P2P_PROVIDER (user_data);
 
   g_debug ("WFDP2PProvider: Restarting P2P discovery");
-  nm_device_wifi_p2p_start_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, log_start_find_error, NULL);
+  start_p2p_find (provider);
 
   return G_SOURCE_CONTINUE;
 }
@@ -203,7 +509,7 @@ discovery_start_stop (NdWFDP2PProvider *provider, NMDeviceState state)
   if (provider->discover && state > NM_DEVICE_STATE_UNAVAILABLE)
     {
       g_debug ("WFDP2PProvider: Starting P2P discovery.");
-      nm_device_wifi_p2p_start_find (NM_DEVICE_WIFI_P2P (provider->nm_device), NULL, NULL, log_start_find_error, NULL);
+      start_p2p_find (provider);
       if (!provider->p2p_find_source_id)
         provider->p2p_find_source_id = g_timeout_add_seconds (20, device_restart_find_timeout, provider);
     }

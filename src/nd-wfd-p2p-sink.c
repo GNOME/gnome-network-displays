@@ -24,6 +24,13 @@
 #include "wfd/wfd-client.h"
 #include "wfd/wfd-server.h"
 
+#define WPA_SUPPLICANT_DBUS_NAME "fi.w1.wpa_supplicant1"
+#define WPA_SUPPLICANT_DBUS_PATH "/fi/w1/wpa_supplicant1"
+#define WPA_SUPPLICANT_DBUS_INTERFACE "fi.w1.wpa_supplicant1"
+#define WPA_SUPPLICANT_P2P_DEVICE_INTERFACE "fi.w1.wpa_supplicant1.Interface.P2PDevice"
+#define DBUS_PROPERTIES_INTERFACE "org.freedesktop.DBus.Properties"
+#define P2P_DEVICE_IFACE_PREFIX "p2p-dev-"
+
 struct _NdWFDP2PSink
 {
   GObject             parent_instance;
@@ -83,6 +90,173 @@ G_DEFINE_TYPE_EXTENDED (NdWFDP2PSink, nd_wfd_p2p_sink, G_TYPE_OBJECT, 0,
 
 static GParamSpec * props[PROP_LAST] = { NULL, };
 
+
+static gchar *
+get_supplicant_iface_name (NMDevice *nm_device)
+{
+  const gchar *ifname = nm_device_get_iface (nm_device);
+
+  if (!ifname)
+    return NULL;
+
+  if (g_str_has_prefix (ifname, P2P_DEVICE_IFACE_PREFIX))
+    return g_strdup (ifname + strlen (P2P_DEVICE_IFACE_PREFIX));
+
+  return g_strdup (ifname);
+}
+
+static gchar *
+get_supplicant_interface_path (GDBusConnection  *connection,
+                               NMDevice         *nm_device,
+                               GError          **error)
+{
+  g_autoptr(GVariant) ret = NULL;
+  g_autofree gchar *supplicant_iface = NULL;
+  gchar *supplicant_path = NULL;
+
+  supplicant_iface = get_supplicant_iface_name (nm_device);
+  if (!supplicant_iface)
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_FAILED,
+                           "Could not determine the supplicant interface name");
+      return NULL;
+    }
+
+  ret = g_dbus_connection_call_sync (connection,
+                                     WPA_SUPPLICANT_DBUS_NAME,
+                                     WPA_SUPPLICANT_DBUS_PATH,
+                                     WPA_SUPPLICANT_DBUS_INTERFACE,
+                                     "GetInterface",
+                                     g_variant_new ("(s)", supplicant_iface),
+                                     G_VARIANT_TYPE ("(o)"),
+                                     G_DBUS_CALL_FLAGS_NONE,
+                                     -1,
+                                     NULL,
+                                     error);
+  if (!ret)
+    return NULL;
+
+  g_variant_get (ret, "(o)", &supplicant_path);
+
+  return supplicant_path;
+}
+
+static gchar *
+get_supplicant_peer_path (NdWFDP2PSink *sink,
+                          const gchar  *supplicant_path)
+{
+  const gchar *hw_addr = NULL;
+  g_autoptr(GString) peer_id = NULL;
+
+  hw_addr = nm_wifi_p2p_peer_get_hw_address (sink->nm_peer);
+  if (!hw_addr)
+    return NULL;
+
+  peer_id = g_string_sized_new (12);
+  for (const gchar *p = hw_addr; *p; p++)
+    {
+      if (g_ascii_isxdigit (*p))
+        g_string_append_c (peer_id, g_ascii_tolower (*p));
+    }
+
+  if (peer_id->len != 12)
+    return NULL;
+
+  return g_strdup_printf ("%s/Peers/%s", supplicant_path, peer_id->str);
+}
+
+static gint
+get_forced_go_intent (void)
+{
+  const gchar *env = g_getenv ("GND_WFD_P2P_GO_INTENT");
+  gchar *end = NULL;
+  gint64 value;
+
+  if (!env || *env == '\0')
+    return 0;
+
+  value = g_ascii_strtoll (env, &end, 10);
+  if (end != env && *end == '\0' && value >= 0 && value <= 15)
+    return value;
+
+  g_warning ("NdWfdP2PSink: Ignoring invalid GND_WFD_P2P_GO_INTENT=%s", env);
+  return 0;
+}
+
+static void
+restart_supplicant_p2p_connect (NdWFDP2PSink *sink)
+{
+  g_autoptr(GDBusConnection) connection = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GVariant) ret = NULL;
+  g_autofree gchar *supplicant_path = NULL;
+  g_autofree gchar *peer_path = NULL;
+  GVariantBuilder options;
+  gint go_intent;
+
+  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
+  if (!connection)
+    {
+      g_warning ("NdWfdP2PSink: Could not connect to the system bus: %s", error->message);
+      return;
+    }
+
+  supplicant_path = get_supplicant_interface_path (connection, sink->nm_device, &error);
+  if (!supplicant_path)
+    {
+      g_warning ("NdWfdP2PSink: Could not resolve the supplicant interface: %s", error->message);
+      return;
+    }
+
+  peer_path = get_supplicant_peer_path (sink, supplicant_path);
+  if (!peer_path)
+    {
+      g_warning ("NdWfdP2PSink: Could not build the supplicant peer path");
+      return;
+    }
+
+  g_dbus_connection_call_sync (connection,
+                               WPA_SUPPLICANT_DBUS_NAME,
+                               supplicant_path,
+                               WPA_SUPPLICANT_P2P_DEVICE_INTERFACE,
+                               "Cancel",
+                               NULL,
+                               G_VARIANT_TYPE ("()"),
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               NULL);
+
+  go_intent = get_forced_go_intent ();
+
+  g_variant_builder_init (&options, G_VARIANT_TYPE_VARDICT);
+  g_variant_builder_add (&options, "{sv}", "wps_method", g_variant_new_string ("pbc"));
+  g_variant_builder_add (&options, "{sv}", "peer", g_variant_new_object_path (peer_path));
+  g_variant_builder_add (&options, "{sv}", "join", g_variant_new_boolean (FALSE));
+  g_variant_builder_add (&options, "{sv}", "persistent", g_variant_new_boolean (FALSE));
+  g_variant_builder_add (&options, "{sv}", "go_intent", g_variant_new_int32 (go_intent));
+
+  ret = g_dbus_connection_call_sync (connection,
+                                     WPA_SUPPLICANT_DBUS_NAME,
+                                     supplicant_path,
+                                     WPA_SUPPLICANT_P2P_DEVICE_INTERFACE,
+                                     "Connect",
+                                     g_variant_new ("(a{sv})", &options),
+                                     G_VARIANT_TYPE ("(s)"),
+                                     G_DBUS_CALL_FLAGS_NONE,
+                                     -1,
+                                     NULL,
+                                     &error);
+  if (!ret)
+    {
+      g_warning ("NdWfdP2PSink: Could not restart supplicant P2P connect: %s", error->message);
+      return;
+    }
+
+  g_debug ("NdWfdP2PSink: Restarted supplicant P2P connect with GO intent %d", go_intent);
+}
 
 static void
 peer_notify_cb (NdWFDP2PSink *self, GParamSpec *pspec, NMWifiP2PPeer *peer)
@@ -433,6 +607,8 @@ p2p_connected (GObject      *source_object,
 
   sink->nm_ac = ac;
 
+  restart_supplicant_p2p_connect (sink);
+
   g_assert (sink->server == NULL);
   sink->server = wfd_server_new ();
 
@@ -544,7 +720,7 @@ firewall_ready (GObject      *source_object,
   options = g_variant_builder_end (builder);
 
   /* Static WFD IEs describing a source with the RTSP server on port 7236. */
-  wfd_ies = g_bytes_new_static ("\x00\x00\x06\x00\x90\x1c\x44\x00\xc8", 9);
+  wfd_ies = g_bytes_new_static ("\x00\x00\x06\x01\x10\x1c\x44\x00\x32", 9);
 
   connection = nm_simple_connection_new ();
 
