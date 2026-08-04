@@ -7,9 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2024-08-08 08:29+0200\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2026-01-23 05:57+0000\n"
+"PO-Revision-Date: 2026-08-04 12:41+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -19,22 +20,22 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
 "n%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 3.8\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "Omrežni zasloni GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "Zrcaljenje zaslona za GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:14
 msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
+msgstr "Benjamin Berg, Christian Glombek"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -121,19 +122,19 @@ msgstr "Predmet GStreamer »%s«"
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Namestite enega izmed navedenih vstavkov GStreamer"
 
-#: src/app/nd-window.c:233
+#: src/app/nd-window.c:239
 msgid "Checking and installing required firewall zones."
 msgstr "Preverjanje in nameščanje zahteva območja požarnih zidov."
 
-#: src/app/nd-window.c:240
+#: src/app/nd-window.c:246
 msgid "Making P2P connection"
 msgstr "Poteka vzpostavljanje povezave P2P"
 
-#: src/app/nd-window.c:247
+#: src/app/nd-window.c:253
 msgid "Establishing connection to sink"
 msgstr "Vzpostavljanje povezave s koritom."
 
-#: src/app/nd-window.c:254
+#: src/app/nd-window.c:260
 msgid "Starting to stream"
 msgstr "Začenjanje pretoka"
 
