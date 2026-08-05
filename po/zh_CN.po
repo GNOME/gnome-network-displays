@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the gnome-network-displays package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 王滋涵 Zephyr Wang <wi24rd@fedoraproject.org>, 2020.
-# lumingzh <lumingzh@qq.com>, 2024.
+# lumingzh <lumingzh@qq.com>, 2024-2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2024-08-15 14:23+0800\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2026-01-23 05:57+0000\n"
+"PO-Revision-Date: 2026-08-05 08:59+0800\n"
 "Last-Translator: lumingzh <lumingzh@qq.com>\n"
 "Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
@@ -18,22 +19,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Gtranslator 46.1\n"
+"X-Generator: Gtranslator 50.0\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "GNOME 网络显示器"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "GNOME 的远程投屏工具"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:14
 msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
+msgstr "Benjamin Berg, Christian Glombek"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -120,19 +121,19 @@ msgstr "GStreamer 元素“%s”"
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "请单击下列的按钮安装其中一个 GStreamer 插件"
 
-#: src/app/nd-window.c:233
+#: src/app/nd-window.c:239
 msgid "Checking and installing required firewall zones."
 msgstr "检查并安装所需的防火墙区域中。"
 
-#: src/app/nd-window.c:240
+#: src/app/nd-window.c:246
 msgid "Making P2P connection"
 msgstr "正在建立 P2P 连接"
 
-#: src/app/nd-window.c:247
+#: src/app/nd-window.c:253
 msgid "Establishing connection to sink"
 msgstr "建立到接收器的连接"
 
-#: src/app/nd-window.c:254
+#: src/app/nd-window.c:260
 msgid "Starting to stream"
 msgstr "开始串流"
 
