@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
 "issues/\n"
 "POT-Creation-Date: 2026-01-23 05:57+0000\n"
-"PO-Revision-Date: 2026-03-15 12:54+0500\n"
+"PO-Revision-Date: 2026-08-22 08:46+0500\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <Kazakh>\n"
 "Language: kk\n"
@@ -26,6 +26,10 @@ msgstr "GNOME желілік дисплейлері"
 #: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "GNOME үшін экранды трансляциялау"
+
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:14
+msgid "Benjamin Berg, Christian Glombek"
+msgstr "Benjamin Berg, Christian Glombek"
 
 #: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
 msgid ""
@@ -112,8 +116,7 @@ msgid "GStreamer Element “%s”"
 msgstr "GStreamer «%s» элементі"
 
 #: src/app/nd-codec-install.c:196
-msgid ""
-"Please install one of the following GStreamer plugins by clicking below"
+msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Төменде шерту арқылы келесі GStreamer плагиндерінің бірін орнатыңыз"
 
 #: src/app/nd-window.c:239
@@ -192,8 +195,8 @@ msgstr ""
 
 #: src/nd-window.ui:327
 msgid ""
-"A required firewall zone is not available and could not be installed. "
-"Please try again and enter the password when prompted or contact a system "
+"A required firewall zone is not available and could not be installed. Please "
+"try again and enter the password when prompted or contact a system "
 "administrator."
 msgstr ""
 "Қажетті желілік қалқан аймағы қолжетімді емес және оны орнату мүмкін "
