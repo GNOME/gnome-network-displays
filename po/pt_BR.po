@@ -3,39 +3,40 @@
 # Copyright (C) 2024 THE gnome-network-displays'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-network-displays package.
 # Hugo Fortini <hugofortinipbi@gmail.com>, 2024.
-# Juliano de Souza Camargo <julianosc@pm.me>, 2024.
 # Rafael Fontenelle <rafaelff@gnome.org>, 2020-2024.
+# Juliano de Souza Camargo <julianosc@pm.me>, 2024-2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2024-09-21 00:54-0300\n"
-"Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
-"Language-Team: Brazilian Portuguese <https://br.gnome.org/traducao>\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/"
+"issues/\n"
+"POT-Creation-Date: 2026-01-23 05:57+0000\n"
+"PO-Revision-Date: 2026-09-07 16:12-0300\n"
+"Last-Translator: Juliano de Souza Camargo <julianosc@pm.me>\n"
+"Language-Team: Brazilian Portuguese <https://br.gnome.org/traducao/>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
-"X-Generator: Gtranslator 46.1\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Gtranslator 50.0\n"
 "X-Project-Style: gnome\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "GNOME Tela via Rede"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "Transmissão de tela para GNOME"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:14
 msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
+msgstr "Benjamin Berg, Christian Glombek"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -122,19 +123,19 @@ msgstr "GStreamer Element “%s”"
 msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr "Por favor, instale um dos seguintes plugins GStreamer clicando abaixo"
 
-#: src/app/nd-window.c:233
+#: src/app/nd-window.c:239
 msgid "Checking and installing required firewall zones."
 msgstr "Verificando e instalando zonas de firewall necessárias."
 
-#: src/app/nd-window.c:240
+#: src/app/nd-window.c:246
 msgid "Making P2P connection"
 msgstr "Fazendo a conexão P2P"
 
-#: src/app/nd-window.c:247
+#: src/app/nd-window.c:253
 msgid "Establishing connection to sink"
 msgstr "Estabelecendo conexão com o coletor"
 
-#: src/app/nd-window.c:254
+#: src/app/nd-window.c:260
 msgid "Starting to stream"
 msgstr "Iniciando a transmissão"
 
