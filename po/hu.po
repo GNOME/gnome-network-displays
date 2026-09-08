@@ -1,14 +1,15 @@
 # Hungarian translation for gnome-network-displays.
-# Copyright (C) 2022, 2024 Free Software Foundation, Inc.
+# Copyright (C) 2022, 2024, 2026 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gnome-network-displays package.
 #
-# Balázs Úr <ur.balazs at fsf dot hu>, 2022, 2024.
+# Balázs Úr <ur.balazs at fsf dot hu>, 2022, 2024, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-network-displays master\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 18:55+0200\n"
-"PO-Revision-Date: 2024-09-09 01:14+0200\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/gnome-network-displays/is"
+"sues/\n"
+"POT-Creation-Date: 2026-01-23 05:57+0000\n"
+"PO-Revision-Date: 2026-09-08 17:50+0200\n"
 "Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
 "Language-Team: Hungarian <openscope at fsf dot hu>\n"
 "Language: hu\n"
@@ -16,22 +17,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 23.08.4\n"
+"X-Generator: Lokalize 25.12.3\n"
 
 #: data/org.gnome.NetworkDisplays.desktop.in:2
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:7 src/app/main.c:68
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:7 src/app/main.c:68
 msgid "GNOME Network Displays"
 msgstr "GNOME Hálózati megjelenítők"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:8
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:8
 msgid "Screencasting for GNOME"
 msgstr "Képernyővideó-továbbítás a GNOME-hoz"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:14
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:14
 msgid "Benjamin Berg, Christian Glombek"
-msgstr ""
+msgstr "Benjamin Berg, Christian Glombek"
 
-#: data/org.gnome.NetworkDisplays.appdata.xml.in:24
+#: data/org.gnome.NetworkDisplays.metainfo.xml.in:24
 msgid ""
 "GNOME Network Displays allows you to cast your desktop to a remote display. "
 "Supports the Miracast and Chromecast protocols."
@@ -119,19 +120,19 @@ msgid "Please install one of the following GStreamer plugins by clicking below"
 msgstr ""
 "Telepítse a következő GStreamer-bővítmények egyikét az alábbira kattintva"
 
-#: src/app/nd-window.c:233
+#: src/app/nd-window.c:239
 msgid "Checking and installing required firewall zones."
 msgstr "Szükséges tűzfalzónák ellenőrzése és telepítése."
 
-#: src/app/nd-window.c:240
+#: src/app/nd-window.c:246
 msgid "Making P2P connection"
 msgstr "Egyenrangú kapcsolat létesítése"
 
-#: src/app/nd-window.c:247
+#: src/app/nd-window.c:253
 msgid "Establishing connection to sink"
 msgstr "Kapcsolat kiépítése a fogadóval"
 
-#: src/app/nd-window.c:254
+#: src/app/nd-window.c:260
 msgid "Starting to stream"
 msgstr "Adatfolyam küldésének indítása"
 
