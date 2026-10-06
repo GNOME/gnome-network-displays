@@ -7,7 +7,7 @@
 	<name>GNOME Network Displays</name>
 	<summary>Screencasting for GNOME</summary>
 	<url type="homepage">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
-	<url type="bugtracker">https://gitlab.gnome.org/GNOME/gnome-network-displays/-/issues</url>
+	<url type="bugtracker">https://gitlab.gnome.org/GNOME/gnome-network-displays/-/work_items</url>
 	<url type="vcs-browser">https://gitlab.gnome.org/GNOME/gnome-network-displays</url>
 	<url type="translate">https://l10n.gnome.org/module/gnome-network-displays/</url>
 	<developer id="org.gnome">
