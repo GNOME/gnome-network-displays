@@ -162,7 +162,13 @@ wfd_media_factory_create_video_element (WfdMediaFactory *self, GstBin *bin)
                 NULL);
   g_clear_pointer (&caps, gst_caps_unref);
 
-  convert = gst_element_factory_make ("videoconvert", "wfd-videoconvert");
+  /* The VA encoder only accepts NV12, so convert on the GPU when it is in use.
+   * vapostproc is absent if the driver has no VideoProc entrypoint. */
+  convert = NULL;
+  if (wfd_media_factory_profiles[self->factory_profile].video_encoder == ELEMENT_VAH264)
+    convert = gst_element_factory_make ("vapostproc", "wfd-videoconvert");
+  if (!convert)
+    convert = gst_element_factory_make ("videoconvert", "wfd-videoconvert");
   g_object_set (convert,
                 "qos", TRUE,
                 NULL);
