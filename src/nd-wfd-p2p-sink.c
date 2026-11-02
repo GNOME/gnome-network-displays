@@ -17,6 +17,7 @@
  */
 
 #include "gnome-network-displays-config.h"
+#include "nd-client-event.h"
 #include "nd-enum-types.h"
 #include "nd-firewalld.h"
 #include "nd-uri-helpers.h"
@@ -31,6 +32,7 @@ struct _NdWFDP2PSink
   NdSinkState         state;
 
   GCancellable       *cancellable;
+  GMainContext       *main_context;
 
   NMClient           *nm_client;
   NMDevice           *nm_device;
@@ -252,6 +254,7 @@ nd_wfd_p2p_sink_finalize (GObject *object)
   g_clear_object (&sink->missing_video_codec);
   g_clear_object (&sink->missing_audio_codec);
   g_clear_pointer (&sink->missing_firewall_zone, g_free);
+  g_main_context_unref (sink->main_context);
 
   G_OBJECT_CLASS (nd_wfd_p2p_sink_parent_class)->finalize (object);
 }
@@ -302,6 +305,8 @@ nd_wfd_p2p_sink_init (NdWFDP2PSink *sink)
   sink->uuid = g_uuid_string_random ();
   sink->state = ND_SINK_STATE_DISCONNECTED;
   sink->cancellable = g_cancellable_new ();
+  /* The RTSP server, its timers and the GTK application use this context. */
+  sink->main_context = g_main_context_ref (g_main_context_default ());
 }
 
 static gchar *
@@ -337,27 +342,45 @@ nd_wfd_p2p_sink_sink_iface_init (NdSinkIface *iface)
 }
 
 static void
-play_request_cb (NdWFDP2PSink *sink, GstRTSPContext *ctx, WfdClient *client)
+play_request_on_main (GObject *owner, GObject *client)
 {
-  g_debug ("NdWfdP2PSink: Got play request from client");
+  NdWFDP2PSink *sink = ND_WFD_P2P_SINK (owner);
+
+  if (sink->wfd_client != WFD_CLIENT (client) ||
+      sink->state != ND_SINK_STATE_WAIT_STREAMING)
+    return;
 
   sink->state = ND_SINK_STATE_STREAMING;
   g_object_notify (G_OBJECT (sink), "state");
 }
 
 static void
-closed_cb (NdWFDP2PSink *sink, WfdClient *client)
+play_request_cb (NdWFDP2PSink *sink, GstRTSPContext *ctx, WfdClient *client)
 {
-  if (sink->state == ND_SINK_STATE_DISCONNECTED)
-    return;
+  g_debug ("NdWfdP2PSink: Got play request from client");
 
-  if (sink->wfd_client == NULL)
+  nd_client_event_queue (sink->main_context, G_OBJECT (sink), G_OBJECT (client), play_request_on_main);
+}
+
+static void
+closed_on_main (GObject *owner, GObject *client)
+{
+  NdWFDP2PSink *sink = ND_WFD_P2P_SINK (owner);
+
+  if (sink->wfd_client != WFD_CLIENT (client) ||
+      sink->state == ND_SINK_STATE_DISCONNECTED)
     return;
 
   nd_wfd_p2p_sink_sink_stop_stream_int (sink);
 
   sink->state = ND_SINK_STATE_DISCONNECTED;
   g_object_notify (G_OBJECT (sink), "state");
+}
+
+static void
+closed_cb (NdWFDP2PSink *sink, WfdClient *client)
+{
+  nd_client_event_queue (sink->main_context, G_OBJECT (sink), G_OBJECT (client), closed_on_main);
 }
 
 static void

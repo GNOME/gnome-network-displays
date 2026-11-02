@@ -5,6 +5,7 @@ subdir('cc')
 gnome_nd_common_sources = [
   'nd-firewalld.c',
   'nd-sink.c',
+  'nd-client-event.c',
   'nd-provider.c',
   'nd-meta-sink.c',
   'nd-meta-provider.c',
@@ -38,10 +39,11 @@ endif
 
 enum_headers = files('nd-sink.h')
 
-gnome_nd_common_sources += gnome.mkenums_simple(
+enum_sources = gnome.mkenums_simple(
   'nd-enum-types',
   sources: enum_headers,
 )
+gnome_nd_common_sources += enum_sources
 
 gnome_nd_common_deps = [
   dependency('gio-2.0', version: '>= 2.50'),
@@ -69,6 +71,24 @@ endif
 
 gnome_nd_common_deps += wfd_server_deps
 gnome_nd_common_deps += cc_deps
+
+client_event_test = executable('test-client-event',
+  '../tests/test-client-event.c', 'nd-client-event.c',
+  include_directories: include_directories('.'),
+  dependencies: dependency('gobject-2.0'),
+  build_by_default: false,
+)
+test('client-event', client_event_test)
+
+mice_client_event_test = executable('test-mice-client-event',
+  '../tests/test-mice-client-event.c', 'nd-sink.c', 'nd-client-event.c',
+  enum_sources,
+  include_directories: include_directories('.'),
+  dependencies: gnome_nd_common_deps,
+  link_with: wfd_server,
+  build_by_default: false,
+)
+test('mice-client-event', mice_client_event_test)
 
 # Daemon sources and dependencies
 gnome_nd_daemon_sources = [
