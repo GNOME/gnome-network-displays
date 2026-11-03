@@ -94,7 +94,7 @@ encoding_perf_probe_cb (GstPad          *pad,
   QOSData *qos_data = user_data;
   GstEvent *event;
 
-  if (info->type != GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM)
+  if (!(info->type & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM))
     return GST_PAD_PROBE_OK;
 
   event = gst_pad_probe_info_get_event (info);

@@ -29,3 +29,12 @@ wfd_server = static_library(
   wfd_server_sources,
   dependencies: wfd_server_deps,
 )
+
+qos_segment_test = executable(
+  'test-wfd-qos-segment',
+  '../../tests/test-wfd-qos-segment.c',
+  dependencies: wfd_server_deps,
+  link_with: wfd_server,
+  build_by_default: false,
+)
+test('wfd-qos-segment', qos_segment_test)
