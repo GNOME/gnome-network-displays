@@ -616,6 +616,11 @@ wfd_client_class_init (WfdClientClass *klass)
 static void
 wfd_client_init (WfdClient *self)
 {
+  /* An expired WFD session must close its control connection so the sink
+   * leaves STREAMING even when the peer never closes its stale TCP socket. */
+  if (g_object_class_find_property (G_OBJECT_GET_CLASS (self), "post-session-timeout"))
+    g_object_set (self, "post-session-timeout", 0, NULL);
+
   self->init_state = INIT_STATE_M0_INVALID;
   self->params = wfd_params_new ();
 }
