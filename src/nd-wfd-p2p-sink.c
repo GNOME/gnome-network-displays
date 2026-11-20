@@ -212,22 +212,25 @@ nd_wfd_p2p_sink_set_property (GObject      *object,
       g_assert (sink->nm_device == NULL);
       sink->nm_device = g_value_dup_object (value);
 
-      g_signal_connect_object (sink->nm_device,
-                               "notify::" NM_DEVICE_ACTIVE_CONNECTION,
-                               (GCallback) notify_active_connection_cb,
-                               sink,
-                               G_CONNECT_SWAPPED);
+      /* Construct-only properties are set to NULL when omitted. */
+      if (sink->nm_device)
+        g_signal_connect_object (sink->nm_device,
+                                 "notify::" NM_DEVICE_ACTIVE_CONNECTION,
+                                 (GCallback) notify_active_connection_cb,
+                                 sink,
+                                 G_CONNECT_SWAPPED);
       break;
 
     case PROP_PEER:
       g_assert (sink->nm_peer == NULL);
       sink->nm_peer = g_value_dup_object (value);
 
-      g_signal_connect_object (sink->nm_peer,
-                               "notify",
-                               (GCallback) peer_notify_cb,
-                               sink,
-                               G_CONNECT_SWAPPED);
+      if (sink->nm_peer)
+        g_signal_connect_object (sink->nm_peer,
+                                 "notify",
+                                 (GCallback) peer_notify_cb,
+                                 sink,
+                                 G_CONNECT_SWAPPED);
       break;
 
     default:

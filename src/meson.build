@@ -90,6 +90,16 @@ mice_client_event_test = executable('test-mice-client-event',
 )
 test('mice-client-event', mice_client_event_test)
 
+p2p_client_event_test = executable('test-p2p-client-event',
+  '../tests/test-p2p-client-event.c', 'nd-sink.c', 'nd-client-event.c', 'nd-firewalld.c',
+  enum_sources,
+  include_directories: include_directories('.'),
+  dependencies: gnome_nd_common_deps,
+  link_with: wfd_server,
+  build_by_default: false,
+)
+test('p2p-client-event', p2p_client_event_test)
+
 # Daemon sources and dependencies
 gnome_nd_daemon_sources = [
   'daemon/main.c',
