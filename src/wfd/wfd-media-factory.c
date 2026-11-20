@@ -46,13 +46,13 @@ encoding_perf_handoff_cb (GstElement *elem, GstBuffer *buf, gpointer user_data)
 {
   g_autoptr(GstClock) clock = NULL;
   QOSData *qos_data = user_data;
-  GstClockTime now;
+  GstClockTimeDiff now;
 
   clock = gst_element_get_clock (elem);
   if (!clock)
     return;
 
-  now = MAX (0, gst_clock_get_time (clock) - gst_element_get_base_time (elem));
+  now = MAX (0, GST_CLOCK_DIFF (gst_element_get_base_time (elem), gst_clock_get_time (clock)));
   if (buf->pts != GST_CLOCK_TIME_NONE)
     {
       GstEvent *qos_event;
