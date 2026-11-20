@@ -17,6 +17,7 @@
  */
 
 #include "gnome-network-displays-config.h"
+#include "nd-client-event.h"
 #include "nd-dummy-wfd-sink.h"
 #include "nd-enum-types.h"
 #include "nd-uri-helpers.h"
@@ -193,22 +194,40 @@ nd_dummy_wfd_sink_sink_iface_init (NdSinkIface *iface)
 }
 
 static void
-play_request_cb (NdDummyWFDSink *sink, GstRTSPContext *ctx, WfdClient *client)
+play_request_on_main (GObject *owner, GObject *client)
 {
-  g_debug ("NdWfdP2PSink: Got play request from client");
+  NdDummyWFDSink *sink = ND_DUMMY_WFD_SINK (owner);
+
+  if (sink->wfd_client != WFD_CLIENT (client))
+    {
+      g_debug ("NdDummyWFDSink: Ignoring play request from a stale client");
+      return;
+    }
+
+  if (sink->state != ND_SINK_STATE_WAIT_STREAMING)
+    {
+      g_debug ("NdDummyWFDSink: Ignoring play request in state %d", sink->state);
+      return;
+    }
+
+  g_debug ("NdDummyWFDSink: Got play request from client");
 
   sink->state = ND_SINK_STATE_STREAMING;
   g_object_notify (G_OBJECT (sink), "state");
 }
 
 static void
-closed_cb (NdDummyWFDSink *sink, WfdClient *client)
+closed_on_main (GObject *owner, GObject *client)
 {
-  if (sink->state == ND_SINK_STATE_DISCONNECTED)
-    return;
+  NdDummyWFDSink *sink = ND_DUMMY_WFD_SINK (owner);
 
-  if (sink->wfd_client == NULL)
-    return;
+  if (sink->wfd_client != WFD_CLIENT (client))
+    {
+      g_debug ("NdDummyWFDSink: Ignoring close of a stale client");
+      return;
+    }
+
+  g_debug ("NdDummyWFDSink: Client closed the connection");
 
   nd_dummy_wfd_sink_sink_stop_stream (ND_SINK (sink));
 }
@@ -216,7 +235,7 @@ closed_cb (NdDummyWFDSink *sink, WfdClient *client)
 static void
 client_connected_cb (NdDummyWFDSink *sink, WfdClient *client, WfdServer *server)
 {
-  g_debug ("NdWfdP2PSink: Got client connection");
+  g_debug ("NdDummyWFDSink: Got client connection");
 
   g_signal_handlers_disconnect_by_func (sink->server, client_connected_cb, sink);
   sink->state = ND_SINK_STATE_WAIT_STREAMING;
@@ -224,17 +243,8 @@ client_connected_cb (NdDummyWFDSink *sink, WfdClient *client, WfdServer *server)
 
   sink->wfd_client = g_object_ref (client);
 
-  g_signal_connect_object (client,
-                           "play-request",
-                           (GCallback) play_request_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
-
-  g_signal_connect_object (client,
-                           "closed",
-                           (GCallback) closed_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
+  nd_client_event_connect (G_OBJECT (client), "play-request", G_OBJECT (sink), play_request_on_main);
+  nd_client_event_connect (G_OBJECT (client), "closed", G_OBJECT (sink), closed_on_main);
 }
 
 static GstElement *
