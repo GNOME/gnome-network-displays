@@ -196,6 +196,34 @@ test_emission_after_sink_finalized (void)
   g_assert_false (g_main_context_pending (g_main_context_default ()));
 }
 
+static void
+test_failed_start_releases_server (void)
+{
+  g_autoptr(GSocketClient) probe = g_socket_client_new ();
+  g_autoptr(GSocketConnection) listener = g_socket_client_connect_to_host (probe, "127.0.0.1", 7250, NULL, NULL);
+
+  /* A running MICE source, e.g. the GND daemon, would accept the connection. */
+  if (listener)
+    {
+      g_test_skip ("Something is listening on 127.0.0.1:7250");
+      return;
+    }
+
+  /* With nothing listening on the MICE signalling port, the start fails after
+   * the RTSP server has been attached. */
+  g_autoptr(NdWFDMiceSink) sink = g_object_new (ND_TYPE_WFD_MICE_SINK, "ip", "127.0.0.1", NULL);
+  GLogLevelFlags fatal = g_log_set_always_fatal (G_LOG_LEVEL_CRITICAL);
+  NdSink *started = nd_sink_start_stream (ND_SINK (sink));
+
+  g_log_set_always_fatal (fatal);
+  g_object_unref (started);
+
+  g_assert_cmpint (sink->state, ==, ND_SINK_STATE_ERROR);
+  g_assert_cmpuint (sink->server_source_id, ==, 0);
+  g_assert_null (sink->server);
+  g_assert_null (sink->signalling_client_conn);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -205,5 +233,6 @@ main (int argc, char **argv)
   g_test_add_func ("/mice-client-event/replaced-client", test_replaced_client_is_ignored);
   g_test_add_func ("/mice-client-event/cancel-before-dispatch", test_cancel_before_dispatch);
   g_test_add_func ("/mice-client-event/emission-after-sink-finalized", test_emission_after_sink_finalized);
+  g_test_add_func ("/mice-client-event/failed-start-releases-server", test_failed_start_releases_server);
   return g_test_run ();
 }

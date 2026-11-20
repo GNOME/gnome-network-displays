@@ -633,9 +633,11 @@ nd_wfd_mice_sink_sink_start_stream (NdSink *sink)
   return g_object_ref (sink);
 
 error:
+  /* Detach the server and close the signalling connection, so that no
+   * receiver can connect to a sink that already failed. */
+  nd_wfd_mice_sink_sink_stop_stream_int (self);
   self->state = ND_SINK_STATE_ERROR;
   g_object_notify (G_OBJECT (self), "state");
-  g_clear_object (&self->server);
 
   return g_object_ref (sink);
 }
