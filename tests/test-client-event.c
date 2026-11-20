@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 
+#include <gio/gio.h>
+
 #include "nd-client-event.h"
 
 typedef struct
@@ -153,10 +155,77 @@ test_event_order (void)
   g_assert_cmpstr (order->str, ==, "PC");
 }
 
+/* GCancellable stands in for the RTSP client: "cancelled" is emitted on the
+ * thread that calls g_cancellable_cancel(). */
+static gpointer
+cancel_from_worker (gpointer data)
+{
+  g_cancellable_cancel (data);
+  return NULL;
+}
+
+static void
+emit_from_worker (GCancellable *client)
+{
+  g_thread_join (g_thread_new ("rtsp-test", cancel_from_worker, client));
+}
+
+static void
+test_connect_dispatches_on_default (void)
+{
+  g_autoptr(GObject) owner = g_object_new (G_TYPE_OBJECT, NULL);
+  g_autoptr(GCancellable) client = g_cancellable_new ();
+  GMainContext *context = g_main_context_default ();
+  TestState state = state_new (context, owner, G_OBJECT (client));
+
+  g_object_set_data (owner, "test-state", &state);
+  g_assert_cmpuint (nd_client_event_connect (G_OBJECT (client), "cancelled", owner, received), !=, 0);
+
+  emit_from_worker (client);
+  g_assert_cmpuint (state.calls, ==, 0);
+  while (g_main_context_iteration (context, FALSE))
+    ;
+  g_assert_cmpuint (state.calls, ==, 1);
+}
+
+static void
+test_connect_owner_finalized (void)
+{
+  GObject *owner = g_object_new (G_TYPE_OBJECT, NULL);
+
+  g_autoptr(GCancellable) client = g_cancellable_new ();
+  gpointer weak_owner = owner;
+
+  g_object_add_weak_pointer (owner, &weak_owner);
+  nd_client_event_connect (G_OBJECT (client), "cancelled", owner, received);
+  g_object_unref (owner);
+  g_assert_null (weak_owner);
+
+  /* The handler is still connected; the dead owner must not be touched. */
+  emit_from_worker (client);
+  g_assert_false (g_main_context_pending (g_main_context_default ()));
+}
+
+static void
+test_connect_disconnect_by_data (void)
+{
+  g_autoptr(GObject) owner = g_object_new (G_TYPE_OBJECT, NULL);
+  g_autoptr(GCancellable) client = g_cancellable_new ();
+
+  nd_client_event_connect (G_OBJECT (client), "cancelled", owner, received);
+  g_assert_cmpuint (g_signal_handlers_disconnect_by_data (client, owner), ==, 1);
+
+  emit_from_worker (client);
+  g_assert_false (g_main_context_pending (g_main_context_default ()));
+}
+
 int
 main (int argc, char **argv)
 {
   g_test_init (&argc, &argv, NULL);
+  g_test_add_func ("/client-event/connect-dispatches-on-default", test_connect_dispatches_on_default);
+  g_test_add_func ("/client-event/connect-owner-finalized", test_connect_owner_finalized);
+  g_test_add_func ("/client-event/connect-disconnect-by-data", test_connect_disconnect_by_data);
   g_test_add_func ("/client-event/worker-context-and-lifetime", test_worker_context_and_lifetime);
   g_test_add_func ("/client-event/always-async-default", test_always_async_default);
   g_test_add_func ("/client-event/source-removal-releases-objects", test_source_removal_releases_objects);

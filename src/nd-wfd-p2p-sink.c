@@ -32,7 +32,6 @@ struct _NdWFDP2PSink
   NdSinkState         state;
 
   GCancellable       *cancellable;
-  GMainContext       *main_context;
 
   NMClient           *nm_client;
   NMDevice           *nm_device;
@@ -254,7 +253,6 @@ nd_wfd_p2p_sink_finalize (GObject *object)
   g_clear_object (&sink->missing_video_codec);
   g_clear_object (&sink->missing_audio_codec);
   g_clear_pointer (&sink->missing_firewall_zone, g_free);
-  g_main_context_unref (sink->main_context);
 
   G_OBJECT_CLASS (nd_wfd_p2p_sink_parent_class)->finalize (object);
 }
@@ -305,8 +303,6 @@ nd_wfd_p2p_sink_init (NdWFDP2PSink *sink)
   sink->uuid = g_uuid_string_random ();
   sink->state = ND_SINK_STATE_DISCONNECTED;
   sink->cancellable = g_cancellable_new ();
-  /* The RTSP server, its timers and the GTK application use this context. */
-  sink->main_context = g_main_context_ref (g_main_context_default ());
 }
 
 static gchar *
@@ -346,20 +342,22 @@ play_request_on_main (GObject *owner, GObject *client)
 {
   NdWFDP2PSink *sink = ND_WFD_P2P_SINK (owner);
 
-  if (sink->wfd_client != WFD_CLIENT (client) ||
-      sink->state != ND_SINK_STATE_WAIT_STREAMING)
-    return;
+  if (sink->wfd_client != WFD_CLIENT (client))
+    {
+      g_debug ("NdWfdP2PSink: Ignoring play request from a stale client");
+      return;
+    }
+
+  if (sink->state != ND_SINK_STATE_WAIT_STREAMING)
+    {
+      g_debug ("NdWfdP2PSink: Ignoring play request in state %d", sink->state);
+      return;
+    }
+
+  g_debug ("NdWfdP2PSink: Got play request from client");
 
   sink->state = ND_SINK_STATE_STREAMING;
   g_object_notify (G_OBJECT (sink), "state");
-}
-
-static void
-play_request_cb (NdWFDP2PSink *sink, GstRTSPContext *ctx, WfdClient *client)
-{
-  g_debug ("NdWfdP2PSink: Got play request from client");
-
-  nd_client_event_queue (sink->main_context, G_OBJECT (sink), G_OBJECT (client), play_request_on_main);
 }
 
 static void
@@ -367,9 +365,16 @@ closed_on_main (GObject *owner, GObject *client)
 {
   NdWFDP2PSink *sink = ND_WFD_P2P_SINK (owner);
 
-  if (sink->wfd_client != WFD_CLIENT (client) ||
-      sink->state == ND_SINK_STATE_DISCONNECTED)
+  if (sink->wfd_client != WFD_CLIENT (client))
+    {
+      g_debug ("NdWfdP2PSink: Ignoring close of a stale client");
+      return;
+    }
+
+  if (sink->state == ND_SINK_STATE_DISCONNECTED)
     return;
+
+  g_debug ("NdWfdP2PSink: Client closed the connection");
 
   nd_wfd_p2p_sink_sink_stop_stream_int (sink);
 
@@ -378,9 +383,12 @@ closed_on_main (GObject *owner, GObject *client)
 }
 
 static void
-closed_cb (NdWFDP2PSink *sink, WfdClient *client)
+watch_client (NdWFDP2PSink *sink, WfdClient *client)
 {
-  nd_client_event_queue (sink->main_context, G_OBJECT (sink), G_OBJECT (client), closed_on_main);
+  sink->wfd_client = g_object_ref (client);
+
+  nd_client_event_connect (G_OBJECT (client), "play-request", G_OBJECT (sink), play_request_on_main);
+  nd_client_event_connect (G_OBJECT (client), "closed", G_OBJECT (sink), closed_on_main);
 }
 
 static void
@@ -392,19 +400,7 @@ client_connected_cb (NdWFDP2PSink *sink, WfdClient *client, WfdServer *server)
   sink->state = ND_SINK_STATE_WAIT_STREAMING;
   g_object_notify (G_OBJECT (sink), "state");
 
-  sink->wfd_client = g_object_ref (client);
-
-  g_signal_connect_object (client,
-                           "play-request",
-                           (GCallback) play_request_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
-
-  g_signal_connect_object (client,
-                           "closed",
-                           (GCallback) closed_cb,
-                           sink,
-                           G_CONNECT_SWAPPED);
+  watch_client (sink, client);
 }
 
 static GstElement *

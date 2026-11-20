@@ -75,7 +75,7 @@ gnome_nd_common_deps += cc_deps
 client_event_test = executable('test-client-event',
   '../tests/test-client-event.c', 'nd-client-event.c',
   include_directories: include_directories('.'),
-  dependencies: dependency('gobject-2.0'),
+  dependencies: dependency('gio-2.0'),
   build_by_default: false,
 )
 test('client-event', client_event_test)
